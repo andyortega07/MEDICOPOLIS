@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>MEDICOPOLIS — Tablero de Juego</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body {
+    background: #2C1506;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px;
+    min-height: 100vh;
+  }
+  .board-wrap {
+    width: min(96vw, 96vh);
+    aspect-ratio: 1;
+    max-width: 900px;
+    max-height: 900px;
+  }
+  svg { width:100%; height:100%; display:block; }
+  @media print {
+    body { padding:0; background:#2C1506; }
+    .board-wrap { width:100%; height:auto; }
+    @page { size: 60cm 60cm; margin:0; }
+  }
+</style>
+</head>
+<body>
+<div class="board-wrap">
+<svg viewBox="0 0 900 900" xmlns="http://www.w3.org/2000/svg">
+<defs>
+
+  <!-- ══ MADERA BASE TABLERO (vetas horizontales) ══ -->
+  <linearGradient id="woodMain" x1="0%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0%"   stop-color="#7A4520"/>
+    <stop offset="6%"   stop-color="#8C5528"/>
+    <stop offset="12%"  stop-color="#6B3A18"/>
+    <stop offset="18%"  stop-color="#9A6030"/>
+    <stop offset="24%"  stop-color="#7A4520"/>
+    <stop offset="30%"  stop-color="#6B3A18"/>
+    <stop offset="36%"  stop-color="#8C5528"/>
+    <stop offset="42%"  stop-color="#5C3010"/>
+    <stop offset="48%"  stop-color="#9A6030"/>
+    <stop offset="54%"  stop-color="#7A4520"/>
+    <stop offset="60%"  stop-color="#6B3A18"/>
+    <stop offset="66%"  stop-color="#8C5528"/>
+    <stop offset="72%"  stop-color="#9A6030"/>
+    <stop offset="78%"  stop-color="#7A4520"/>
+    <stop offset="84%"  stop-color="#5C3010"/>
+    <stop offset="90%"  stop-color="#8C5528"/>
+    <stop offset="100%" stop-color="#6B3A18"/>
+  </linearGradient>
+
+  <!-- Vetas diagonales -->
+  <pattern id="grainPat" width="300" height="900" patternUnits="userSpaceOnUse">
+    <path d="M-10 0 Q80 450 -10 900"   stroke="#3D1A06" stroke-width="2.5" fill="none" opacity="0.22"/>
+    <path d="M15 0 Q105 450 15 900"    stroke="#5C2E0E" stroke-width="1.2" fill="none" opacity="0.18"/>
+    <path d="M40 0 Q130 450 40 900"    stroke="#2E1204" stroke-width="3"   fill="none" opacity="0.15"/>
+    <path d="M65 0 Q155 450 65 900"    stroke="#7A4520" stroke-width="0.8" fill="none" opacity="0.25"/>
+    <path d="M90 0 Q180 450 90 900"    stroke="#3D1A06" stroke-width="1.8" fill="none" opacity="0.2"/>
+    <path d="M115 0 Q205 450 115 900"  stroke="#5C2E0E" stroke-width="1"   fill="none" opacity="0.18"/>
+    <path d="M140 0 Q230 450 140 900"  stroke="#2E1204" stroke-width="2.2" fill="none" opacity="0.16"/>
+    <path d="M170 0 Q260 450 170 900"  stroke="#7A4520" stroke-width="0.7" fill="none" opacity="0.22"/>
+    <path d="M200 0 Q290 450 200 900"  stroke="#3D1A06" stroke-width="1.5" fill="none" opacity="0.2"/>
+    <path d="M230 0 Q320 450 230 900"  stroke="#5C2E0E" stroke-width="2.8" fill="none" opacity="0.14"/>
+    <path d="M260 0 Q350 450 260 900"  stroke="#2E1204" stroke-width="1.1" fill="none" opacity="0.19"/>
+    <path d="M290 0 Q195 450 290 900"  stroke="#7A4520" stroke-width="1.6" fill="none" opacity="0.2"/>
+  </pattern>
+
+  <!-- Nudo de madera decorativo -->
+  <radialGradient id="woodKnot1" cx="50%" cy="50%" r="50%">
+    <stop offset="0%"   stop-color="#2E1204" stop-opacity="0.5"/>
+    <stop offset="40%"  stop-color="#5C2E0E" stop-opacity="0.25"/>
+    <stop offset="100%" stop-color="#7A4520" stop-opacity="0"/>
+  </radialGradient>
+
+  <!-- Barniz / sheen -->
+  <linearGradient id="varnish" x1="0%" y1="0%" x2="15%" y2="100%">
+    <stop offset="0%"   stop-color="#FFFFFF" stop-opacity="0.08"/>
+    <stop offset="40%"  stop-color="#D4A060" stop-opacity="0.04"/>
+    <stop offset="100%" stop-color="#000000" stop-opacity="0.12"/>
+  </linearGradient>
+
+  <!-- Marco de madera oscura -->
+  <linearGradient id="woodFrame" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%"   stop-color="#3D1A06"/>
+    <stop offset="30%"  stop-color="#5C2E0E"/>
+    <stop offset="60%"  stop-color="#2E1204"/>
+    <stop offset="100%" stop-color="#4A2210"/>
+  </linearGradient>
+
+  <!-- Borde dorado madera -->
+  <linearGradient id="goldBorder" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%"   stop-color="#D4A840"/>
+    <stop offset="35%"  stop-color="#F0C860"/>
+    <stop offset="65%"  stop-color="#B88828"/>
+    <stop offset="100%" stop-color="#E0B850"/>
+  </linearGradient>
+
+  <!-- ══ MADERA PARA CASILLAS (versiones oscuras por categoría) ══ -->
+  <!-- Cardio - madera caoba rojiza -->
+  <linearGradient id="wCardio" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%"   stop-color="#5C1A10"/>
+    <stop offset="25%"  stop-color="#6B2418"/>
+    <stop offset="50%"  stop-color="#4A1208"/>
+    <stop offset="75%"  stop-color="#6B2418"/>
+    <stop offset="100%" stop-color="#5C1A10"/>
+  </linearGradient>
+  <pattern id="grainCardio" width="75" height="120" patternUnits="userSpaceOnUse">
+    <path d="M0 0 Q37 60 0 120"  stroke="#3A0E08" stroke-width="1.5" fill="none" opacity="0.3"/>
+    <path d="M20 0 Q57 60 20 120" stroke="#7A2A20" stroke-width="0.8" fill="none" opacity="0.2"/>
+    <path d="M45 0 Q82 60 45 120" stroke="#3A0E08" stroke-width="2"   fill="none" opacity="0.22"/>
+    <path d="M65 0 Q28 60 65 120" stroke="#7A2A20" stroke-width="1"   fill="none" opacity="0.18"/>
+  </pattern>
+
+  <!-- Nutrición - madera verde oliva oscura -->
+  <linearGradient id="wNutri" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%"   stop-color="#1A3D18"/>
+    <stop offset="25%"  stop-color="#244D20"/>
+    <stop offset="50%"  stop-color="#142E10"/>
+    <stop offset="75%"  stop-color="#244D20"/>
+    <stop offset="100%" stop-color="#1A3D18"/>
+  </linearGradient>
+  <pattern id="grainNutri" width="75" height="120" patternUnits="userSpaceOnUse">
+    <path d="M0 0 Q37 60 0 120"  stroke="#0E2008" stroke-width="1.5" fill="none" opacity="0.3"/>
+    <path d="M22 0 Q59 60 22 120" stroke="#2A5A28" stroke-width="0.8" fill="none" opacity="0.2"/>
+    <path d="M48 0 Q85 60 48 120" stroke="#0E2008" stroke-width="2"   fill="none" opacity="0.22"/>
+    <path d="M68 0 Q31 60 68 120" stroke="#2A5A28" stroke-width="1"   fill="none" opacity="0.18"/>
+  </pattern>
+
+  <!-- Diabetes - madera ámbar tostada -->
+  <linearGradient id="wDiab" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%"   stop-color="#4A3A08"/>
+    <stop offset="25%"  stop-color="#5A4810"/>
+    <stop offset="50%"  stop-color="#382C04"/>
+    <stop offset="75%"  stop-color="#5A4810"/>
+    <stop offset="100%" stop-color="#4A3A08"/>
+  </linearGradient>
+  <pattern id="grainDiab" width="75" height="120" patternUnits="userSpaceOnUse">
+    <path d="M0 0 Q37 60 0 120"  stroke="#2A1E02" stroke-width="1.5" fill="none" opacity="0.3"/>
+    <path d="M20 0 Q57 60 20 120" stroke="#6A5A18" stroke-width="0.8" fill="none" opacity="0.2"/>
+    <path d="M45 0 Q82 60 45 120" stroke="#2A1E02" stroke-width="2"   fill="none" opacity="0.22"/>
+    <path d="M68 0 Q31 60 68 120" stroke="#6A5A18" stroke-width="1"   fill="none" opacity="0.18"/>
+  </pattern>
+
+  <!-- Pulmonar - madera azul pizarra oscura -->
+  <linearGradient id="wResp" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%"   stop-color="#0E2038"/>
+    <stop offset="25%"  stop-color="#163050"/>
+    <stop offset="50%"  stop-color="#081828"/>
+    <stop offset="75%"  stop-color="#163050"/>
+    <stop offset="100%" stop-color="#0E2038"/>
+  </linearGradient>
+  <pattern id="grainResp" width="75" height="120" patternUnits="userSpaceOnUse">
+    <path d="M0 0 Q37 60 0 120"  stroke="#061018" stroke-width="1.5" fill="none" opacity="0.35"/>
+    <path d="M22 0 Q59 60 22 120" stroke="#1A3858" stroke-width="0.8" fill="none" opacity="0.22"/>
+    <path d="M48 0 Q85 60 48 120" stroke="#061018" stroke-width="2"   fill="none" opacity="0.25"/>
+    <path d="M68 0 Q31 60 68 120" stroke="#1A3858" stroke-width="1"   fill="none" opacity="0.2"/>
+  </pattern>
+
+  <!-- Oncología - madera morada oscura -->
+  <linearGradient id="wOnco" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%"   stop-color="#2E1040"/>
+    <stop offset="25%"  stop-color="#3C1850"/>
+    <stop offset="50%"  stop-color="#220830"/>
+    <stop offset="75%"  stop-color="#3C1850"/>
+    <stop offset="100%" stop-color="#2E1040"/>
+  </linearGradient>
+  <pattern id="grainOnco" width="75" height="120" patternUnits="userSpaceOnUse">
+    <path d="M0 0 Q37 60 0 120"  stroke="#180620" stroke-width="1.5" fill="none" opacity="0.35"/>
+    <path d="M22 0 Q59 60 22 120" stroke="#4A2060" stroke-width="0.8" fill="none" opacity="0.22"/>
+    <path d="M48 0 Q85 60 48 120" stroke="#180620" stroke-width="2"   fill="none" opacity="0.25"/>
+    <path d="M68 0 Q31 60 68 120" stroke="#4A2060" stroke-width="1"   fill="none" opacity="0.2"/>
+  </pattern>
+
+  <!-- Salud - madera verde esmeralda -->
+  <linearGradient id="wSalud" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%"   stop-color="#0C3828"/>
+    <stop offset="25%"  stop-color="#144830"/>
+    <stop offset="50%"  stop-color="#082C1C"/>
+    <stop offset="75%"  stop-color="#144830"/>
+    <stop offset="100%" stop-color="#0C3828"/>
+  </linearGradient>
+  <pattern id="grainSalud" width="75" height="120" patternUnits="userSpaceOnUse">
+    <path d="M0 0 Q37 60 0 120"  stroke="#041810" stroke-width="1.5" fill="none" opacity="0.35"/>
+    <path d="M22 0 Q59 60 22 120" stroke="#1C5038" stroke-width="0.8" fill="none" opacity="0.22"/>
+    <path d="M48 0 Q85 60 48 120" stroke="#041810" stroke-width="2"   fill="none" opacity="0.25"/>
+    <path d="M68 0 Q31 60 68 120" stroke="#1C5038" stroke-width="1"   fill="none" opacity="0.2"/>
+  </pattern>
+
+  <!-- Riesgo - madera vino oscuro -->
+  <linearGradient id="wRiesgo" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%"   stop-color="#3A1050"/>
+    <stop offset="25%"  stop-color="#481860"/>
+    <stop offset="50%"  stop-color="#2C0840"/>
+    <stop offset="75%"  stop-color="#481860"/>
+    <stop offset="100%" stop-color="#3A1050"/>
+  </linearGradient>
+  <pattern id="grainRiesgo" width="75" height="120" patternUnits="userSpaceOnUse">
+    <path d="M0 0 Q37 60 0 120"  stroke="#1E0428" stroke-width="1.5" fill="none" opacity="0.35"/>
+    <path d="M22 0 Q59 60 22 120" stroke="#502070" stroke-width="0.8" fill="none" opacity="0.22"/>
+    <path d="M48 0 Q85 60 48 120" stroke="#1E0428" stroke-width="2"   fill="none" opacity="0.25"/>
+    <path d="M68 0 Q31 60 68 120" stroke="#502070" stroke-width="1"   fill="none" opacity="0.2"/>
+  </pattern>
+
+  <!-- Pago - madera ámbar dorada -->
+  <linearGradient id="wPago" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%"   stop-color="#4A3808"/>
+    <stop offset="25%"  stop-color="#5C4810"/>
+    <stop offset="50%"  stop-color="#382C04"/>
+    <stop offset="75%"  stop-color="#5C4810"/>
+    <stop offset="100%" stop-color="#4A3808"/>
+  </linearGradient>
+  <pattern id="grainPago" width="75" height="120" patternUnits="userSpaceOnUse">
+    <path d="M0 0 Q37 60 0 120"  stroke="#281E02" stroke-width="1.5" fill="none" opacity="0.3"/>
+    <path d="M20 0 Q57 60 20 120" stroke="#6C5818" stroke-width="0.8" fill="none" opacity="0.2"/>
+    <path d="M45 0 Q82 60 45 120" stroke="#281E02" stroke-width="2"   fill="none" opacity="0.22"/>
+    <path d="M68 0 Q31 60 68 120" stroke="#6C5818" stroke-width="1"   fill="none" opacity="0.18"/>
+  </pattern>
+
+  <!-- Madera oscura central -->
+  <radialGradient id="centerWood" cx="50%" cy="50%" r="60%">
+    <stop offset="0%"   stop-color="#3A1C08"/>
+    <stop offset="40%"  stop-color="#2E1406"/>
+    <stop offset="100%" stop-color="#1E0C02"/>
+  </radialGradient>
+  <pattern id="grainCenter" width="400" height="400" patternUnits="userSpaceOnUse" x="112" y="112">
+    <path d="M0 0 Q200 200 0 400"    stroke="#1A0A02" stroke-width="3"   fill="none" opacity="0.2"/>
+    <path d="M50 0 Q250 200 50 400"  stroke="#5C2E10" stroke-width="1.5" fill="none" opacity="0.15"/>
+    <path d="M100 0 Q300 200 100 400" stroke="#1A0A02" stroke-width="4" fill="none" opacity="0.12"/>
+    <path d="M160 0 Q360 200 160 400" stroke="#4A2010" stroke-width="2" fill="none" opacity="0.14"/>
+    <path d="M220 0 Q420 200 220 400" stroke="#1A0A02" stroke-width="1.5" fill="none" opacity="0.16"/>
+    <path d="M280 0 Q80 200 280 400" stroke="#5C2E10" stroke-width="2.5" fill="none" opacity="0.13"/>
+    <path d="M340 0 Q140 200 340 400" stroke="#1A0A02" stroke-width="1.8" fill="none" opacity="0.15"/>
+  </pattern>
+
+  <!-- Gradientes de acento para tops de casillas -->
+  <linearGradient id="gCardio" x1="0%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0%" stop-color="#C0392B"/><stop offset="100%" stop-color="#7B241C"/>
+  </linearGradient>
+  <linearGradient id="gNutri" x1="0%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0%" stop-color="#1E8449"/><stop offset="100%" stop-color="#145A32"/>
+  </linearGradient>
+  <linearGradient id="gDiab" x1="0%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0%" stop-color="#D4AC0D"/><stop offset="100%" stop-color="#9A7D0A"/>
+  </linearGradient>
+  <linearGradient id="gResp" x1="0%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0%" stop-color="#1A5276"/><stop offset="100%" stop-color="#0E2F44"/>
+  </linearGradient>
+  <linearGradient id="gOnco" x1="0%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0%" stop-color="#7D3C98"/><stop offset="100%" stop-color="#4A235A"/>
+  </linearGradient>
+  <linearGradient id="gSalud" x1="0%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0%" stop-color="#117A65"/><stop offset="100%" stop-color="#0E6655"/>
+  </linearGradient>
+  <linearGradient id="gRiesgo" x1="0%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0%" stop-color="#7D3C98"/><stop offset="100%" stop-color="#6C3483"/>
+  </linearGradient>
+  <linearGradient id="gPago" x1="0%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0%" stop-color="#B7950B"/><stop offset="100%" stop-color="#7D6608"/>
+  </linearGradient>
+  <linearGradient id="cornerTeal" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="#028090"/><stop offset="100%" stop-color="#02C39A"/>
+  </linearGradient>
+
+  <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+    <feGaussianBlur stdDeviation="3" result="blur"/>
+    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="glow2" x="-10%" y="-10%" width="120%" height="120%">
+    <feGaussianBlur stdDeviation="1.5" result="blur"/>
+    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="shadow">
+    <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.6"/>
+  </filter>
+  <filter id="innerShadow">
+    <feDropShadow dx="1" dy="1" stdDeviation="2" flood-color="#000" flood-opacity="0.4"/>
+  </filter>
+</defs>
+
+<!-- ══ FONDO TABLERO MADERA ══ -->
+<rect width="900" height="900" fill="url(#woodMain)" rx="14"/>
+<rect width="900" height="900" fill="url(#grainPat)"  rx="14" opacity="0.85"/>
+<rect width="900" height="900" fill="url(#varnish)"   rx="14"/>
+<!-- Nudos decorativos -->
+<ellipse cx="200" cy="180" rx="55" ry="35" fill="url(#woodKnot1)" opacity="0.6"/>
+<ellipse cx="700" cy="720" rx="65" ry="40" fill="url(#woodKnot1)" opacity="0.5"/>
+<ellipse cx="750" cy="200" rx="40" ry="28" fill="url(#woodKnot1)" opacity="0.4"/>
+<ellipse cx="180" cy="700" rx="48" ry="32" fill="url(#woodKnot1)" opacity="0.45"/>
+
+<!-- Marco exterior madera oscura laminada -->
+<rect x="2"  y="2"  width="896" height="896" fill="none" stroke="url(#goldBorder)"  stroke-width="5"   rx="13"/>
+<rect x="7"  y="7"  width="886" height="886" fill="none" stroke="#2E1204"           stroke-width="3"   rx="10"/>
+<rect x="11" y="11" width="878" height="878" fill="none" stroke="#D4A840"           stroke-width="1.2" rx="8"  opacity="0.7"/>
+<rect x="14" y="14" width="872" height="872" fill="none" stroke="#5C2E0E"           stroke-width="1.5" rx="7"  opacity="0.5"/>
+<rect x="17" y="17" width="866" height="866" fill="none" stroke="#E0B850"           stroke-width="0.6" rx="6"  opacity="0.4"/>
+
+<!-- Tachuelas de esquina -->
+<circle cx="22" cy="22" r="8" fill="#5C2E0E" stroke="#D4A840" stroke-width="1.5"/>
+<circle cx="22" cy="22" r="3" fill="#D4A840"/>
+<circle cx="878" cy="22"  r="8" fill="#5C2E0E" stroke="#D4A840" stroke-width="1.5"/>
+<circle cx="878" cy="22"  r="3" fill="#D4A840"/>
+<circle cx="22"  cy="878" r="8" fill="#5C2E0E" stroke="#D4A840" stroke-width="1.5"/>
+<circle cx="22"  cy="878" r="3" fill="#D4A840"/>
+<circle cx="878" cy="878" r="8" fill="#5C2E0E" stroke="#D4A840" stroke-width="1.5"/>
+<circle cx="878" cy="878" r="3" fill="#D4A840"/>
+
+
+<!-- ══════════════════════════════════
+     CORNERS
+══════════════════════════════════ -->
+
+<!-- Bottom-Right: SALIDA -->
+<g transform="translate(788,788)">
+  <rect width="110" height="110" fill="url(#cornerTeal)" rx="7" filter="url(#shadow)"/>
+  <rect x="0" y="0" width="110" height="10" fill="#02C39A" rx="5"/>
+  <rect x="44" y="24" width="22" height="7" fill="white" rx="2"/>
+  <rect x="50" y="18" width="10" height="19" fill="white" rx="2"/>
+  <text x="55" y="60"  text-anchor="middle" fill="white"   font-size="11" font-family="Georgia" font-weight="bold">SALIDA</text>
+  <text x="55" y="76"  text-anchor="middle" fill="#d0fff5"  font-size="9"  font-family="Georgia">AL PASAR</text>
+  <text x="55" y="93"  text-anchor="middle" fill="white"   font-size="12" font-family="Georgia" font-weight="bold">COBRA $200</text>
+  <text x="55" y="107" text-anchor="middle" fill="#d0fff5"  font-size="8"  font-family="Georgia">🏥 INICIO</text>
+</g>
+
+<!-- Bottom-Left: VISITA HOSPITAL -->
+<g transform="translate(2,788)">
+  <rect width="110" height="110" fill="#1A0A02" rx="7" filter="url(#shadow)"/>
+  <rect width="110" height="110" fill="url(#grainPat)" rx="7" opacity="0.5"/>
+  <rect x="0" y="0" width="110" height="10" fill="#028090" rx="5"/>
+  <rect x="25" y="26" width="60" height="36" fill="#0D2B45" rx="4" stroke="#028090" stroke-width="1.2"/>
+  <rect x="25" y="32" width="60" height="14" fill="#028090" rx="2" opacity="0.7"/>
+  <circle cx="55" cy="39" r="8" fill="#1E8449"/>
+  <rect x="50" y="36" width="10" height="2.5" fill="white" rx="1"/>
+  <rect x="53.5" y="33" width="2.5" height="10" fill="white" rx="1"/>
+  <text x="55" y="76"  text-anchor="middle" fill="#4ab8c8"  font-size="9.5" font-family="Georgia" font-weight="bold">VISITA AL</text>
+  <text x="55" y="90"  text-anchor="middle" fill="white"    font-size="10"  font-family="Georgia" font-weight="bold">HOSPITAL</text>
+  <text x="55" y="105" text-anchor="middle" fill="#C8A060"  font-size="8"   font-family="Georgia">Solo visita</text>
+</g>
+
+<!-- Top-Left: UCI EMERGENCIA -->
+<g transform="translate(2,2)">
+  <rect width="110" height="110" fill="#1A0A02" rx="7" filter="url(#shadow)"/>
+  <rect width="110" height="110" fill="url(#grainPat)" rx="7" opacity="0.4"/>
+  <rect x="0" y="0" width="110" height="10" fill="#C0392B" rx="5"/>
+  <polygon points="55,22 80,62 30,62" fill="none" stroke="#F96167" stroke-width="2.5" stroke-linejoin="round"/>
+  <text x="55" y="57"  text-anchor="middle" fill="#F96167" font-size="16" font-weight="bold">!</text>
+  <text x="55" y="78"  text-anchor="middle" fill="#F96167" font-size="13" font-family="Georgia" font-weight="bold">UCI</text>
+  <text x="55" y="92"  text-anchor="middle" fill="white"   font-size="9.5" font-family="Georgia">EMERGENCIA</text>
+  <text x="55" y="106" text-anchor="middle" fill="#C8A060" font-size="8"   font-family="Georgia">Pierde 2 turnos</text>
+</g>
+
+<!-- Top-Right: ZONA LIBRE -->
+<g transform="translate(788,2)">
+  <rect width="110" height="110" fill="#1A0A02" rx="7" filter="url(#shadow)"/>
+  <rect width="110" height="110" fill="url(#grainPat)" rx="7" opacity="0.4"/>
+  <rect x="0" y="0" width="110" height="10" fill="url(#cornerTeal)" rx="5"/>
+  <text x="55" y="43" text-anchor="middle" fill="#02C39A" font-size="28">🛡</text>
+  <text x="55" y="66" text-anchor="middle" fill="white"   font-size="13" font-family="Georgia" font-weight="bold">ZONA</text>
+  <text x="55" y="82" text-anchor="middle" fill="#02C39A" font-size="13" font-family="Georgia" font-weight="bold">LIBRE</text>
+  <text x="55" y="96" text-anchor="middle" fill="#C8A060" font-size="9"  font-family="Georgia">Descansa</text>
+  <text x="55" y="108" text-anchor="middle" fill="#C8A060" font-size="9" font-family="Georgia">sin pagar 🌿</text>
+</g>
+
+
+<!-- ══════════════════════════════════
+     BOTTOM ROW (right→left)
+══════════════════════════════════ -->
+
+<!-- C-1 Hipertensión -->
+<g transform="translate(713,788)">
+  <rect width="75" height="110" fill="url(#wCardio)" rx="4" filter="url(#innerShadow)"/>
+  <rect width="75" height="110" fill="url(#grainCardio)" rx="4" opacity="0.6"/>
+  <rect x="0" y="0" width="75" height="9" fill="url(#gCardio)" rx="3"/>
+  <text x="37" y="28"  text-anchor="middle" fill="#ff9090" font-size="17">❤</text>
+  <text x="37" y="48"  text-anchor="middle" fill="#FFD0C0" font-size="8.5" font-family="Georgia" font-weight="bold">CARDIO</text>
+  <text x="37" y="61"  text-anchor="middle" fill="#FFB8A8" font-size="7.5" font-family="Georgia">Hipertensión</text>
+  <line x1="8" y1="72" x2="67" y2="72" stroke="#C0392B" stroke-width="0.7" opacity="0.6"/>
+  <text x="37" y="87"  text-anchor="middle" fill="#F0C860" font-size="10" font-weight="bold" font-family="Georgia">$120</text>
+  <text x="37" y="103" text-anchor="middle" fill="#A08060" font-size="7.5" font-family="Georgia">C-1</text>
+</g>
+
+<!-- Tarjeta Salud -->
+<g transform="translate(638,788)">
+  <rect width="75" height="110" fill="url(#wSalud)" rx="4" filter="url(#innerShadow)"/>
+  <rect width="75" height="110" fill="url(#grainSalud)" rx="4" opacity="0.6"/>
+  <rect x="0" y="0" width="75" height="9" fill="url(#gSalud)" rx="3"/>
+  <text x="37" y="30"  text-anchor="middle" fill="white"   font-size="8.5" font-family="Georgia" font-weight="bold">TARJETA</text>
+  <text x="37" y="44"  text-anchor="middle" fill="#90E8A0" font-size="8.5" font-family="Georgia" font-weight="bold">SALUD</text>
+  <rect x="22" y="52"  width="31" height="31" fill="#117A65" rx="5" opacity="0.9"/>
+  <rect x="31" y="59"  width="13" height="4"  fill="white" rx="1.5"/>
+  <rect x="36" y="54"  width="4"  height="13" fill="white" rx="1.5"/>
+  <text x="37" y="100" text-anchor="middle" fill="#90E8A0" font-size="7.5" font-family="Georgia">Beneficio (+)</text>
+</g>
+
+<!-- N-1 Alimentación -->
+<g transform="translate(563,788)">
+  <rect width="75" height="110" fill="url(#wNutri)" rx="4" filter="url(#innerShadow)"/>
+  <rect width="75" height="110" fill="url(#grainNutri)" rx="4" opacity="0.6"/>
+  <rect x="0" y="0" width="75" height="9" fill="url(#gNutri)" rx="3"/>
+  <text x="37" y="28"  text-anchor="middle" fill="#90E898" font-size="17">🥦</text>
+  <text x="37" y="48"  text-anchor="middle" fill="#C8F0C0" font-size="8.5" font-family="Georgia" font-weight="bold">NUTRICIÓN</text>
+  <text x="37" y="61"  text-anchor="middle" fill="#A8D8A0" font-size="7.5" font-family="Georgia">Alimentación</text>
+  <line x1="8" y1="72" x2="67" y2="72" stroke="#1E8449" stroke-width="0.7" opacity="0.6"/>
+  <text x="37" y="87"  text-anchor="middle" fill="#F0C860" font-size="10" font-weight="bold" font-family="Georgia">$100</text>
+  <text x="37" y="103" text-anchor="middle" fill="#A08060" font-size="7.5" font-family="Georgia">N-1</text>
+</g>
+
+<!-- N-2 Obesidad -->
+<g transform="translate(488,788)">
+  <rect width="75" height="110" fill="url(#wNutri)" rx="4" filter="url(#innerShadow)"/>
+  <rect width="75" height="110" fill="url(#grainNutri)" rx="4" opacity="0.6"/>
+  <rect x="0" y="0" width="75" height="9" fill="url(#gNutri)" rx="3"/>
+  <text x="37" y="28"  text-anchor="middle" fill="#90E898" font-size="17">🥗</text>
+  <text x="37" y="48"  text-anchor="middle" fill="#C8F0C0" font-size="8.5" font-family="Georgia" font-weight="bold">NUTRICIÓN</text>
+  <text x="37" y="61"  text-anchor="middle" fill="#A8D8A0" font-size="7.5" font-family="Georgia">Obesidad</text>
+  <line x1="8" y1="72" x2="67" y2="72" stroke="#1E8449" stroke-width="0.7" opacity="0.6"/>
+  <text x="37" y="87"  text-anchor="middle" fill="#F0C860" font-size="10" font-weight="bold" font-family="Georgia">$120</text>
+  <text x="37" y="103" text-anchor="middle" fill="#A08060" font-size="7.5" font-family="Georgia">N-2</text>
+</g>
+
+<!-- Consulta Médica -->
+<g transform="translate(413,788)">
+  <rect width="75" height="110" fill="url(#wPago)" rx="4" filter="url(#innerShadow)"/>
+  <rect width="75" height="110" fill="url(#grainPago)" rx="4" opacity="0.6"/>
+  <rect x="0" y="0" width="75" height="9" fill="url(#gPago)" rx="3"/>
+  <text x="37" y="28"  text-anchor="middle" fill="#F8E890" font-size="17">💊</text>
+  <text x="37" y="48"  text-anchor="middle" fill="#F8E890" font-size="8.5" font-family="Georgia" font-weight="bold">CONSULTA</text>
+  <text x="37" y="61"  text-anchor="middle" fill="#D8C870" font-size="7.5" font-family="Georgia">Médica</text>
+  <line x1="8" y1="72" x2="67" y2="72" stroke="#D4AC0D" stroke-width="0.7" opacity="0.6"/>
+  <text x="37" y="87"  text-anchor="middle" fill="#E8C840" font-size="9"  font-weight="bold" font-family="Georgia">PAGA</text>
+  <text x="37" y="103" text-anchor="middle" fill="#E8C840" font-size="10" font-weight="bold" font-family="Georgia">$75</text>
+</g>
+
+<!-- D-1 Diabetes Tipo 2 -->
+<g transform="translate(338,788)">
+  <rect width="75" height="110" fill="url(#wDiab)" rx="4" filter="url(#innerShadow)"/>
+  <rect width="75" height="110" fill="url(#grainDiab)" rx="4" opacity="0.6"/>
+  <rect x="0" y="0" width="75" height="9" fill="url(#gDiab)" rx="3"/>
+  <text x="37" y="28"  text-anchor="middle" fill="#F8E898" font-size="17">🩸</text>
+  <text x="37" y="48"  text-anchor="middle" fill="#F8E898" font-size="8.5" font-family="Georgia" font-weight="bold">DIABETES</text>
+  <text x="37" y="61"  text-anchor="middle" fill="#D8C878" font-size="7.5" font-family="Georgia">Tipo 2</text>
+  <line x1="8" y1="72" x2="67" y2="72" stroke="#D4AC0D" stroke-width="0.7" opacity="0.6"/>
+  <text x="37" y="87"  text-anchor="middle" fill="#F0C860" font-size="10" font-weight="bold" font-family="Georgia">$140</text>
+  <text x="37" y="103" text-anchor="middle" fill="#A08060" font-size="7.5" font-family="Georgia">D-1</text>
+</g>
+
+<!-- C-2 Infarto -->
+<g transform="translate(263,788)">
+  <rect width="75" height="110" fill="url(#wCardio)" rx="4" filter="url(#innerShadow)"/>
+  <rect width="75" height="110" fill="url(#grainCardio)" rx="4" opacity="0.6"/>
+  <rect x="0" y="0" width="75" height="9" fill="url(#gCardio)" rx="3"/>
+  <text x="37" y="28"  text-anchor="middle" fill="#FF9090" font-size="17">🫀</text>
+  <text x="37" y="48"  text-anchor="middle" fill="#FFD0C0" font-size="8.5" font-family="Georgia" font-weight="bold">CARDIO</text>
+  <text x="37" y="61"  text-anchor="middle" fill="#FFB8A8" font-size="7.5" font-family="Georgia">Infarto</text>
+  <line x1="8" y1="72" x2="67" y2="72" stroke="#C0392B" stroke-width="0.7" opacity="0.6"/>
+  <text x="37" y="87"  text-anchor="middle" fill="#F0C860" font-size="10" font-weight="bold" font-family="Georgia">$160</text>
+  <text x="37" y="103" text-anchor="middle" fill="#A08060" font-size="7.5" font-family="Georgia">C-2</text>
+</g>
+
+<!-- Tarjeta Riesgo -->
+<g transform="translate(188,788)">
+  <rect width="75" height="110" fill="url(#wRiesgo)" rx="4" filter="url(#innerShadow)"/>
+  <rect width="75" height="110" fill="url(#grainRiesgo)" rx="4" opacity="0.6"/>
+  <rect x="0" y="0" width="75" height="9" fill="url(#gRiesgo)" rx="3"/>
+  <text x="37" y="30"  text-anchor="middle" fill="white"   font-size="8.5" font-family="Georgia" font-weight="bold">TARJETA</text>
+  <text x="37" y="44"  text-anchor="middle" fill="#D8B8F0" font-size="8.5" font-family="Georgia" font-weight="bold">RIESGO</text>
+  <rect x="22" y="52"  width="31" height="31" fill="#7D3C98" rx="5" opacity="0.9"/>
+  <text x="37" y="74"  text-anchor="middle" fill="white"   font-size="18" font-weight="bold">!</text>
+  <text x="37" y="100" text-anchor="middle" fill="#D8B8F0" font-size="7.5" font-family="Georgia">Penalidad (!)</text>
+</g>
+
+<!-- R-1 EPOC -->
+<g transform="translate(113,788)">
+  <rect width="75" height="110" fill="url(#wResp)" rx="4" filter="url(#innerShadow)"/>
+  <rect width="75" height="110" fill="url(#grainResp)" rx="4" opacity="0.6"/>
+  <rect x="0" y="0" width="75" height="9" fill="url(#gResp)" rx="3"/>
+  <text x="37" y="28"  text-anchor="middle" fill="#A8D8F8" font-size="17">🫁</text>
+  <text x="37" y="48"  text-anchor="middle" fill="#C0E0F8" font-size="8.5" font-family="Georgia" font-weight="bold">PULMONAR</text>
+  <text x="37" y="61"  text-anchor="middle" fill="#A0C8E8" font-size="7.5" font-family="Georgia">EPOC</text>
+  <line x1="8" y1="72" x2="67" y2="72" stroke="#1A5276" stroke-width="0.7" opacity="0.6"/>
+  <text x="37" y="87"  text-anchor="middle" fill="#F0C860" font-size="10" font-weight="bold" font-family="Georgia">$180</text>
+  <text x="37" y="103" text-anchor="middle" fill="#A08060" font-size="7.5" font-family="Georgia">R-1</text>
+</g>
+
+
+<!-- ══════════════════════════════════
+     TOP ROW (left→right)
+══════════════════════════════════ -->
+
+<!-- N-4 Vitaminas -->
+<g transform="translate(113,2)">
+  <rect width="75" height="110" fill="url(#wNutri)" rx="4" filter="url(#innerShadow)"/>
+  <rect width="75" height="110" fill="url(#grainNutri)" rx="4" opacity="0.6"/>
+  <rect x="0" y="101" width="75" height="9" fill="url(#gNutri)" rx="3"/>
+  <text x="37" y="24"  text-anchor="middle" fill="#A08060" font-size="7.5" font-family="Georgia">N-4</text>
+  <text x="37" y="38"  text-anchor="middle" fill="#F0C860" font-size="10" font-weight="bold" font-family="Georgia">$140</text>
+  <line x1="8" y1="47" x2="67" y2="47" stroke="#1E8449" stroke-width="0.7" opacity="0.6"/>
+  <text x="37" y="62"  text-anchor="middle" fill="#A8D8A0" font-size="7.5" font-family="Georgia">Vitaminas</text>
+  <text x="37" y="77"  text-anchor="middle" fill="#C8F0C0" font-size="8.5" font-family="Georgia" font-weight="bold">NUTRICIÓN</text>
+  <text x="37" y="97"  text-anchor="middle" fill="#90E898" font-size="15">🥕</text>
+</g>
+
+<!-- O-3 Prevención -->
+<g transform="translate(188,2)">
+  <rect width="75" height="110" fill="url(#wOnco)" rx="4" filter="url(#innerShadow)"/>
+  <rect width="75" height="110" fill="url(#grainOnco)" rx="4" opacity="0.6"/>
+  <rect x="0" y="101" width="75" height="9" fill="url(#gOnco)" rx="3"/>
+  <text x="37" y="24"  text-anchor="middle" fill="#A08060" font-size="7.5" font-family="Georgia">O-3</text>
+  <text x="37" y="38"  text-anchor="middle" fill="#F0C860" font-size="10" font-weight="bold" font-family="Georgia">$200</text>
+  <line x1="8" y1="47" x2="67" y2="47" stroke="#7D3C98" stroke-width="0.7" opacity="0.6"/>
+  <text x="37" y="62"  text-anchor="middle" fill="#D8B8F0" font-size="7.5" font-family="Georgia">Prevención</text>
+  <text x="37" y="77"  text-anchor="middle" fill="#E8D0FF" font-size="8.5" font-family="Georgia" font-weight="bold">ONCOLOGÍA</text>
+  <text x="37" y="97"  text-anchor="middle" fill="#D8B8F0" font-size="15">🧬</text>
+</g>
+
+<!-- Paga $80 Examen -->
+<g transform="translate(263,2)">
+  <rect width="75" height="110" fill="url(#wPago)" rx="4" filter="url(#innerShadow)"/>
+  <rect width="75" height="110" fill="url(#grainPago)" rx="4" opacity="0.6"/>
+  <rect x="0" y="101" width="75" height="9" fill="url(#gPago)" rx="3"/>
+  <text x="37" y="24"  text-anchor="middle" fill="#E8C840" font-size="8" font-family="Georgia" font-weight="bold">PAGA $80</text>
+  <line x1="8" y1="33" x2="67" y2="33" stroke="#D4AC0D" stroke-width="0.7" opacity="0.6"/>
+  <text x="37" y="51"  text-anchor="middle" fill="#D8C870" font-size="7.5" font-family="Georgia">Examen</text>
+  <text x="37" y="65"  text-anchor="middle" fill="#F8E890" font-size="8.5" font-family="Georgia" font-weight="bold">DE SALUD</text>
+  <text x="37" y="89"  text-anchor="middle" fill="#F8E890" font-size="15">🧾</text>
+</g>
+
+<!-- D-3 Insulina -->
+<g transform="translate(338,2)">
+  <rect width="75" height="110" fill="url(#wDiab)" rx="4" filter="url(#innerShadow)"/>
+  <rect width="75" height="110" fill="url(#grainDiab)" rx="4" opacity="0.6"/>
+  <rect x="0" y="101" width="75" height="9" fill="url(#gDiab)" rx="3"/>
+  <text x="37" y="24"  text-anchor="middle" fill="#A08060" font-size="7.5" font-family="Georgia">D-3</text>
+  <text x="37" y="38"  text-anchor="middle" fill="#F0C860" font-size="10" font-weight="bold" font-family="Georgia">$160</text>
+  <line x1="8" y1="47" x2="67" y2="47" stroke="#D4AC0D" stroke-width="0.7" opacity="0.6"/>
+  <text x="37" y="62"  text-anchor="middle" fill="#D8C878" font-size="7.5" font-family="Georgia">Insulina</text>
+  <text x="37" y="77"  text-anchor="middle" fill="#F8E898" font-size="8.5" font-family="Georgia" font-weight="bold">DIABETES</text>
+  <text x="37" y="97"  text-anchor="middle" fill="#F8E898" font-size="15">💉</text>
+</g>
+
+<!-- C-4 Colesterol -->
+<g transform="translate(413,2)">
+  <rect width="75" height="110" fill="url(#wCardio)" rx="4" filter="url(#innerShadow)"/>
+  <rect width="75" height="110" fill="url(#grainCardio)" rx="4" opacity="0.6"/>
+  <rect x="0" y="101" width="75" height="9" fill="url(#gCardio)" rx="3"/>
+  <text x="37" y="24"  text-anchor="middle" fill="#A08060" font-size="7.5" font-family="Georgia">C-4</text>
+  <text x="37" y="38"  text-anchor="middle" fill="#F0C860" font-size="10" font-weight="bold" font-family="Georgia">$200</text>
+  <line x1="8" y1="47" x2="67" y2="47" stroke="#C0392B" stroke-width="0.7" opacity="0.6"/>
+  <text x="37" y="62"  text-anchor="middle" fill="#FFB8A8" font-size="7.5" font-family="Georgia">Colesterol</text>
+  <text x="37" y="77"  text-anchor="middle" fill="#FFD0C0" font-size="8.5" font-family="Georgia" font-weight="bold">CARDIO</text>
+  <text x="37" y="97"  text-anchor="middle" fill="#FF9090" font-size="15">💓</text>
+</g>
+
+<!-- Tarjeta Salud top -->
+<g transform="translate(488,2)">
+  <rect width="75" height="110" fill="url(#wSalud)" rx="4" filter="url(#innerShadow)"/>
+  <rect width="75" height="110" fill="url(#grainSalud)" rx="4" opacity="0.6"/>
+  <rect x="0" y="101" width="75" height="9" fill="url(#gSalud)" rx="3"/>
+  <text x="37" y="20"  text-anchor="middle" fill="#90E8A0" font-size="7.5" font-family="Georgia" font-weight="bold">TARJETA</text>
+  <text x="37" y="34"  text-anchor="middle" fill="white"   font-size="8.5" font-family="Georgia" font-weight="bold">SALUD</text>
+  <rect x="22" y="44"  width="31" height="31" fill="#117A65" rx="5" opacity="0.9"/>
+  <rect x="31" y="51"  width="13" height="4"  fill="white" rx="1.5"/>
+  <rect x="36" y="46"  width="4"  height="13" fill="white" rx="1.5"/>
+  <text x="37" y="94"  text-anchor="middle" fill="#90E8A0" font-size="7.5" font-family="Georgia">Beneficio (+)</text>
+</g>
+
+<!-- R-3 Tabaquismo -->
+<g transform="translate(563,2)">
+  <rect width="75" height="110" fill="url(#wResp)" rx="4" filter="url(#innerShadow)"/>
+  <rect width="75" height="110" fill="url(#grainResp)" rx="4" opacity="0.6"/>
+  <rect x="0" y="101" width="75" height="9" fill="url(#gResp)" rx="3"/>
+  <text x="37" y="24"  text-anchor="middle" fill="#A08060" font-size="7.5" font-family="Georgia">R-3</text>
+  <text x="37" y="38"  text-anchor="middle" fill="#F0C860" font-size="10" font-weight="bold" font-family="Georgia">$180</text>
+  <line x1="8" y1="47" x2="67" y2="47" stroke="#1A5276" stroke-width="0.7" opacity="0.6"/>
+  <text x="37" y="62"  text-anchor="middle" fill="#A0C8E8" font-size="7.5" font-family="Georgia">Tabaquismo</text>
+  <text x="37" y="77"  text-anchor="middle" fill="#C0E0F8" font-size="8.5" font-family="Georgia" font-weight="bold">PULMONAR</text>
+  <text x="37" y="97"  text-anchor="middle" fill="#A8D8F8" font-size="15">🌬</text>
+</g>
+
+<!-- O-4 Diagnóstico -->
+<g transform="translate(638,2)">
+  <rect width="75" height="110" fill="url(#wOnco)" rx="4" filter="url(#innerShadow)"/>
+  <rect width="75" height="110" fill="url(#grainOnco)" rx="4" opacity="0.6"/>
+  <rect x="0" y="101" width="75" height="9" fill="url(#gOnco)" rx="3"/>
+  <text x="37" y="24"  text-anchor="middle" fill="#A08060" font-size="7.5" font-family="Georgia">O-4</text>
+  <text x="37" y="38"  text-anchor="middle" fill="#F0C860" font-size="10" font-weight="bold" font-family="Georgia">$240</text>
+  <line x1="8" y1="47" x2="67" y2="47" stroke="#7D3C98" stroke-width="0.7" opacity="0.6"/>
+  <text x="37" y="62"  text-anchor="middle" fill="#D8B8F0" font-size="7.5" font-family="Georgia">Diagnóst.</text>
+  <text x="37" y="77"  text-anchor="middle" fill="#E8D0FF" font-size="8.5" font-family="Georgia" font-weight="bold">ONCOLOGÍA</text>
+  <text x="37" y="97"  text-anchor="middle" fill="#D8B8F0" font-size="15">⚕</text>
+</g>
+
+<!-- Tarjeta Riesgo top -->
+<g transform="translate(713,2)">
+  <rect width="75" height="110" fill="url(#wRiesgo)" rx="4" filter="url(#innerShadow)"/>
+  <rect width="75" height="110" fill="url(#grainRiesgo)" rx="4" opacity="0.6"/>
+  <rect x="0" y="101" width="75" height="9" fill="url(#gRiesgo)" rx="3"/>
+  <text x="37" y="20"  text-anchor="middle" fill="#D8B8F0" font-size="7.5" font-family="Georgia" font-weight="bold">TARJETA</text>
+  <text x="37" y="34"  text-anchor="middle" fill="white"   font-size="8.5" font-family="Georgia" font-weight="bold">RIESGO</text>
+  <rect x="22" y="44"  width="31" height="31" fill="#7D3C98" rx="5" opacity="0.9"/>
+  <text x="37" y="66"  text-anchor="middle" fill="white"   font-size="18" font-weight="bold">!</text>
+  <text x="37" y="94"  text-anchor="middle" fill="#D8B8F0" font-size="7.5" font-family="Georgia">Penalidad (!)</text>
+</g>
+
+
+<!-- ══════════════════════════════════
+     LEFT COL (bottom→top)
+══════════════════════════════════ -->
+
+<!-- R-2 Asma -->
+<g transform="translate(2,713)">
+  <rect width="110" height="75" fill="url(#wResp)" rx="4" filter="url(#innerShadow)"/>
+  <rect width="110" height="75" fill="url(#grainResp)" rx="4" opacity="0.6"/>
+  <rect x="0" y="0" width="10" height="75" fill="url(#gResp)" rx="3"/>
+  <text x="65" y="23" text-anchor="middle" fill="#A8D8F8" font-size="15">🫁</text>
+  <text x="65" y="40" text-anchor="middle" fill="#C0E0F8" font-size="8.5" font-family="Georgia" font-weight="bold">PULMONAR</text>
+  <text x="65" y="53" text-anchor="middle" fill="#A0C8E8" font-size="7.5" font-family="Georgia">Asma</text>
+  <text x="65" y="68" text-anchor="middle" fill="#F0C860" font-size="9"   font-weight="bold" font-family="Georgia">$160 · R-2</text>
+</g>
+
+<!-- D-2 Glucemia -->
+<g transform="translate(2,638)">
+  <rect width="110" height="75" fill="url(#wDiab)" rx="4" filter="url(#innerShadow)"/>
+  <rect width="110" height="75" fill="url(#grainDiab)" rx="4" opacity="0.6"/>
+  <rect x="0" y="0" width="10" height="75" fill="url(#gDiab)" rx="3"/>
+  <text x="65" y="23" text-anchor="middle" fill="#F8E898" font-size="15">🩺</text>
+  <text x="65" y="40" text-anchor="middle" fill="#F8E898" font-size="8.5" font-family="Georgia" font-weight="bold">DIABETES</text>
+  <text x="65" y="53" text-anchor="middle" fill="#D8C878" font-size="7.5" font-family="Georgia">Glucemia</text>
+  <text x="65" y="68" text-anchor="middle" fill="#F0C860" font-size="9"   font-weight="bold" font-family="Georgia">$140 · D-2</text>
+</g>
+
+<!-- Tarjeta Salud izq -->
+<g transform="translate(2,563)">
+  <rect width="110" height="75" fill="url(#wSalud)" rx="4" filter="url(#innerShadow)"/>
+  <rect width="110" height="75" fill="url(#grainSalud)" rx="4" opacity="0.6"/>
+  <rect x="0" y="0" width="10" height="75" fill="url(#gSalud)" rx="3"/>
+  <text x="65" y="20" text-anchor="middle" fill="white"   font-size="8.5" font-family="Georgia" font-weight="bold">TARJETA SALUD</text>
+  <rect x="44" y="27" width="24" height="24" fill="#117A65" rx="4" opacity="0.9"/>
+  <rect x="51" y="32" width="10" height="3.5" fill="white" rx="1"/>
+  <rect x="54.7" y="28" width="3.5" height="10" fill="white" rx="1"/>
+  <text x="65" y="66" text-anchor="middle" fill="#90E8A0" font-size="8" font-family="Georgia">Beneficio (+)</text>
+</g>
+
+<!-- O-1 Detección -->
+<g transform="translate(2,488)">
+  <rect width="110" height="75" fill="url(#wOnco)" rx="4" filter="url(#innerShadow)"/>
+  <rect width="110" height="75" fill="url(#grainOnco)" rx="4" opacity="0.6"/>
+  <rect x="0" y="0" width="10" height="75" fill="url(#gOnco)" rx="3"/>
+  <text x="65" y="23" text-anchor="middle" fill="#D8B8F0" font-size="15">🔬</text>
+  <text x="65" y="40" text-anchor="middle" fill="#E8D0FF" font-size="8.5" font-family="Georgia" font-weight="bold">ONCOLOGÍA</text>
+  <text x="65" y="53" text-anchor="middle" fill="#D8B8F0" font-size="7.5" font-family="Georgia">Detección</text>
+  <text x="65" y="68" text-anchor="middle" fill="#F0C860" font-size="9"   font-weight="bold" font-family="Georgia">$200 · O-1</text>
+</g>
+
+<!-- Seguro Médico -->
+<g transform="translate(2,413)">
+  <rect width="110" height="75" fill="url(#wPago)" rx="4" filter="url(#innerShadow)"/>
+  <rect width="110" height="75" fill="url(#grainPago)" rx="4" opacity="0.6"/>
+  <rect x="0" y="0" width="10" height="75" fill="url(#gPago)" rx="3"/>
+  <text x="65" y="23" text-anchor="middle" fill="#F8E890" font-size="15">💰</text>
+  <text x="65" y="40" text-anchor="middle" fill="#F8E890" font-size="8.5" font-family="Georgia" font-weight="bold">SEGURO</text>
+  <text x="65" y="53" text-anchor="middle" fill="#D8C870" font-size="7.5" font-family="Georgia">Médico</text>
+  <text x="65" y="68" text-anchor="middle" fill="#E8C840" font-size="9"   font-weight="bold" font-family="Georgia">COBRA $100</text>
+</g>
+
+<!-- C-3 Ejercicio -->
+<g transform="translate(2,338)">
+  <rect width="110" height="75" fill="url(#wCardio)" rx="4" filter="url(#innerShadow)"/>
+  <rect width="110" height="75" fill="url(#grainCardio)" rx="4" opacity="0.6"/>
+  <rect x="0" y="0" width="10" height="75" fill="url(#gCardio)" rx="3"/>
+  <text x="65" y="23" text-anchor="middle" fill="#FF9090" font-size="15">🏃</text>
+  <text x="65" y="40" text-anchor="middle" fill="#FFD0C0" font-size="8.5" font-family="Georgia" font-weight="bold">CARDIO</text>
+  <text x="65" y="53" text-anchor="middle" fill="#FFB8A8" font-size="7.5" font-family="Georgia">Ejercicio</text>
+  <text x="65" y="68" text-anchor="middle" fill="#F0C860" font-size="9"   font-weight="bold" font-family="Georgia">$180 · C-3</text>
+</g>
+
+<!-- N-3 Dieta Sana -->
+<g transform="translate(2,263)">
+  <rect width="110" height="75" fill="url(#wNutri)" rx="4" filter="url(#innerShadow)"/>
+  <rect width="110" height="75" fill="url(#grainNutri)" rx="4" opacity="0.6"/>
+  <rect x="0" y="0" width="10" height="75" fill="url(#gNutri)" rx="3"/>
+  <text x="65" y="23" text-anchor="middle" fill="#90E898" font-size="15">🥑</text>
+  <text x="65" y="40" text-anchor="middle" fill="#C8F0C0" font-size="8.5" font-family="Georgia" font-weight="bold">NUTRICIÓN</text>
+  <text x="65" y="53" text-anchor="middle" fill="#A8D8A0" font-size="7.5" font-family="Georgia">Dieta Sana</text>
+  <text x="65" y="68" text-anchor="middle" fill="#F0C860" font-size="9"   font-weight="bold" font-family="Georgia">$160 · N-3</text>
+</g>
+
+<!-- Tarjeta Riesgo izq -->
+<g transform="translate(2,188)">
+  <rect width="110" height="75" fill="url(#wRiesgo)" rx="4" filter="url(#innerShadow)"/>
+  <rect width="110" height="75" fill="url(#grainRiesgo)" rx="4" opacity="0.6"/>
+  <rect x="0" y="0" width="10" height="75" fill="url(#gRiesgo)" rx="3"/>
+  <text x="65" y="20" text-anchor="middle" fill="white"   font-size="8.5" font-family="Georgia" font-weight="bold">TARJETA RIESGO</text>
+  <rect x="44" y="27" width="24" height="24" fill="#7D3C98" rx="4" opacity="0.9"/>
+  <text x="56" y="45" text-anchor="middle" fill="white"   font-size="15" font-weight="bold">!</text>
+  <text x="65" y="66" text-anchor="middle" fill="#D8B8F0" font-size="8" font-family="Georgia">Penalidad (!)</text>
+</g>
+
+<!-- O-2 Tratamiento -->
+<g transform="translate(2,113)">
+  <rect width="110" height="75" fill="url(#wOnco)" rx="4" filter="url(#innerShadow)"/>
+  <rect width="110" height="75" fill="url(#grainOnco)" rx="4" opacity="0.6"/>
+  <rect x="0" y="0" width="10" height="75" fill="url(#gOnco)" rx="3"/>
+  <text x="65" y="23" text-anchor="middle" fill="#D8B8F0" font-size="15">🔬</text>
+  <text x="65" y="40" text-anchor="middle" fill="#E8D0FF" font-size="8.5" font-family="Georgia" font-weight="bold">ONCOLOGÍA</text>
+  <text x="65" y="53" text-anchor="middle" fill="#D8B8F0" font-size="7.5" font-family="Georgia">Tratamiento</text>
+  <text x="65" y="68" text-anchor="middle" fill="#F0C860" font-size="9"   font-weight="bold" font-family="Georgia">$220 · O-2</text>
+</g>
+
+
+<!-- ══════════════════════════════════
+     RIGHT COL (top→bottom)
+══════════════════════════════════ -->
+
+<!-- D-4 Resistencia -->
+<g transform="translate(788,113)">
+  <rect width="110" height="75" fill="url(#wDiab)" rx="4" filter="url(#innerShadow)"/>
+  <rect width="110" height="75" fill="url(#grainDiab)" rx="4" opacity="0.6"/>
+  <rect x="100" y="0" width="10" height="75" fill="url(#gDiab)" rx="3"/>
+  <text x="45" y="23" text-anchor="middle" fill="#F8E898" font-size="15">🩸</text>
+  <text x="45" y="40" text-anchor="middle" fill="#F8E898" font-size="8.5" font-family="Georgia" font-weight="bold">DIABETES</text>
+  <text x="45" y="53" text-anchor="middle" fill="#D8C878" font-size="7.5" font-family="Georgia">Resistencia</text>
+  <text x="45" y="68" text-anchor="middle" fill="#F0C860" font-size="9"   font-weight="bold" font-family="Georgia">$180 · D-4</text>
+</g>
+
+<!-- N-5 Ultraprocesados -->
+<g transform="translate(788,188)">
+  <rect width="110" height="75" fill="url(#wNutri)" rx="4" filter="url(#innerShadow)"/>
+  <rect width="110" height="75" fill="url(#grainNutri)" rx="4" opacity="0.6"/>
+  <rect x="100" y="0" width="10" height="75" fill="url(#gNutri)" rx="3"/>
+  <text x="45" y="23" text-anchor="middle" fill="#90E898" font-size="15">🌽</text>
+  <text x="45" y="40" text-anchor="middle" fill="#C8F0C0" font-size="8.5" font-family="Georgia" font-weight="bold">NUTRICIÓN</text>
+  <text x="45" y="53" text-anchor="middle" fill="#A8D8A0" font-size="7.5" font-family="Georgia">Ultra-proc.</text>
+  <text x="45" y="68" text-anchor="middle" fill="#F0C860" font-size="9"   font-weight="bold" font-family="Georgia">$160 · N-5</text>
+</g>
+
+<!-- Análisis Clínicos -->
+<g transform="translate(788,263)">
+  <rect width="110" height="75" fill="url(#wPago)" rx="4" filter="url(#innerShadow)"/>
+  <rect width="110" height="75" fill="url(#grainPago)" rx="4" opacity="0.6"/>
+  <rect x="100" y="0" width="10" height="75" fill="url(#gPago)" rx="3"/>
+  <text x="45" y="23" text-anchor="middle" fill="#F8E890" font-size="15">🧪</text>
+  <text x="45" y="40" text-anchor="middle" fill="#F8E890" font-size="8.5" font-family="Georgia" font-weight="bold">ANÁLISIS</text>
+  <text x="45" y="53" text-anchor="middle" fill="#D8C870" font-size="7.5" font-family="Georgia">Clínicos</text>
+  <text x="45" y="68" text-anchor="middle" fill="#E8C840" font-size="9"   font-weight="bold" font-family="Georgia">PAGA $90</text>
+</g>
+
+<!-- C-5 ACV -->
+<g transform="translate(788,338)">
+  <rect width="110" height="75" fill="url(#wCardio)" rx="4" filter="url(#innerShadow)"/>
+  <rect width="110" height="75" fill="url(#grainCardio)" rx="4" opacity="0.6"/>
+  <rect x="100" y="0" width="10" height="75" fill="url(#gCardio)" rx="3"/>
+  <text x="45" y="23" text-anchor="middle" fill="#FF9090" font-size="15">💊</text>
+  <text x="45" y="40" text-anchor="middle" fill="#FFD0C0" font-size="8.5" font-family="Georgia" font-weight="bold">CARDIO</text>
+  <text x="45" y="53" text-anchor="middle" fill="#FFB8A8" font-size="7.5" font-family="Georgia">ACV</text>
+  <text x="45" y="68" text-anchor="middle" fill="#F0C860" font-size="9"   font-weight="bold" font-family="Georgia">$220 · C-5</text>
+</g>
+
+<!-- Tarjeta Salud der -->
+<g transform="translate(788,413)">
+  <rect width="110" height="75" fill="url(#wSalud)" rx="4" filter="url(#innerShadow)"/>
+  <rect width="110" height="75" fill="url(#grainSalud)" rx="4" opacity="0.6"/>
+  <rect x="100" y="0" width="10" height="75" fill="url(#gSalud)" rx="3"/>
+  <text x="45" y="20" text-anchor="middle" fill="white"   font-size="8.5" font-family="Georgia" font-weight="bold">TARJETA SALUD</text>
+  <rect x="32" y="27" width="24" height="24" fill="#117A65" rx="4" opacity="0.9"/>
+  <rect x="39" y="32" width="10" height="3.5" fill="white" rx="1"/>
+  <rect x="42.7" y="28" width="3.5" height="10" fill="white" rx="1"/>
+  <text x="45" y="66" text-anchor="middle" fill="#90E8A0" font-size="8" font-family="Georgia">Beneficio (+)</text>
+</g>
+
+<!-- R-4 Fibrosis -->
+<g transform="translate(788,488)">
+  <rect width="110" height="75" fill="url(#wResp)" rx="4" filter="url(#innerShadow)"/>
+  <rect width="110" height="75" fill="url(#grainResp)" rx="4" opacity="0.6"/>
+  <rect x="100" y="0" width="10" height="75" fill="url(#gResp)" rx="3"/>
+  <text x="45" y="23" text-anchor="middle" fill="#A8D8F8" font-size="15">🌡</text>
+  <text x="45" y="40" text-anchor="middle" fill="#C0E0F8" font-size="8.5" font-family="Georgia" font-weight="bold">PULMONAR</text>
+  <text x="45" y="53" text-anchor="middle" fill="#A0C8E8" font-size="7.5" font-family="Georgia">Fibrosis</text>
+  <text x="45" y="68" text-anchor="middle" fill="#F0C860" font-size="9"   font-weight="bold" font-family="Georgia">$200 · R-4</text>
+</g>
+
+<!-- O-5 Biología -->
+<g transform="translate(788,563)">
+  <rect width="110" height="75" fill="url(#wOnco)" rx="4" filter="url(#innerShadow)"/>
+  <rect width="110" height="75" fill="url(#grainOnco)" rx="4" opacity="0.6"/>
+  <rect x="100" y="0" width="10" height="75" fill="url(#gOnco)" rx="3"/>
+  <text x="45" y="23" text-anchor="middle" fill="#D8B8F0" font-size="15">🧫</text>
+  <text x="45" y="40" text-anchor="middle" fill="#E8D0FF" font-size="8.5" font-family="Georgia" font-weight="bold">ONCOLOGÍA</text>
+  <text x="45" y="53" text-anchor="middle" fill="#D8B8F0" font-size="7.5" font-family="Georgia">Biología</text>
+  <text x="45" y="68" text-anchor="middle" fill="#F0C860" font-size="9"   font-weight="bold" font-family="Georgia">$240 · O-5</text>
+</g>
+
+<!-- Tarjeta Riesgo der -->
+<g transform="translate(788,638)">
+  <rect width="110" height="75" fill="url(#wRiesgo)" rx="4" filter="url(#innerShadow)"/>
+  <rect width="110" height="75" fill="url(#grainRiesgo)" rx="4" opacity="0.6"/>
+  <rect x="100" y="0" width="10" height="75" fill="url(#gRiesgo)" rx="3"/>
+  <text x="45" y="20" text-anchor="middle" fill="white"   font-size="8.5" font-family="Georgia" font-weight="bold">TARJETA RIESGO</text>
+  <rect x="32" y="27" width="24" height="24" fill="#7D3C98" rx="4" opacity="0.9"/>
+  <text x="44" y="45" text-anchor="middle" fill="white"   font-size="15" font-weight="bold">!</text>
+  <text x="45" y="66" text-anchor="middle" fill="#D8B8F0" font-size="8" font-family="Georgia">Penalidad (!)</text>
+</g>
+
+<!-- N-6 Hidratación -->
+<g transform="translate(788,713)">
+  <rect width="110" height="75" fill="url(#wNutri)" rx="4" filter="url(#innerShadow)"/>
+  <rect width="110" height="75" fill="url(#grainNutri)" rx="4" opacity="0.6"/>
+  <rect x="100" y="0" width="10" height="75" fill="url(#gNutri)" rx="3"/>
+  <text x="45" y="23" text-anchor="middle" fill="#90E898" font-size="15">💧</text>
+  <text x="45" y="40" text-anchor="middle" fill="#C8F0C0" font-size="8.5" font-family="Georgia" font-weight="bold">NUTRICIÓN</text>
+  <text x="45" y="53" text-anchor="middle" fill="#A8D8A0" font-size="7.5" font-family="Georgia">Hidratación</text>
+  <text x="45" y="68" text-anchor="middle" fill="#F0C860" font-size="9"   font-weight="bold" font-family="Georgia">$180 · N-6</text>
+</g>
+
+
+<!-- ══════════════════════════════════
+     PANEL CENTRAL
+══════════════════════════════════ -->
+<rect x="112" y="112" width="676" height="676" fill="url(#centerWood)" rx="8"/>
+<rect x="112" y="112" width="676" height="676" fill="url(#grainCenter)" rx="8" opacity="0.8"/>
+<!-- Barniz sobre centro -->
+<rect x="112" y="112" width="676" height="676" fill="url(#varnish)" rx="8"/>
+
+<!-- Marco incrustado del centro -->
+<rect x="112" y="112" width="676" height="676" fill="none" stroke="#5C2E0E"  stroke-width="4"   rx="8"  opacity="0.9"/>
+<rect x="115" y="115" width="670" height="670" fill="none" stroke="#D4A840"  stroke-width="1.5" rx="7"  opacity="0.7"/>
+<rect x="118" y="118" width="664" height="664" fill="none" stroke="#3D1A06"  stroke-width="1.5" rx="6"  opacity="0.6"/>
+<rect x="121" y="121" width="658" height="658" fill="none" stroke="#E0B850"  stroke-width="0.7" rx="5"  opacity="0.4"/>
+<rect x="124" y="124" width="652" height="652" fill="none" stroke="#5C2E0E"  stroke-width="0.5" rx="4"  opacity="0.4"/>
+
+<!-- Circulos decorativos centro -->
+<circle cx="450" cy="450" r="295" fill="none" stroke="#8A5530" stroke-width="0.8" stroke-dasharray="5 9" opacity="0.3"/>
+<circle cx="450" cy="450" r="220" fill="none" stroke="#D4A840" stroke-width="0.4" stroke-dasharray="3 7" opacity="0.22"/>
+<line x1="450" y1="130" x2="450" y2="770" stroke="#8A5530" stroke-width="0.5" opacity="0.12"/>
+<line x1="130" y1="450" x2="770" y2="450" stroke="#8A5530" stroke-width="0.5" opacity="0.12"/>
+
+<!-- LOGO elipse - madera oscura pulida -->
+<ellipse cx="450" cy="315" rx="240" ry="142" fill="#180A02" opacity="0.96"/>
+<ellipse cx="450" cy="315" rx="240" ry="142" fill="url(#varnish)" opacity="0.5"/>
+<ellipse cx="450" cy="315" rx="240" ry="142" fill="none" stroke="#D4A840" stroke-width="2.5" opacity="0.8" filter="url(#glow2)"/>
+<ellipse cx="450" cy="315" rx="234" ry="136" fill="none" stroke="#5C2E0E" stroke-width="1"   opacity="0.5"/>
+<ellipse cx="450" cy="315" rx="228" ry="130" fill="none" stroke="#E0B850" stroke-width="0.4" opacity="0.3"/>
+
+<!-- Cruz médica -->
+<rect x="437" y="180" width="26" height="9"  fill="#C0392B" rx="2.5" filter="url(#glow2)"/>
+<rect x="446" y="171" width="9"  height="27" fill="#C0392B" rx="2.5" filter="url(#glow2)"/>
+
+<!-- Título MEDICO -->
+<text x="450" y="268" text-anchor="middle" fill="#FFFFFF" font-size="70" font-family="Georgia, serif" font-weight="bold" letter-spacing="2" filter="url(#glow2)">MEDICO</text>
+<!-- Título POLIS en dorado madera -->
+<text x="450" y="332" text-anchor="middle" fill="#D4A840" font-size="62" font-family="Georgia, serif" font-weight="bold" letter-spacing="9" filter="url(#glow)">POLIS</text>
+<!-- tagline -->
+<text x="450" y="368" text-anchor="middle" fill="#8A6030" font-size="11" font-family="Georgia" font-style="italic" letter-spacing="1.2">Juego Educativo · Enfermedades Crónicas No Transmisibles</text>
+<line x1="290" y1="380" x2="610" y2="380" stroke="#8A5530" stroke-width="1" opacity="0.6"/>
+<circle cx="450" cy="380" r="4" fill="#D4A840" opacity="0.8"/>
+
+<!-- CATEGORÍAS -->
+<text x="450" y="408" text-anchor="middle" fill="#8A6030" font-size="9.5" font-family="Georgia" letter-spacing="3.5">— CATEGORÍAS —</text>
+<rect x="148" y="418" width="12" height="12" fill="#C0392B" rx="2"/>
+<text x="167" y="429" fill="#D4B888" font-size="11" font-family="Georgia">Cardiología</text>
+<rect x="148" y="436" width="12" height="12" fill="#1E8449" rx="2"/>
+<text x="167" y="447" fill="#D4B888" font-size="11" font-family="Georgia">Nutrición</text>
+<rect x="148" y="454" width="12" height="12" fill="#D4AC0D" rx="2"/>
+<text x="167" y="465" fill="#D4B888" font-size="11" font-family="Georgia">Diabetes</text>
+<rect x="148" y="472" width="12" height="12" fill="#1A5276" rx="2"/>
+<text x="167" y="483" fill="#D4B888" font-size="11" font-family="Georgia">Pulmonar</text>
+<rect x="148" y="490" width="12" height="12" fill="#7D3C98" rx="2"/>
+<text x="167" y="501" fill="#D4B888" font-size="11" font-family="Georgia">Oncología</text>
+<rect x="530" y="418" width="12" height="12" fill="#117A65" rx="2"/>
+<text x="549" y="429" fill="#D4B888" font-size="11" font-family="Georgia">Tarjeta Salud (+)</text>
+<rect x="530" y="436" width="12" height="12" fill="#7D3C98" rx="2"/>
+<text x="549" y="447" fill="#D4B888" font-size="11" font-family="Georgia">Tarjeta Riesgo (!)</text>
+<rect x="530" y="454" width="12" height="12" fill="#B7950B" rx="2"/>
+<text x="549" y="465" fill="#D4B888" font-size="11" font-family="Georgia">Pago Especial ($)</text>
+<rect x="530" y="472" width="12" height="12" fill="#5C2E0E" stroke="#D4A840" stroke-width="1" rx="2"/>
+<text x="549" y="483" fill="#D4B888" font-size="11" font-family="Georgia">Zona Libre 🛡</text>
+<rect x="530" y="490" width="12" height="12" fill="#C0392B" rx="2"/>
+<text x="549" y="501" fill="#D4B888" font-size="11" font-family="Georgia">UCI / Emergencia</text>
+
+<line x1="148" y1="514" x2="752" y2="514" stroke="#5C2E0E" stroke-width="1" opacity="0.7"/>
+
+<!-- REGLAS -->
+<text x="450" y="536" text-anchor="middle" fill="#8A6030" font-size="9.5" font-family="Georgia" letter-spacing="3.5">— REGLAS BÁSICAS —</text>
+<text x="215" y="558" fill="#A88050" font-size="10" font-family="Georgia">🎲  Tira los dados y avanza tu ficha por el tablero</text>
+<text x="215" y="575" fill="#A88050" font-size="10" font-family="Georgia">🏥  Al caer en propiedad: compra o paga alquiler al dueño</text>
+<text x="215" y="592" fill="#A88050" font-size="10" font-family="Georgia">💊  Tarjetas Salud: beneficios · Tarjetas Riesgo: penalidades</text>
+<text x="215" y="609" fill="#A88050" font-size="10" font-family="Georgia">🫀  Construye Clínicas 🏠 y Hospitales 🏨 en tus propiedades</text>
+<text x="215" y="626" fill="#A88050" font-size="10" font-family="Georgia">⚠️  UCI: pierde 2 turnos o paga $150 para salir</text>
+<text x="215" y="643" fill="#A88050" font-size="10" font-family="Georgia">🏆  Gana quien lleve a la bancarrota a todos los demás</text>
+
+<line x1="175" y1="657" x2="725" y2="657" stroke="#5C2E0E" stroke-width="1" opacity="0.6"/>
+
+<!-- FICHAS -->
+<text x="450" y="676" text-anchor="middle" fill="#8A6030" font-size="9.5" font-family="Georgia" letter-spacing="3">— FICHAS DE JUGADORES —</text>
+<circle cx="303" cy="710" r="22" fill="#C0392B" stroke="#FF9090" stroke-width="1.5"/>
+<text x="303" y="717" text-anchor="middle" font-size="16">🧑</text>
+<circle cx="360" cy="710" r="22" fill="#1A5276" stroke="#85C1E9" stroke-width="1.5"/>
+<text x="360" y="717" text-anchor="middle" font-size="16">👩</text>
+<circle cx="417" cy="710" r="22" fill="#1E8449" stroke="#90E898" stroke-width="1.5"/>
+<text x="417" y="717" text-anchor="middle" font-size="16">👦</text>
+<circle cx="483" cy="710" r="22" fill="#7D3C98" stroke="#D8B8F0" stroke-width="1.5"/>
+<text x="483" y="717" text-anchor="middle" font-size="16">👧</text>
+<circle cx="540" cy="710" r="22" fill="#B7950B" stroke="#F8E890" stroke-width="1.5"/>
+<text x="540" y="717" text-anchor="middle" font-size="16">🧓</text>
+<circle cx="597" cy="710" r="22" fill="#5C2E0E" stroke="#D4A840" stroke-width="1.5"/>
+<text x="597" y="717" text-anchor="middle" font-size="16">🧑‍⚕️</text>
+
+<!-- DADOS de madera -->
+<rect x="388" y="742" width="34" height="34" fill="#2A1206" rx="6" stroke="#D4A840" stroke-width="1.5"/>
+<circle cx="399" cy="753" r="3.2" fill="#D4A840"/>
+<circle cx="413" cy="767" r="3.2" fill="#D4A840"/>
+<rect x="432" y="742" width="34" height="34" fill="#2A1206" rx="6" stroke="#D4A840" stroke-width="1.5"/>
+<circle cx="443" cy="753" r="3.2" fill="#D4A840"/>
+<circle cx="457" cy="753" r="3.2" fill="#D4A840"/>
+<circle cx="450" cy="759" r="3.2" fill="#D4A840"/>
+<circle cx="443" cy="767" r="3.2" fill="#D4A840"/>
+<circle cx="457" cy="767" r="3.2" fill="#D4A840"/>
+
+<!-- Línea latido decorativa -->
+<polyline points="148,784 168,784 178,764 190,804 202,754 214,788 230,788 752,788"
+  fill="none" stroke="#8A5530" stroke-width="1.2" opacity="0.28" stroke-linejoin="round"/>
+
+</svg>
+</div>
+</body>
+</html>

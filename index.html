@@ -1,38 +1,31 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>MEDICOPOLIS — Tablero de Juego</title>
-<style>
-  * { margin:0; padding:0; box-sizing:border-box; }
-  html, body {
-    background: #2C1506;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 16px;
-    min-height: 100vh;
-  }
-  .board-wrap {
-    width: min(96vw, 96vh);
-    aspect-ratio: 1;
-    max-width: 900px;
-    max-height: 900px;
-  }
-  svg { width:100%; height:100%; display:block; }
-  @media print {
-    body { padding:0; background:#2C1506; }
-    .board-wrap { width:100%; height:auto; }
-    @page { size: 60cm 60cm; margin:0; }
-  }
-</style>
+  <meta charset="UTF-8">
+  <title>MEDICOPOLIS — Tablero de Juego</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+
+  <nav class="navbar">
+  <div class="nav-brand">
+    <span class="nav-cross">✚</span>
+    <span class="nav-title">MEDICOPOLIS</span>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#">Inicio</a></li>
+    <li><a href="#">Cómo Jugar</a></li>
+    <li><a href="#">Categorías</a></li>
+    <li><a href="login.html" class="nav-btn-login">Iniciar Sesión</a></li>
+  </ul>
+  <button class="nav-hamburger" onclick="toggleMenu()">☰</button>
+</nav>
+
 <div class="board-wrap">
 <svg viewBox="0 0 900 900" xmlns="http://www.w3.org/2000/svg">
 <defs>
 
-  <!-- ══ MADERA BASE TABLERO (vetas horizontales) ══ -->
+  <!-- ══ MADERA BASE TABLERO ══ -->
   <linearGradient id="woodMain" x1="0%" y1="0%" x2="0%" y2="100%">
     <stop offset="0%"   stop-color="#7A4520"/>
     <stop offset="6%"   stop-color="#8C5528"/>
@@ -69,21 +62,21 @@
     <path d="M290 0 Q195 450 290 900"  stroke="#7A4520" stroke-width="1.6" fill="none" opacity="0.2"/>
   </pattern>
 
-  <!-- Nudo de madera decorativo -->
+  <!-- Nudo de madera -->
   <radialGradient id="woodKnot1" cx="50%" cy="50%" r="50%">
     <stop offset="0%"   stop-color="#2E1204" stop-opacity="0.5"/>
     <stop offset="40%"  stop-color="#5C2E0E" stop-opacity="0.25"/>
     <stop offset="100%" stop-color="#7A4520" stop-opacity="0"/>
   </radialGradient>
 
-  <!-- Barniz / sheen -->
+  <!-- Barniz -->
   <linearGradient id="varnish" x1="0%" y1="0%" x2="15%" y2="100%">
     <stop offset="0%"   stop-color="#FFFFFF" stop-opacity="0.08"/>
     <stop offset="40%"  stop-color="#D4A060" stop-opacity="0.04"/>
     <stop offset="100%" stop-color="#000000" stop-opacity="0.12"/>
   </linearGradient>
 
-  <!-- Marco de madera oscura -->
+  <!-- Marco madera oscura -->
   <linearGradient id="woodFrame" x1="0%" y1="0%" x2="100%" y2="100%">
     <stop offset="0%"   stop-color="#3D1A06"/>
     <stop offset="30%"  stop-color="#5C2E0E"/>
@@ -91,7 +84,7 @@
     <stop offset="100%" stop-color="#4A2210"/>
   </linearGradient>
 
-  <!-- Borde dorado madera -->
+  <!-- Borde dorado -->
   <linearGradient id="goldBorder" x1="0%" y1="0%" x2="100%" y2="100%">
     <stop offset="0%"   stop-color="#D4A840"/>
     <stop offset="35%"  stop-color="#F0C860"/>
@@ -99,8 +92,7 @@
     <stop offset="100%" stop-color="#E0B850"/>
   </linearGradient>
 
-  <!-- ══ MADERA PARA CASILLAS (versiones oscuras por categoría) ══ -->
-  <!-- Cardio - madera caoba rojiza -->
+  <!-- ══ MADERA POR CATEGORÍA ══ -->
   <linearGradient id="wCardio" x1="0%" y1="0%" x2="100%" y2="100%">
     <stop offset="0%"   stop-color="#5C1A10"/>
     <stop offset="25%"  stop-color="#6B2418"/>
@@ -109,13 +101,12 @@
     <stop offset="100%" stop-color="#5C1A10"/>
   </linearGradient>
   <pattern id="grainCardio" width="75" height="120" patternUnits="userSpaceOnUse">
-    <path d="M0 0 Q37 60 0 120"  stroke="#3A0E08" stroke-width="1.5" fill="none" opacity="0.3"/>
+    <path d="M0 0 Q37 60 0 120"   stroke="#3A0E08" stroke-width="1.5" fill="none" opacity="0.3"/>
     <path d="M20 0 Q57 60 20 120" stroke="#7A2A20" stroke-width="0.8" fill="none" opacity="0.2"/>
     <path d="M45 0 Q82 60 45 120" stroke="#3A0E08" stroke-width="2"   fill="none" opacity="0.22"/>
     <path d="M65 0 Q28 60 65 120" stroke="#7A2A20" stroke-width="1"   fill="none" opacity="0.18"/>
   </pattern>
 
-  <!-- Nutrición - madera verde oliva oscura -->
   <linearGradient id="wNutri" x1="0%" y1="0%" x2="100%" y2="100%">
     <stop offset="0%"   stop-color="#1A3D18"/>
     <stop offset="25%"  stop-color="#244D20"/>
@@ -124,13 +115,12 @@
     <stop offset="100%" stop-color="#1A3D18"/>
   </linearGradient>
   <pattern id="grainNutri" width="75" height="120" patternUnits="userSpaceOnUse">
-    <path d="M0 0 Q37 60 0 120"  stroke="#0E2008" stroke-width="1.5" fill="none" opacity="0.3"/>
+    <path d="M0 0 Q37 60 0 120"   stroke="#0E2008" stroke-width="1.5" fill="none" opacity="0.3"/>
     <path d="M22 0 Q59 60 22 120" stroke="#2A5A28" stroke-width="0.8" fill="none" opacity="0.2"/>
     <path d="M48 0 Q85 60 48 120" stroke="#0E2008" stroke-width="2"   fill="none" opacity="0.22"/>
     <path d="M68 0 Q31 60 68 120" stroke="#2A5A28" stroke-width="1"   fill="none" opacity="0.18"/>
   </pattern>
 
-  <!-- Diabetes - madera ámbar tostada -->
   <linearGradient id="wDiab" x1="0%" y1="0%" x2="100%" y2="100%">
     <stop offset="0%"   stop-color="#4A3A08"/>
     <stop offset="25%"  stop-color="#5A4810"/>
@@ -139,13 +129,12 @@
     <stop offset="100%" stop-color="#4A3A08"/>
   </linearGradient>
   <pattern id="grainDiab" width="75" height="120" patternUnits="userSpaceOnUse">
-    <path d="M0 0 Q37 60 0 120"  stroke="#2A1E02" stroke-width="1.5" fill="none" opacity="0.3"/>
+    <path d="M0 0 Q37 60 0 120"   stroke="#2A1E02" stroke-width="1.5" fill="none" opacity="0.3"/>
     <path d="M20 0 Q57 60 20 120" stroke="#6A5A18" stroke-width="0.8" fill="none" opacity="0.2"/>
     <path d="M45 0 Q82 60 45 120" stroke="#2A1E02" stroke-width="2"   fill="none" opacity="0.22"/>
     <path d="M68 0 Q31 60 68 120" stroke="#6A5A18" stroke-width="1"   fill="none" opacity="0.18"/>
   </pattern>
 
-  <!-- Pulmonar - madera azul pizarra oscura -->
   <linearGradient id="wResp" x1="0%" y1="0%" x2="100%" y2="100%">
     <stop offset="0%"   stop-color="#0E2038"/>
     <stop offset="25%"  stop-color="#163050"/>
@@ -154,13 +143,12 @@
     <stop offset="100%" stop-color="#0E2038"/>
   </linearGradient>
   <pattern id="grainResp" width="75" height="120" patternUnits="userSpaceOnUse">
-    <path d="M0 0 Q37 60 0 120"  stroke="#061018" stroke-width="1.5" fill="none" opacity="0.35"/>
+    <path d="M0 0 Q37 60 0 120"   stroke="#061018" stroke-width="1.5" fill="none" opacity="0.35"/>
     <path d="M22 0 Q59 60 22 120" stroke="#1A3858" stroke-width="0.8" fill="none" opacity="0.22"/>
     <path d="M48 0 Q85 60 48 120" stroke="#061018" stroke-width="2"   fill="none" opacity="0.25"/>
     <path d="M68 0 Q31 60 68 120" stroke="#1A3858" stroke-width="1"   fill="none" opacity="0.2"/>
   </pattern>
 
-  <!-- Oncología - madera morada oscura -->
   <linearGradient id="wOnco" x1="0%" y1="0%" x2="100%" y2="100%">
     <stop offset="0%"   stop-color="#2E1040"/>
     <stop offset="25%"  stop-color="#3C1850"/>
@@ -169,13 +157,12 @@
     <stop offset="100%" stop-color="#2E1040"/>
   </linearGradient>
   <pattern id="grainOnco" width="75" height="120" patternUnits="userSpaceOnUse">
-    <path d="M0 0 Q37 60 0 120"  stroke="#180620" stroke-width="1.5" fill="none" opacity="0.35"/>
+    <path d="M0 0 Q37 60 0 120"   stroke="#180620" stroke-width="1.5" fill="none" opacity="0.35"/>
     <path d="M22 0 Q59 60 22 120" stroke="#4A2060" stroke-width="0.8" fill="none" opacity="0.22"/>
     <path d="M48 0 Q85 60 48 120" stroke="#180620" stroke-width="2"   fill="none" opacity="0.25"/>
     <path d="M68 0 Q31 60 68 120" stroke="#4A2060" stroke-width="1"   fill="none" opacity="0.2"/>
   </pattern>
 
-  <!-- Salud - madera verde esmeralda -->
   <linearGradient id="wSalud" x1="0%" y1="0%" x2="100%" y2="100%">
     <stop offset="0%"   stop-color="#0C3828"/>
     <stop offset="25%"  stop-color="#144830"/>
@@ -184,13 +171,12 @@
     <stop offset="100%" stop-color="#0C3828"/>
   </linearGradient>
   <pattern id="grainSalud" width="75" height="120" patternUnits="userSpaceOnUse">
-    <path d="M0 0 Q37 60 0 120"  stroke="#041810" stroke-width="1.5" fill="none" opacity="0.35"/>
+    <path d="M0 0 Q37 60 0 120"   stroke="#041810" stroke-width="1.5" fill="none" opacity="0.35"/>
     <path d="M22 0 Q59 60 22 120" stroke="#1C5038" stroke-width="0.8" fill="none" opacity="0.22"/>
     <path d="M48 0 Q85 60 48 120" stroke="#041810" stroke-width="2"   fill="none" opacity="0.25"/>
     <path d="M68 0 Q31 60 68 120" stroke="#1C5038" stroke-width="1"   fill="none" opacity="0.2"/>
   </pattern>
 
-  <!-- Riesgo - madera vino oscuro -->
   <linearGradient id="wRiesgo" x1="0%" y1="0%" x2="100%" y2="100%">
     <stop offset="0%"   stop-color="#3A1050"/>
     <stop offset="25%"  stop-color="#481860"/>
@@ -199,13 +185,12 @@
     <stop offset="100%" stop-color="#3A1050"/>
   </linearGradient>
   <pattern id="grainRiesgo" width="75" height="120" patternUnits="userSpaceOnUse">
-    <path d="M0 0 Q37 60 0 120"  stroke="#1E0428" stroke-width="1.5" fill="none" opacity="0.35"/>
+    <path d="M0 0 Q37 60 0 120"   stroke="#1E0428" stroke-width="1.5" fill="none" opacity="0.35"/>
     <path d="M22 0 Q59 60 22 120" stroke="#502070" stroke-width="0.8" fill="none" opacity="0.22"/>
     <path d="M48 0 Q85 60 48 120" stroke="#1E0428" stroke-width="2"   fill="none" opacity="0.25"/>
     <path d="M68 0 Q31 60 68 120" stroke="#502070" stroke-width="1"   fill="none" opacity="0.2"/>
   </pattern>
 
-  <!-- Pago - madera ámbar dorada -->
   <linearGradient id="wPago" x1="0%" y1="0%" x2="100%" y2="100%">
     <stop offset="0%"   stop-color="#4A3808"/>
     <stop offset="25%"  stop-color="#5C4810"/>
@@ -214,29 +199,29 @@
     <stop offset="100%" stop-color="#4A3808"/>
   </linearGradient>
   <pattern id="grainPago" width="75" height="120" patternUnits="userSpaceOnUse">
-    <path d="M0 0 Q37 60 0 120"  stroke="#281E02" stroke-width="1.5" fill="none" opacity="0.3"/>
+    <path d="M0 0 Q37 60 0 120"   stroke="#281E02" stroke-width="1.5" fill="none" opacity="0.3"/>
     <path d="M20 0 Q57 60 20 120" stroke="#6C5818" stroke-width="0.8" fill="none" opacity="0.2"/>
     <path d="M45 0 Q82 60 45 120" stroke="#281E02" stroke-width="2"   fill="none" opacity="0.22"/>
     <path d="M68 0 Q31 60 68 120" stroke="#6C5818" stroke-width="1"   fill="none" opacity="0.18"/>
   </pattern>
 
-  <!-- Madera oscura central -->
+  <!-- Madera central -->
   <radialGradient id="centerWood" cx="50%" cy="50%" r="60%">
     <stop offset="0%"   stop-color="#3A1C08"/>
     <stop offset="40%"  stop-color="#2E1406"/>
     <stop offset="100%" stop-color="#1E0C02"/>
   </radialGradient>
   <pattern id="grainCenter" width="400" height="400" patternUnits="userSpaceOnUse" x="112" y="112">
-    <path d="M0 0 Q200 200 0 400"    stroke="#1A0A02" stroke-width="3"   fill="none" opacity="0.2"/>
-    <path d="M50 0 Q250 200 50 400"  stroke="#5C2E10" stroke-width="1.5" fill="none" opacity="0.15"/>
-    <path d="M100 0 Q300 200 100 400" stroke="#1A0A02" stroke-width="4" fill="none" opacity="0.12"/>
-    <path d="M160 0 Q360 200 160 400" stroke="#4A2010" stroke-width="2" fill="none" opacity="0.14"/>
+    <path d="M0 0 Q200 200 0 400"     stroke="#1A0A02" stroke-width="3"   fill="none" opacity="0.2"/>
+    <path d="M50 0 Q250 200 50 400"   stroke="#5C2E10" stroke-width="1.5" fill="none" opacity="0.15"/>
+    <path d="M100 0 Q300 200 100 400" stroke="#1A0A02" stroke-width="4"   fill="none" opacity="0.12"/>
+    <path d="M160 0 Q360 200 160 400" stroke="#4A2010" stroke-width="2"   fill="none" opacity="0.14"/>
     <path d="M220 0 Q420 200 220 400" stroke="#1A0A02" stroke-width="1.5" fill="none" opacity="0.16"/>
-    <path d="M280 0 Q80 200 280 400" stroke="#5C2E10" stroke-width="2.5" fill="none" opacity="0.13"/>
+    <path d="M280 0 Q80 200 280 400"  stroke="#5C2E10" stroke-width="2.5" fill="none" opacity="0.13"/>
     <path d="M340 0 Q140 200 340 400" stroke="#1A0A02" stroke-width="1.8" fill="none" opacity="0.15"/>
   </pattern>
 
-  <!-- Gradientes de acento para tops de casillas -->
+  <!-- Gradientes de acento para tops/labels de casillas -->
   <linearGradient id="gCardio" x1="0%" y1="0%" x2="0%" y2="100%">
     <stop offset="0%" stop-color="#C0392B"/><stop offset="100%" stop-color="#7B241C"/>
   </linearGradient>
@@ -265,6 +250,7 @@
     <stop offset="0%" stop-color="#028090"/><stop offset="100%" stop-color="#02C39A"/>
   </linearGradient>
 
+  <!-- Filtros -->
   <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
     <feGaussianBlur stdDeviation="3" result="blur"/>
     <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
@@ -281,7 +267,7 @@
   </filter>
 </defs>
 
-<!-- ══ FONDO TABLERO MADERA ══ -->
+<!-- ══ FONDO MADERA ══ -->
 <rect width="900" height="900" fill="url(#woodMain)" rx="14"/>
 <rect width="900" height="900" fill="url(#grainPat)"  rx="14" opacity="0.85"/>
 <rect width="900" height="900" fill="url(#varnish)"   rx="14"/>
@@ -291,16 +277,16 @@
 <ellipse cx="750" cy="200" rx="40" ry="28" fill="url(#woodKnot1)" opacity="0.4"/>
 <ellipse cx="180" cy="700" rx="48" ry="32" fill="url(#woodKnot1)" opacity="0.45"/>
 
-<!-- Marco exterior madera oscura laminada -->
-<rect x="2"  y="2"  width="896" height="896" fill="none" stroke="url(#goldBorder)"  stroke-width="5"   rx="13"/>
-<rect x="7"  y="7"  width="886" height="886" fill="none" stroke="#2E1204"           stroke-width="3"   rx="10"/>
-<rect x="11" y="11" width="878" height="878" fill="none" stroke="#D4A840"           stroke-width="1.2" rx="8"  opacity="0.7"/>
-<rect x="14" y="14" width="872" height="872" fill="none" stroke="#5C2E0E"           stroke-width="1.5" rx="7"  opacity="0.5"/>
-<rect x="17" y="17" width="866" height="866" fill="none" stroke="#E0B850"           stroke-width="0.6" rx="6"  opacity="0.4"/>
+<!-- Marco exterior laminado -->
+<rect x="2"  y="2"  width="896" height="896" fill="none" stroke="url(#goldBorder)" stroke-width="5"   rx="13"/>
+<rect x="7"  y="7"  width="886" height="886" fill="none" stroke="#2E1204"          stroke-width="3"   rx="10"/>
+<rect x="11" y="11" width="878" height="878" fill="none" stroke="#D4A840"          stroke-width="1.2" rx="8"  opacity="0.7"/>
+<rect x="14" y="14" width="872" height="872" fill="none" stroke="#5C2E0E"          stroke-width="1.5" rx="7"  opacity="0.5"/>
+<rect x="17" y="17" width="866" height="866" fill="none" stroke="#E0B850"          stroke-width="0.6" rx="6"  opacity="0.4"/>
 
-<!-- Tachuelas de esquina -->
-<circle cx="22" cy="22" r="8" fill="#5C2E0E" stroke="#D4A840" stroke-width="1.5"/>
-<circle cx="22" cy="22" r="3" fill="#D4A840"/>
+<!-- Tachuelas esquinas -->
+<circle cx="22"  cy="22"  r="8" fill="#5C2E0E" stroke="#D4A840" stroke-width="1.5"/>
+<circle cx="22"  cy="22"  r="3" fill="#D4A840"/>
 <circle cx="878" cy="22"  r="8" fill="#5C2E0E" stroke="#D4A840" stroke-width="1.5"/>
 <circle cx="878" cy="22"  r="3" fill="#D4A840"/>
 <circle cx="22"  cy="878" r="8" fill="#5C2E0E" stroke="#D4A840" stroke-width="1.5"/>
@@ -317,12 +303,12 @@
 <g transform="translate(788,788)">
   <rect width="110" height="110" fill="url(#cornerTeal)" rx="7" filter="url(#shadow)"/>
   <rect x="0" y="0" width="110" height="10" fill="#02C39A" rx="5"/>
-  <rect x="44" y="24" width="22" height="7" fill="white" rx="2"/>
+  <rect x="44" y="24" width="22" height="7"  fill="white" rx="2"/>
   <rect x="50" y="18" width="10" height="19" fill="white" rx="2"/>
-  <text x="55" y="60"  text-anchor="middle" fill="white"   font-size="11" font-family="Georgia" font-weight="bold">SALIDA</text>
-  <text x="55" y="76"  text-anchor="middle" fill="#d0fff5"  font-size="9"  font-family="Georgia">AL PASAR</text>
-  <text x="55" y="93"  text-anchor="middle" fill="white"   font-size="12" font-family="Georgia" font-weight="bold">COBRA $200</text>
-  <text x="55" y="107" text-anchor="middle" fill="#d0fff5"  font-size="8"  font-family="Georgia">🏥 INICIO</text>
+  <text x="55" y="60"  text-anchor="middle" fill="white"  font-size="11" font-family="Georgia" font-weight="bold">SALIDA</text>
+  <text x="55" y="76"  text-anchor="middle" fill="#d0fff5" font-size="9"  font-family="Georgia">AL PASAR</text>
+  <text x="55" y="93"  text-anchor="middle" fill="white"  font-size="12" font-family="Georgia" font-weight="bold">COBRA $200</text>
+  <text x="55" y="107" text-anchor="middle" fill="#d0fff5" font-size="8"  font-family="Georgia">🏥 INICIO</text>
 </g>
 
 <!-- Bottom-Left: VISITA HOSPITAL -->
@@ -333,10 +319,10 @@
   <rect x="25" y="26" width="60" height="36" fill="#0D2B45" rx="4" stroke="#028090" stroke-width="1.2"/>
   <rect x="25" y="32" width="60" height="14" fill="#028090" rx="2" opacity="0.7"/>
   <circle cx="55" cy="39" r="8" fill="#1E8449"/>
-  <rect x="50" y="36" width="10" height="2.5" fill="white" rx="1"/>
+  <rect x="50" y="36"  width="10" height="2.5" fill="white" rx="1"/>
   <rect x="53.5" y="33" width="2.5" height="10" fill="white" rx="1"/>
-  <text x="55" y="76"  text-anchor="middle" fill="#4ab8c8"  font-size="9.5" font-family="Georgia" font-weight="bold">VISITA AL</text>
-  <text x="55" y="90"  text-anchor="middle" fill="white"    font-size="10"  font-family="Georgia" font-weight="bold">HOSPITAL</text>
+  <text x="55" y="76"  text-anchor="middle" fill="#4ab8c8" font-size="9.5" font-family="Georgia" font-weight="bold">VISITA AL</text>
+  <text x="55" y="90"  text-anchor="middle" fill="white"   font-size="10"  font-family="Georgia" font-weight="bold">HOSPITAL</text>
   <text x="55" y="105" text-anchor="middle" fill="#C8A060"  font-size="8"   font-family="Georgia">Solo visita</text>
 </g>
 
@@ -349,7 +335,7 @@
   <text x="55" y="57"  text-anchor="middle" fill="#F96167" font-size="16" font-weight="bold">!</text>
   <text x="55" y="78"  text-anchor="middle" fill="#F96167" font-size="13" font-family="Georgia" font-weight="bold">UCI</text>
   <text x="55" y="92"  text-anchor="middle" fill="white"   font-size="9.5" font-family="Georgia">EMERGENCIA</text>
-  <text x="55" y="106" text-anchor="middle" fill="#C8A060" font-size="8"   font-family="Georgia">Pierde 2 turnos</text>
+  <text x="55" y="106" text-anchor="middle" fill="#C8A060"  font-size="8"  font-family="Georgia">Pierde 2 turnos</text>
 </g>
 
 <!-- Top-Right: ZONA LIBRE -->
@@ -357,16 +343,16 @@
   <rect width="110" height="110" fill="#1A0A02" rx="7" filter="url(#shadow)"/>
   <rect width="110" height="110" fill="url(#grainPat)" rx="7" opacity="0.4"/>
   <rect x="0" y="0" width="110" height="10" fill="url(#cornerTeal)" rx="5"/>
-  <text x="55" y="43" text-anchor="middle" fill="#02C39A" font-size="28">🛡</text>
-  <text x="55" y="66" text-anchor="middle" fill="white"   font-size="13" font-family="Georgia" font-weight="bold">ZONA</text>
-  <text x="55" y="82" text-anchor="middle" fill="#02C39A" font-size="13" font-family="Georgia" font-weight="bold">LIBRE</text>
-  <text x="55" y="96" text-anchor="middle" fill="#C8A060" font-size="9"  font-family="Georgia">Descansa</text>
-  <text x="55" y="108" text-anchor="middle" fill="#C8A060" font-size="9" font-family="Georgia">sin pagar 🌿</text>
+  <text x="55" y="43"  text-anchor="middle" fill="#02C39A" font-size="28">🛡</text>
+  <text x="55" y="66"  text-anchor="middle" fill="white"   font-size="13" font-family="Georgia" font-weight="bold">ZONA</text>
+  <text x="55" y="82"  text-anchor="middle" fill="#02C39A" font-size="13" font-family="Georgia" font-weight="bold">LIBRE</text>
+  <text x="55" y="96"  text-anchor="middle" fill="#C8A060"  font-size="9"  font-family="Georgia">Descansa</text>
+  <text x="55" y="108" text-anchor="middle" fill="#C8A060"  font-size="9"  font-family="Georgia">sin pagar 🌿</text>
 </g>
 
 
 <!-- ══════════════════════════════════
-     BOTTOM ROW (right→left)
+     BOTTOM ROW (right → left)
 ══════════════════════════════════ -->
 
 <!-- C-1 Hipertensión -->
@@ -389,9 +375,9 @@
   <rect x="0" y="0" width="75" height="9" fill="url(#gSalud)" rx="3"/>
   <text x="37" y="30"  text-anchor="middle" fill="white"   font-size="8.5" font-family="Georgia" font-weight="bold">TARJETA</text>
   <text x="37" y="44"  text-anchor="middle" fill="#90E8A0" font-size="8.5" font-family="Georgia" font-weight="bold">SALUD</text>
-  <rect x="22" y="52"  width="31" height="31" fill="#117A65" rx="5" opacity="0.9"/>
-  <rect x="31" y="59"  width="13" height="4"  fill="white" rx="1.5"/>
-  <rect x="36" y="54"  width="4"  height="13" fill="white" rx="1.5"/>
+  <rect x="22" y="52" width="31" height="31" fill="#117A65" rx="5" opacity="0.9"/>
+  <rect x="31" y="59" width="13" height="4"  fill="white" rx="1.5"/>
+  <rect x="36" y="54" width="4"  height="13" fill="white" rx="1.5"/>
   <text x="37" y="100" text-anchor="middle" fill="#90E8A0" font-size="7.5" font-family="Georgia">Beneficio (+)</text>
 </g>
 
@@ -467,7 +453,7 @@
   <rect x="0" y="0" width="75" height="9" fill="url(#gRiesgo)" rx="3"/>
   <text x="37" y="30"  text-anchor="middle" fill="white"   font-size="8.5" font-family="Georgia" font-weight="bold">TARJETA</text>
   <text x="37" y="44"  text-anchor="middle" fill="#D8B8F0" font-size="8.5" font-family="Georgia" font-weight="bold">RIESGO</text>
-  <rect x="22" y="52"  width="31" height="31" fill="#7D3C98" rx="5" opacity="0.9"/>
+  <rect x="22" y="52" width="31" height="31" fill="#7D3C98" rx="5" opacity="0.9"/>
   <text x="37" y="74"  text-anchor="middle" fill="white"   font-size="18" font-weight="bold">!</text>
   <text x="37" y="100" text-anchor="middle" fill="#D8B8F0" font-size="7.5" font-family="Georgia">Penalidad (!)</text>
 </g>
@@ -487,7 +473,7 @@
 
 
 <!-- ══════════════════════════════════
-     TOP ROW (left→right)
+     TOP ROW (left → right)
 ══════════════════════════════════ -->
 
 <!-- N-4 Vitaminas -->
@@ -521,7 +507,7 @@
   <rect width="75" height="110" fill="url(#wPago)" rx="4" filter="url(#innerShadow)"/>
   <rect width="75" height="110" fill="url(#grainPago)" rx="4" opacity="0.6"/>
   <rect x="0" y="101" width="75" height="9" fill="url(#gPago)" rx="3"/>
-  <text x="37" y="24"  text-anchor="middle" fill="#E8C840" font-size="8" font-family="Georgia" font-weight="bold">PAGA $80</text>
+  <text x="37" y="24"  text-anchor="middle" fill="#E8C840" font-size="8"   font-family="Georgia" font-weight="bold">PAGA $80</text>
   <line x1="8" y1="33" x2="67" y2="33" stroke="#D4AC0D" stroke-width="0.7" opacity="0.6"/>
   <text x="37" y="51"  text-anchor="middle" fill="#D8C870" font-size="7.5" font-family="Georgia">Examen</text>
   <text x="37" y="65"  text-anchor="middle" fill="#F8E890" font-size="8.5" font-family="Georgia" font-weight="bold">DE SALUD</text>
@@ -561,9 +547,9 @@
   <rect x="0" y="101" width="75" height="9" fill="url(#gSalud)" rx="3"/>
   <text x="37" y="20"  text-anchor="middle" fill="#90E8A0" font-size="7.5" font-family="Georgia" font-weight="bold">TARJETA</text>
   <text x="37" y="34"  text-anchor="middle" fill="white"   font-size="8.5" font-family="Georgia" font-weight="bold">SALUD</text>
-  <rect x="22" y="44"  width="31" height="31" fill="#117A65" rx="5" opacity="0.9"/>
-  <rect x="31" y="51"  width="13" height="4"  fill="white" rx="1.5"/>
-  <rect x="36" y="46"  width="4"  height="13" fill="white" rx="1.5"/>
+  <rect x="22" y="44" width="31" height="31" fill="#117A65" rx="5" opacity="0.9"/>
+  <rect x="31" y="51" width="13" height="4"  fill="white" rx="1.5"/>
+  <rect x="36" y="46" width="4"  height="13" fill="white" rx="1.5"/>
   <text x="37" y="94"  text-anchor="middle" fill="#90E8A0" font-size="7.5" font-family="Georgia">Beneficio (+)</text>
 </g>
 
@@ -600,14 +586,14 @@
   <rect x="0" y="101" width="75" height="9" fill="url(#gRiesgo)" rx="3"/>
   <text x="37" y="20"  text-anchor="middle" fill="#D8B8F0" font-size="7.5" font-family="Georgia" font-weight="bold">TARJETA</text>
   <text x="37" y="34"  text-anchor="middle" fill="white"   font-size="8.5" font-family="Georgia" font-weight="bold">RIESGO</text>
-  <rect x="22" y="44"  width="31" height="31" fill="#7D3C98" rx="5" opacity="0.9"/>
+  <rect x="22" y="44" width="31" height="31" fill="#7D3C98" rx="5" opacity="0.9"/>
   <text x="37" y="66"  text-anchor="middle" fill="white"   font-size="18" font-weight="bold">!</text>
   <text x="37" y="94"  text-anchor="middle" fill="#D8B8F0" font-size="7.5" font-family="Georgia">Penalidad (!)</text>
 </g>
 
 
 <!-- ══════════════════════════════════
-     LEFT COL (bottom→top)
+     LEFT COL (bottom → top)
 ══════════════════════════════════ -->
 
 <!-- R-2 Asma -->
@@ -696,7 +682,7 @@
   <text x="65" y="20" text-anchor="middle" fill="white"   font-size="8.5" font-family="Georgia" font-weight="bold">TARJETA RIESGO</text>
   <rect x="44" y="27" width="24" height="24" fill="#7D3C98" rx="4" opacity="0.9"/>
   <text x="56" y="45" text-anchor="middle" fill="white"   font-size="15" font-weight="bold">!</text>
-  <text x="65" y="66" text-anchor="middle" fill="#D8B8F0" font-size="8" font-family="Georgia">Penalidad (!)</text>
+  <text x="65" y="66" text-anchor="middle" fill="#D8B8F0" font-size="8"  font-family="Georgia">Penalidad (!)</text>
 </g>
 
 <!-- O-2 Tratamiento -->
@@ -712,7 +698,7 @@
 
 
 <!-- ══════════════════════════════════
-     RIGHT COL (top→bottom)
+     RIGHT COL (top → bottom)
 ══════════════════════════════════ -->
 
 <!-- D-4 Resistencia -->
@@ -801,7 +787,7 @@
   <text x="45" y="20" text-anchor="middle" fill="white"   font-size="8.5" font-family="Georgia" font-weight="bold">TARJETA RIESGO</text>
   <rect x="32" y="27" width="24" height="24" fill="#7D3C98" rx="4" opacity="0.9"/>
   <text x="44" y="45" text-anchor="middle" fill="white"   font-size="15" font-weight="bold">!</text>
-  <text x="45" y="66" text-anchor="middle" fill="#D8B8F0" font-size="8" font-family="Georgia">Penalidad (!)</text>
+  <text x="45" y="66" text-anchor="middle" fill="#D8B8F0" font-size="8"  font-family="Georgia">Penalidad (!)</text>
 </g>
 
 <!-- N-6 Hidratación -->
@@ -821,23 +807,22 @@
 ══════════════════════════════════ -->
 <rect x="112" y="112" width="676" height="676" fill="url(#centerWood)" rx="8"/>
 <rect x="112" y="112" width="676" height="676" fill="url(#grainCenter)" rx="8" opacity="0.8"/>
-<!-- Barniz sobre centro -->
 <rect x="112" y="112" width="676" height="676" fill="url(#varnish)" rx="8"/>
 
-<!-- Marco incrustado del centro -->
-<rect x="112" y="112" width="676" height="676" fill="none" stroke="#5C2E0E"  stroke-width="4"   rx="8"  opacity="0.9"/>
-<rect x="115" y="115" width="670" height="670" fill="none" stroke="#D4A840"  stroke-width="1.5" rx="7"  opacity="0.7"/>
-<rect x="118" y="118" width="664" height="664" fill="none" stroke="#3D1A06"  stroke-width="1.5" rx="6"  opacity="0.6"/>
-<rect x="121" y="121" width="658" height="658" fill="none" stroke="#E0B850"  stroke-width="0.7" rx="5"  opacity="0.4"/>
-<rect x="124" y="124" width="652" height="652" fill="none" stroke="#5C2E0E"  stroke-width="0.5" rx="4"  opacity="0.4"/>
+<!-- Marco incrustado centro -->
+<rect x="112" y="112" width="676" height="676" fill="none" stroke="#5C2E0E" stroke-width="4"   rx="8"  opacity="0.9"/>
+<rect x="115" y="115" width="670" height="670" fill="none" stroke="#D4A840" stroke-width="1.5" rx="7"  opacity="0.7"/>
+<rect x="118" y="118" width="664" height="664" fill="none" stroke="#3D1A06" stroke-width="1.5" rx="6"  opacity="0.6"/>
+<rect x="121" y="121" width="658" height="658" fill="none" stroke="#E0B850" stroke-width="0.7" rx="5"  opacity="0.4"/>
+<rect x="124" y="124" width="652" height="652" fill="none" stroke="#5C2E0E" stroke-width="0.5" rx="4"  opacity="0.4"/>
 
-<!-- Circulos decorativos centro -->
+<!-- Decoración circular -->
 <circle cx="450" cy="450" r="295" fill="none" stroke="#8A5530" stroke-width="0.8" stroke-dasharray="5 9" opacity="0.3"/>
 <circle cx="450" cy="450" r="220" fill="none" stroke="#D4A840" stroke-width="0.4" stroke-dasharray="3 7" opacity="0.22"/>
 <line x1="450" y1="130" x2="450" y2="770" stroke="#8A5530" stroke-width="0.5" opacity="0.12"/>
 <line x1="130" y1="450" x2="770" y2="450" stroke="#8A5530" stroke-width="0.5" opacity="0.12"/>
 
-<!-- LOGO elipse - madera oscura pulida -->
+<!-- Elipse logo -->
 <ellipse cx="450" cy="315" rx="240" ry="142" fill="#180A02" opacity="0.96"/>
 <ellipse cx="450" cy="315" rx="240" ry="142" fill="url(#varnish)" opacity="0.5"/>
 <ellipse cx="450" cy="315" rx="240" ry="142" fill="none" stroke="#D4A840" stroke-width="2.5" opacity="0.8" filter="url(#glow2)"/>
@@ -848,16 +833,14 @@
 <rect x="437" y="180" width="26" height="9"  fill="#C0392B" rx="2.5" filter="url(#glow2)"/>
 <rect x="446" y="171" width="9"  height="27" fill="#C0392B" rx="2.5" filter="url(#glow2)"/>
 
-<!-- Título MEDICO -->
+<!-- Título -->
 <text x="450" y="268" text-anchor="middle" fill="#FFFFFF" font-size="70" font-family="Georgia, serif" font-weight="bold" letter-spacing="2" filter="url(#glow2)">MEDICO</text>
-<!-- Título POLIS en dorado madera -->
 <text x="450" y="332" text-anchor="middle" fill="#D4A840" font-size="62" font-family="Georgia, serif" font-weight="bold" letter-spacing="9" filter="url(#glow)">POLIS</text>
-<!-- tagline -->
 <text x="450" y="368" text-anchor="middle" fill="#8A6030" font-size="11" font-family="Georgia" font-style="italic" letter-spacing="1.2">Juego Educativo · Enfermedades Crónicas No Transmisibles</text>
 <line x1="290" y1="380" x2="610" y2="380" stroke="#8A5530" stroke-width="1" opacity="0.6"/>
 <circle cx="450" cy="380" r="4" fill="#D4A840" opacity="0.8"/>
 
-<!-- CATEGORÍAS -->
+<!-- Categorías -->
 <text x="450" y="408" text-anchor="middle" fill="#8A6030" font-size="9.5" font-family="Georgia" letter-spacing="3.5">— CATEGORÍAS —</text>
 <rect x="148" y="418" width="12" height="12" fill="#C0392B" rx="2"/>
 <text x="167" y="429" fill="#D4B888" font-size="11" font-family="Georgia">Cardiología</text>
@@ -882,7 +865,7 @@
 
 <line x1="148" y1="514" x2="752" y2="514" stroke="#5C2E0E" stroke-width="1" opacity="0.7"/>
 
-<!-- REGLAS -->
+<!-- Reglas -->
 <text x="450" y="536" text-anchor="middle" fill="#8A6030" font-size="9.5" font-family="Georgia" letter-spacing="3.5">— REGLAS BÁSICAS —</text>
 <text x="215" y="558" fill="#A88050" font-size="10" font-family="Georgia">🎲  Tira los dados y avanza tu ficha por el tablero</text>
 <text x="215" y="575" fill="#A88050" font-size="10" font-family="Georgia">🏥  Al caer en propiedad: compra o paga alquiler al dueño</text>
@@ -893,7 +876,7 @@
 
 <line x1="175" y1="657" x2="725" y2="657" stroke="#5C2E0E" stroke-width="1" opacity="0.6"/>
 
-<!-- FICHAS -->
+<!-- Fichas -->
 <text x="450" y="676" text-anchor="middle" fill="#8A6030" font-size="9.5" font-family="Georgia" letter-spacing="3">— FICHAS DE JUGADORES —</text>
 <circle cx="303" cy="710" r="22" fill="#C0392B" stroke="#FF9090" stroke-width="1.5"/>
 <text x="303" y="717" text-anchor="middle" font-size="16">🧑</text>
@@ -908,7 +891,7 @@
 <circle cx="597" cy="710" r="22" fill="#5C2E0E" stroke="#D4A840" stroke-width="1.5"/>
 <text x="597" y="717" text-anchor="middle" font-size="16">🧑‍⚕️</text>
 
-<!-- DADOS de madera -->
+<!-- Dados -->
 <rect x="388" y="742" width="34" height="34" fill="#2A1206" rx="6" stroke="#D4A840" stroke-width="1.5"/>
 <circle cx="399" cy="753" r="3.2" fill="#D4A840"/>
 <circle cx="413" cy="767" r="3.2" fill="#D4A840"/>
@@ -925,5 +908,48 @@
 
 </svg>
 </div>
+<footer class="footer">
+  <div class="footer-grid">
+
+    <div class="footer-brand">
+      <span class="footer-cross">✚</span>
+      <span class="footer-logo">MEDICOPOLIS</span>
+      <p class="footer-tagline">Juego Educativo sobre<br>Enfermedades Crónicas No Transmisibles</p>
+    </div>
+
+    <div class="footer-section">
+      <h4>Contáctanos</h4>
+      <ul>
+        <li>📞 <a href="tel:+593958605284">+593 95 860 5284</a></li>
+        <li>📱 <a href="https://wa.me/593958605284">WhatsApp</a></li>
+        <li>✉️ <a href="mailto:info@medicopolis.edu.ec">info@medicopolis.edu.ec</a></li>
+        <li>✉️ <a href="mailto:soporte@medicopolis.edu.ec">soporte@medicopolis.edu.ec</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-section">
+      <h4>Ubicación</h4>
+      <ul>
+        <li>📍 Cuenca, Azuay, Ecuador</li>
+        <li>🕘 Lun – Vie: 08:00 – 17:00</li>
+        <li>🌐 <a href="#">www.medicopolis.edu.ec</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-section">
+      <h4>Síguenos</h4>
+      <ul class="footer-social">
+        <li><a href="#">Facebook</a></li>
+        <li><a href="#">Instagram</a></li>
+        <li><a href="#">YouTube</a></li>
+        <li><a href="#">LinkedIn</a></li>
+      </ul>
+    </div>
+
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 MEDICOPOLIS · Todos los derechos reservados</p>
+  </div>
+</footer>
 </body>
 </html>

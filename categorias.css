@@ -1,0 +1,160 @@
+/* ==============================================
+   categorias.css
+============================================== */
+
+.page-header {
+  width: 100%;
+  max-width: 1000px;
+  text-align: center;
+  padding: 40px 20px 20px;
+  animation: fadeInDown 0.7s ease both;
+}
+.page-header h1 {
+  color: var(--gold);
+  font-size: clamp(28px, 5vw, 46px);
+  letter-spacing: 3px;
+  animation: glow 4s ease infinite;
+  margin-bottom: 10px;
+}
+.page-header p { color: var(--text-dim); font-size: 14px; letter-spacing: 1px; }
+
+.cat-section {
+  width: 100%;
+  max-width: 1000px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+/* Card base */
+.cat-card {
+  border-radius: 14px;
+  border: 1px solid;
+  overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+  animation: fadeInUp 0.6s ease both;
+}
+.cat-card:nth-child(1) { animation-delay: 0.05s; }
+.cat-card:nth-child(2) { animation-delay: 0.12s; }
+.cat-card:nth-child(3) { animation-delay: 0.19s; }
+.cat-card:nth-child(4) { animation-delay: 0.26s; }
+.cat-card:nth-child(5) { animation-delay: 0.33s; }
+.cat-card:hover { transform: translateY(-5px); }
+
+/* Per-category colors */
+.cardio { border-color: #C0392B; background: linear-gradient(135deg, #1A0802, #2E1208); }
+.cardio:hover { box-shadow: 0 12px 35px rgba(192,57,43,0.25); }
+
+.nutri  { border-color: #1E8449; background: linear-gradient(135deg, #081208, #14280E); }
+.nutri:hover  { box-shadow: 0 12px 35px rgba(30,132,73,0.25); }
+
+.diab   { border-color: #D4AC0D; background: linear-gradient(135deg, #140E02, #26200A); }
+.diab:hover   { box-shadow: 0 12px 35px rgba(212,172,13,0.25); }
+
+.resp   { border-color: #1A5276; background: linear-gradient(135deg, #020A12, #0A1C2E); }
+.resp:hover   { box-shadow: 0 12px 35px rgba(26,82,118,0.3); }
+
+.onco   { border-color: #7D3C98; background: linear-gradient(135deg, #100818, #1E1030); }
+.onco:hover   { box-shadow: 0 12px 35px rgba(125,60,152,0.25); }
+
+/* Header strip */
+.cat-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 28px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.cardio .cat-header { background: rgba(192,57,43,0.18); }
+.nutri  .cat-header { background: rgba(30,132,73,0.18); }
+.diab   .cat-header { background: rgba(212,172,13,0.18); }
+.resp   .cat-header { background: rgba(26,82,118,0.22); }
+.onco   .cat-header { background: rgba(125,60,152,0.18); }
+
+.cat-emoji {
+  font-size: 42px;
+  animation: floatUp 3.5s ease infinite;
+}
+.cat-card:hover .cat-emoji { animation: pulse 0.5s ease; }
+
+.cat-header h2 {
+  color: white;
+  font-size: 22px;
+  letter-spacing: 2px;
+  flex: 1;
+}
+.cardio .cat-header h2 { color: #FF9090; }
+.nutri  .cat-header h2 { color: #90E898; }
+.diab   .cat-header h2 { color: #F8E898; }
+.resp   .cat-header h2 { color: #A8D8F8; }
+.onco   .cat-header h2 { color: #D8B8F0; }
+
+.cat-badge {
+  font-size: 11px;
+  letter-spacing: 1px;
+  padding: 4px 12px;
+  border-radius: 14px;
+  font-family: 'Courier New', monospace;
+}
+.cardio .cat-badge { background: rgba(192,57,43,0.3); color: #FF9090; border: 1px solid #C0392B; }
+.nutri  .cat-badge { background: rgba(30,132,73,0.3);  color: #90E898; border: 1px solid #1E8449; }
+.diab   .cat-badge { background: rgba(212,172,13,0.3); color: #F8E898; border: 1px solid #D4AC0D; }
+.resp   .cat-badge { background: rgba(26,82,118,0.3);  color: #A8D8F8; border: 1px solid #1A5276; }
+.onco   .cat-badge { background: rgba(125,60,152,0.3); color: #D8B8F0; border: 1px solid #7D3C98; }
+
+/* Body */
+.cat-body { padding: 24px 28px; display: flex; flex-direction: column; gap: 18px; }
+
+.cat-desc { color: var(--text-warm); font-size: 13px; line-height: 1.8; }
+
+.cat-props {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.cat-prop {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: 12px;
+  color: var(--text-warm);
+  transition: background 0.2s, transform 0.2s;
+}
+.cat-prop:hover { background: rgba(255,255,255,0.09); transform: translateX(3px); }
+
+.prop-code {
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  font-size: 11px;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+.cardio .prop-code { background: rgba(192,57,43,0.3); color: #FF9090; }
+.nutri  .prop-code { background: rgba(30,132,73,0.3);  color: #90E898; }
+.diab   .prop-code { background: rgba(212,172,13,0.3); color: #F8E898; }
+.resp   .prop-code { background: rgba(26,82,118,0.3);  color: #A8D8F8; }
+.onco   .prop-code { background: rgba(125,60,152,0.3); color: #D8B8F0; }
+
+.cat-fact {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: rgba(212,168,64,0.06);
+  border: 1px solid rgba(212,168,64,0.18);
+  border-radius: 8px;
+  padding: 14px 18px;
+}
+.fact-icon { font-size: 20px; margin-top: 1px; }
+.cat-fact p { color: var(--text-dim); font-size: 12px; line-height: 1.7; font-style: italic; }
+
+@media (max-width: 600px) {
+  .cat-header { padding: 16px 18px; }
+  .cat-body   { padding: 18px 18px; }
+  .cat-header h2 { font-size: 18px; }
+  .cat-emoji { font-size: 32px; }
+}

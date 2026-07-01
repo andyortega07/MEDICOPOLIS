@@ -1,0 +1,175 @@
+/* ==============================================
+   comojugar.css
+============================================== */
+
+.page-header {
+  width: 100%;
+  max-width: 1000px;
+  text-align: center;
+  padding: 40px 20px 20px;
+  animation: fadeInDown 0.7s ease both;
+}
+.page-header h1 {
+  color: var(--gold);
+  font-size: clamp(28px, 5vw, 46px);
+  letter-spacing: 3px;
+  animation: glow 4s ease infinite;
+  margin-bottom: 10px;
+}
+.page-header p {
+  color: var(--text-dim);
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+
+.cj-section {
+  width: 100%;
+  max-width: 1000px;
+  margin-bottom: 22px;
+  animation: fadeInUp 0.7s ease 0.2s both;
+}
+
+/* Objetivo */
+.cj-card {
+  background: linear-gradient(135deg, #1A0802, #2E1204);
+  border: 1px solid var(--gold);
+  border-radius: 14px;
+  padding: 32px 36px;
+  display: flex;
+  align-items: flex-start;
+  gap: 28px;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.cj-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px rgba(212,168,64,0.15);
+}
+.cj-icon { font-size: 52px; animation: floatUp 3s ease infinite; }
+.cj-text h2 { color: var(--gold); font-size: 20px; margin-bottom: 12px; letter-spacing: 1px; }
+.cj-text p { color: var(--text-warm); font-size: 14px; line-height: 1.8; }
+
+/* Steps */
+.steps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.step-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 22px;
+  background: linear-gradient(135deg, #1A0802, #261006);
+  border: 1px solid var(--wood-mid);
+  border-left: 4px solid var(--gold);
+  border-radius: 10px;
+  padding: 22px 26px;
+  transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+  animation: slideInLeft 0.5s ease both;
+}
+.step-item:nth-child(1) { animation-delay: 0.05s; }
+.step-item:nth-child(2) { animation-delay: 0.10s; }
+.step-item:nth-child(3) { animation-delay: 0.15s; }
+.step-item:nth-child(4) { animation-delay: 0.20s; }
+.step-item:nth-child(5) { animation-delay: 0.25s; }
+.step-item:nth-child(6) { animation-delay: 0.30s; }
+.step-item:nth-child(7) { animation-delay: 0.35s; }
+.step-item:nth-child(8) { animation-delay: 0.40s; }
+
+.step-item:hover {
+  transform: translateX(6px);
+  border-color: var(--teal);
+  box-shadow: 0 6px 20px rgba(2,195,154,0.12);
+}
+
+.step-num {
+  font-size: 36px;
+  font-weight: bold;
+  color: var(--gold);
+  opacity: 0.35;
+  min-width: 54px;
+  line-height: 1;
+  font-family: Georgia, serif;
+  transition: opacity 0.25s;
+}
+.step-item:hover .step-num { opacity: 0.8; }
+
+.step-body h3 {
+  color: var(--gold);
+  font-size: 15px;
+  margin-bottom: 7px;
+  letter-spacing: 0.5px;
+}
+.step-body p {
+  color: var(--text-warm);
+  font-size: 13px;
+  line-height: 1.75;
+}
+.step-body strong { color: var(--gold-light); }
+
+.tag-salud {
+  background: rgba(17,122,101,0.3);
+  color: #90E8A0;
+  border: 1px solid #117A65;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+.tag-riesgo {
+  background: rgba(125,60,152,0.3);
+  color: #D8B8F0;
+  border: 1px solid #7D3C98;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+.tag-uci {
+  background: rgba(192,57,43,0.3);
+  color: #FF9090;
+  border: 1px solid #C0392B;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+/* Tabla de rentas */
+.renta-table-wrap {
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1px solid var(--wood-mid);
+}
+.renta-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.renta-table thead tr {
+  background: linear-gradient(135deg, #2E1204, #3D1A06);
+}
+.renta-table th {
+  color: var(--gold);
+  padding: 14px 18px;
+  text-align: left;
+  letter-spacing: 1px;
+  font-size: 12px;
+  border-bottom: 2px solid var(--gold);
+}
+.renta-table td {
+  padding: 12px 18px;
+  color: var(--text-warm);
+  border-bottom: 1px solid rgba(92,46,14,0.4);
+  transition: background 0.2s;
+}
+.renta-table tbody tr:hover td { background: rgba(212,168,64,0.06); }
+
+.row-cardio td:first-child { color: #FF9090; }
+.row-nutri  td:first-child { color: #90E898; }
+.row-diab   td:first-child { color: #F8E898; }
+.row-resp   td:first-child { color: #A8D8F8; }
+.row-onco   td:first-child { color: #D8B8F0; }
+
+@media (max-width: 600px) {
+  .cj-card { flex-direction: column; gap: 14px; padding: 22px 20px; }
+  .step-item { padding: 16px 18px; }
+  .step-num { font-size: 26px; min-width: 40px; }
+}

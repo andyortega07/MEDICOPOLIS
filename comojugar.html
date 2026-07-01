@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MEDICOPOLIS — Cómo Jugar</title>
+  <link rel="stylesheet" href="shared.css">
+  <link rel="stylesheet" href="comojugar.css">
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="index.html" class="nav-brand">
+    <span class="nav-cross">✚</span>
+    <span class="nav-title">MEDICOPOLIS</span>
+  </a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="index.html">Inicio</a></li>
+    <li><a href="comojugar.html" class="active">Cómo Jugar</a></li>
+    <li><a href="categorias.html">Categorías</a></li>
+    <li><a href="tablero.html">Tablero</a></li>
+    <li><a href="login.html" class="nav-btn-login">Iniciar Sesión</a></li>
+  </ul>
+  <button class="nav-hamburger" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
+</nav>
+
+<!-- PAGE HEADER -->
+<header class="page-header">
+  <h1>¿Cómo se Juega?</h1>
+  <p>Aprende las reglas básicas de MEDICOPOLIS en minutos</p>
+</header>
+
+<!-- OBJETIVO -->
+<section class="cj-section">
+  <div class="cj-card objetivo">
+    <div class="cj-icon">🏆</div>
+    <div class="cj-text">
+      <h2>Objetivo del Juego</h2>
+      <p>El objetivo de MEDICOPOLIS es ser el último jugador en pie. Compra propiedades médicas, cobra renta a tus rivales y llévalos a la bancarrota mientras aprendes sobre enfermedades crónicas no transmisibles.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PASOS -->
+<section class="cj-section">
+  <h2 class="section-title">Pasos para Jugar</h2>
+  <div class="steps-list">
+    <div class="step-item">
+      <div class="step-num">01</div>
+      <div class="step-body">
+        <h3>Preparación</h3>
+        <p>Cada jugador elige una ficha y recibe <strong>$1,500</strong> de capital inicial. Coloca todas las fichas en la casilla <strong>SALIDA</strong>.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">02</div>
+      <div class="step-body">
+        <h3>Tirar los Dados</h3>
+        <p>En tu turno, lanza los dos dados y avanza tu ficha el número de casillas indicado. Si sacas dobles, vuelves a lanzar.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">03</div>
+      <div class="step-body">
+        <h3>Casillas de Propiedad</h3>
+        <p>Si caes en una propiedad sin dueño, puedes <strong>comprarla</strong>. Si ya tiene dueño, debes <strong>pagar alquiler</strong>.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">04</div>
+      <div class="step-body">
+        <h3>Tarjetas Especiales</h3>
+        <p><span class="tag-salud">Tarjeta Salud</span> = beneficio positivo. <span class="tag-riesgo">Tarjeta Riesgo</span> = penalidad. Sigue las instrucciones al pie de la letra.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">05</div>
+      <div class="step-body">
+        <h3>Construir Clínicas y Hospitales</h3>
+        <p>Si posees todas las propiedades de una categoría, puedes construir <strong>Clínicas 🏠</strong> (x4) y luego un <strong>Hospital 🏨</strong> para cobrar más renta.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">06</div>
+      <div class="step-body">
+        <h3>UCI — Emergencia</h3>
+        <p>Si caes en la casilla <span class="tag-uci">UCI</span>, pierdes <strong>2 turnos</strong> o puedes pagar <strong>$150</strong> para salir inmediatamente.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">07</div>
+      <div class="step-body">
+        <h3>Pasar por SALIDA</h3>
+        <p>Cada vez que pases o caigas en la casilla SALIDA, cobras <strong>$200</strong> del banco.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">08</div>
+      <div class="step-body">
+        <h3>¡Ganar!</h3>
+        <p>El juego termina cuando todos los rivales quedan en <strong>bancarrota</strong>. El último jugador con dinero gana.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TABLA DE RENTAS -->
+<section class="cj-section">
+  <h2 class="section-title">Tabla de Rentas por Categoría</h2>
+  <div class="renta-table-wrap">
+    <table class="renta-table">
+      <thead>
+        <tr>
+          <th>Categoría</th>
+          <th>Sin Clínica</th>
+          <th>1 Clínica</th>
+          <th>2 Clínicas</th>
+          <th>Hospital</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="row-cardio">
+          <td>🫀 Cardiología</td>
+          <td>$120–$220</td>
+          <td>×2</td>
+          <td>×3</td>
+          <td>×5</td>
+        </tr>
+        <tr class="row-nutri">
+          <td>🥦 Nutrición</td>
+          <td>$100–$180</td>
+          <td>×2</td>
+          <td>×3</td>
+          <td>×5</td>
+        </tr>
+        <tr class="row-diab">
+          <td>🩸 Diabetes</td>
+          <td>$140–$180</td>
+          <td>×2</td>
+          <td>×3</td>
+          <td>×5</td>
+        </tr>
+        <tr class="row-resp">
+          <td>🫁 Pulmonar</td>
+          <td>$160–$200</td>
+          <td>×2</td>
+          <td>×3</td>
+          <td>×5</td>
+        </tr>
+        <tr class="row-onco">
+          <td>🔬 Oncología</td>
+          <td>$200–$240</td>
+          <td>×2</td>
+          <td>×3</td>
+          <td>×5</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <span class="footer-cross">✚</span>
+      <span class="footer-logo">MEDICOPOLIS</span>
+      <p class="footer-tagline">Juego Educativo sobre<br>Enfermedades Crónicas No Transmisibles</p>
+    </div>
+    <div class="footer-section">
+      <h4>Contáctanos</h4>
+      <ul>
+        <li>📞 <a href="tel:+593958605284">+593 95 860 5284</a></li>
+        <li>📱 <a href="https://wa.me/593958605284">WhatsApp</a></li>
+        <li>✉️ <a href="mailto:info@medicopolis.edu.ec">info@medicopolis.edu.ec</a></li>
+        <li>✉️ <a href="mailto:soporte@medicopolis.edu.ec">soporte@medicopolis.edu.ec</a></li>
+      </ul>
+    </div>
+    <div class="footer-section">
+      <h4>Ubicación</h4>
+      <ul>
+        <li>📍 Cuenca, Azuay, Ecuador</li>
+        <li>🕘 Lun – Vie: 08:00 – 17:00</li>
+        <li>🌐 <a href="#">www.medicopolis.edu.ec</a></li>
+      </ul>
+    </div>
+    <div class="footer-section">
+      <h4>Síguenos</h4>
+      <ul class="footer-social">
+        <li><a href="https://www.facebook.com/andy.otg/">📘 Facebook</a></li>
+        <li><a href="https://www.instagram.com/andy.otg/">📸 Instagram</a></li>
+        <li><a href="https://www.youtube.com/@andyLaunchVision">▶️ YouTube</a></li>
+        <li><a href="https://github.com/andyortega07/MEDICOPOLIS">💼 GitHub</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 MEDICOPOLIS · Todos los derechos reservados · Desarrollado en Cuenca, Ecuador</p>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MEDICOPOLIS — Categorías</title>
+  <link rel="stylesheet" href="shared.css">
+  <link rel="stylesheet" href="categorias.css">
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="index.html" class="nav-brand">
+    <span class="nav-cross">✚</span>
+    <span class="nav-title">MEDICOPOLIS</span>
+  </a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="index.html">Inicio</a></li>
+    <li><a href="comojugar.html">Cómo Jugar</a></li>
+    <li><a href="categorias.html" class="active">Categorías</a></li>
+    <li><a href="tablero.html">Tablero</a></li>
+    <li><a href="login.html" class="nav-btn-login">Iniciar Sesión</a></li>
+  </ul>
+  <button class="nav-hamburger" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
+</nav>
+
+<header class="page-header">
+  <h1>Categorías Médicas</h1>
+  <p>Cinco áreas de enfermedades crónicas no transmisibles</p>
+</header>
+
+<!-- CARDS CATEGORÍAS -->
+<section class="cat-section">
+
+  <div class="cat-card cardio">
+    <div class="cat-header">
+      <span class="cat-emoji">🫀</span>
+      <h2>Cardiología</h2>
+      <span class="cat-badge">C-1 a C-5</span>
+    </div>
+    <div class="cat-body">
+      <p class="cat-desc">Las enfermedades cardiovasculares son la principal causa de muerte a nivel mundial. En MEDICOPOLIS aprendes sobre sus factores de riesgo y prevención.</p>
+      <div class="cat-props">
+        <div class="cat-prop"><span class="prop-code">C-1</span><span>Hipertensión — $120</span></div>
+        <div class="cat-prop"><span class="prop-code">C-2</span><span>Infarto — $160</span></div>
+        <div class="cat-prop"><span class="prop-code">C-3</span><span>Ejercicio — $180</span></div>
+        <div class="cat-prop"><span class="prop-code">C-4</span><span>Colesterol — $200</span></div>
+        <div class="cat-prop"><span class="prop-code">C-5</span><span>ACV — $220</span></div>
+      </div>
+      <div class="cat-fact">
+        <span class="fact-icon">💡</span>
+        <p>El 80% de los infartos y ACV prematuros son prevenibles con hábitos saludables.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cat-card nutri">
+    <div class="cat-header">
+      <span class="cat-emoji">🥦</span>
+      <h2>Nutrición</h2>
+      <span class="cat-badge">N-1 a N-6</span>
+    </div>
+    <div class="cat-body">
+      <p class="cat-desc">Una alimentación equilibrada es la base de la salud. Esta categoría aborda desde la obesidad hasta los ultraprocesados y la hidratación.</p>
+      <div class="cat-props">
+        <div class="cat-prop"><span class="prop-code">N-1</span><span>Alimentación — $100</span></div>
+        <div class="cat-prop"><span class="prop-code">N-2</span><span>Obesidad — $120</span></div>
+        <div class="cat-prop"><span class="prop-code">N-3</span><span>Dieta Sana — $160</span></div>
+        <div class="cat-prop"><span class="prop-code">N-4</span><span>Vitaminas — $140</span></div>
+        <div class="cat-prop"><span class="prop-code">N-5</span><span>Ultraprocesados — $160</span></div>
+        <div class="cat-prop"><span class="prop-code">N-6</span><span>Hidratación — $180</span></div>
+      </div>
+      <div class="cat-fact">
+        <span class="fact-icon">💡</span>
+        <p>La obesidad aumenta el riesgo de diabetes tipo 2, hipertensión y ciertos tipos de cáncer.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cat-card diab">
+    <div class="cat-header">
+      <span class="cat-emoji">🩸</span>
+      <h2>Diabetes</h2>
+      <span class="cat-badge">D-1 a D-4</span>
+    </div>
+    <div class="cat-body">
+      <p class="cat-desc">La diabetes afecta a más de 400 millones de personas. Aprende sobre sus tipos, la glucemia y el tratamiento con insulina.</p>
+      <div class="cat-props">
+        <div class="cat-prop"><span class="prop-code">D-1</span><span>Tipo 2 — $140</span></div>
+        <div class="cat-prop"><span class="prop-code">D-2</span><span>Glucemia — $140</span></div>
+        <div class="cat-prop"><span class="prop-code">D-3</span><span>Insulina — $160</span></div>
+        <div class="cat-prop"><span class="prop-code">D-4</span><span>Resistencia — $180</span></div>
+      </div>
+      <div class="cat-fact">
+        <span class="fact-icon">💡</span>
+        <p>La diabetes tipo 2 se puede prevenir en un 70% con ejercicio y buena alimentación.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cat-card resp">
+    <div class="cat-header">
+      <span class="cat-emoji">🫁</span>
+      <h2>Pulmonar</h2>
+      <span class="cat-badge">R-1 a R-4</span>
+    </div>
+    <div class="cat-body">
+      <p class="cat-desc">Las enfermedades respiratorias crónicas incluyen el EPOC, el asma y la fibrosis. El tabaquismo es el principal factor de riesgo.</p>
+      <div class="cat-props">
+        <div class="cat-prop"><span class="prop-code">R-1</span><span>EPOC — $180</span></div>
+        <div class="cat-prop"><span class="prop-code">R-2</span><span>Asma — $160</span></div>
+        <div class="cat-prop"><span class="prop-code">R-3</span><span>Tabaquismo — $180</span></div>
+        <div class="cat-prop"><span class="prop-code">R-4</span><span>Fibrosis — $200</span></div>
+      </div>
+      <div class="cat-fact">
+        <span class="fact-icon">💡</span>
+        <p>El tabaco causa el 90% de los casos de EPOC. Dejar de fumar a cualquier edad mejora la función pulmonar.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cat-card onco">
+    <div class="cat-header">
+      <span class="cat-emoji">🔬</span>
+      <h2>Oncología</h2>
+      <span class="cat-badge">O-1 a O-5</span>
+    </div>
+    <div class="cat-body">
+      <p class="cat-desc">La detección temprana salva vidas. Esta categoría cubre desde la prevención hasta el diagnóstico, tratamiento y biología del cáncer.</p>
+      <div class="cat-props">
+        <div class="cat-prop"><span class="prop-code">O-1</span><span>Detección — $200</span></div>
+        <div class="cat-prop"><span class="prop-code">O-2</span><span>Tratamiento — $220</span></div>
+        <div class="cat-prop"><span class="prop-code">O-3</span><span>Prevención — $200</span></div>
+        <div class="cat-prop"><span class="prop-code">O-4</span><span>Diagnóstico — $240</span></div>
+        <div class="cat-prop"><span class="prop-code">O-5</span><span>Biología — $240</span></div>
+      </div>
+      <div class="cat-fact">
+        <span class="fact-icon">💡</span>
+        <p>Un tercio de los cánceres son prevenibles eliminando tabaco, alcohol y malos hábitos alimenticios.</p>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <span class="footer-cross">✚</span>
+      <span class="footer-logo">MEDICOPOLIS</span>
+      <p class="footer-tagline">Juego Educativo sobre<br>Enfermedades Crónicas No Transmisibles</p>
+    </div>
+    <div class="footer-section">
+      <h4>Contáctanos</h4>
+      <ul>
+        <li>📞 <a href="tel:+593958605284">+593 95 860 5284</a></li>
+        <li>📱 <a href="https://wa.me/593958605284">WhatsApp</a></li>
+        <li>✉️ <a href="mailto:info@medicopolis.edu.ec">info@medicopolis.edu.ec</a></li>
+      </ul>
+    </div>
+    <div class="footer-section">
+      <h4>Ubicación</h4>
+      <ul>
+        <li>📍 Cuenca, Azuay, Ecuador</li>
+        <li>🕘 Lun – Vie: 08:00 – 17:00</li>
+        <li>🌐 <a href="#">www.medicopolis.edu.ec</a></li>
+      </ul>
+    </div>
+    <div class="footer-section">
+      <h4>Síguenos</h4>
+      <ul class="footer-social">
+        <li><a href="https://www.facebook.com/andy.otg/">📘 Facebook</a></li>
+        <li><a href="https://www.instagram.com/andy.otg/">📸 Instagram</a></li>
+        <li><a href="https://www.youtube.com/@andyLaunchVision">▶️ YouTube</a></li>
+        <li><a href="https://github.com/andyortega07/MEDICOPOLIS">💼 GitHub</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 MEDICOPOLIS · Todos los derechos reservados · Desarrollado en Cuenca, Ecuador</p>
+  </div>
+</footer>
+
+</body>
+</html>

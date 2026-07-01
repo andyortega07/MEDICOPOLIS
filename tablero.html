@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MEDICOPOLIS — Tablero</title>
+  <link rel="stylesheet" href="shared.css">
+  <link rel="stylesheet" href="tablero.css">
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="index.html" class="nav-brand">
+    <span class="nav-cross">✚</span>
+    <span class="nav-title">MEDICOPOLIS</span>
+  </a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="index.html">Inicio</a></li>
+    <li><a href="comojugar.html">Cómo Jugar</a></li>
+    <li><a href="categorias.html">Categorías</a></li>
+    <li><a href="tablero.html" class="active">Tablero</a></li>
+    <li><a href="login.html" class="nav-btn-login">Iniciar Sesión</a></li>
+  </ul>
+  <button class="nav-hamburger" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
+</nav>
+
+<!-- GAME LAYOUT -->
+<div class="game-layout">
+
+  <!-- PANEL IZQUIERDO: jugadores y turno -->
+  <aside class="side-panel left-panel">
+    <h3 class="panel-title">Jugadores</h3>
+
+    <div class="player-card" id="p0card">
+      <div class="player-token" id="p0token">🧑</div>
+      <div class="player-info">
+        <span class="player-name">Jugador 1</span>
+        <span class="player-money" id="p0money">$1,500</span>
+      </div>
+      <div class="turn-indicator" id="p0turn">◀ TURNO</div>
+    </div>
+
+    <div class="player-card" id="p1card">
+      <div class="player-token" id="p1token">👩</div>
+      <div class="player-info">
+        <span class="player-name">Jugador 2</span>
+        <span class="player-money" id="p1money">$1,500</span>
+      </div>
+      <div class="turn-indicator hidden" id="p1turn">◀ TURNO</div>
+    </div>
+
+    <div class="player-card" id="p2card">
+      <div class="player-token" id="p2token">👦</div>
+      <div class="player-info">
+        <span class="player-name">Jugador 3</span>
+        <span class="player-money" id="p2money">$1,500</span>
+      </div>
+      <div class="turn-indicator hidden" id="p2turn">◀ TURNO</div>
+    </div>
+
+    <div class="panel-sep"></div>
+
+    <!-- DADOS -->
+    <h3 class="panel-title">Dados</h3>
+    <div class="dice-area">
+      <button class="die-btn" id="die1" onclick="rollDice()">⚀</button>
+      <button class="die-btn" id="die2" onclick="rollDice()">⚀</button>
+    </div>
+    <div class="dice-result" id="diceResult">Presiona un dado para tirar</div>
+    <button class="roll-btn" id="rollBtn" onclick="rollDice()">🎲 Tirar Dados</button>
+
+    <div class="panel-sep"></div>
+
+    <!-- LOG -->
+    <h3 class="panel-title">Registro</h3>
+    <div class="game-log" id="gameLog">
+      <p class="log-entry">🎮 Juego iniciado. Turno: Jugador 1</p>
+    </div>
+  </aside>
+
+  <!-- TABLERO SVG -->
+  <main class="board-area">
+    <div class="board-wrap">
+      <svg id="boardSvg" viewBox="0 0 900 900" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="woodMain" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%"   stop-color="#7A4520"/>
+          <stop offset="6%"   stop-color="#8C5528"/>
+          <stop offset="12%"  stop-color="#6B3A18"/>
+          <stop offset="18%"  stop-color="#9A6030"/>
+          <stop offset="24%"  stop-color="#7A4520"/>
+          <stop offset="30%"  stop-color="#6B3A18"/>
+          <stop offset="36%"  stop-color="#8C5528"/>
+          <stop offset="42%"  stop-color="#5C3010"/>
+          <stop offset="48%"  stop-color="#9A6030"/>
+          <stop offset="54%"  stop-color="#7A4520"/>
+          <stop offset="60%"  stop-color="#6B3A18"/>
+          <stop offset="66%"  stop-color="#8C5528"/>
+          <stop offset="72%"  stop-color="#9A6030"/>
+          <stop offset="78%"  stop-color="#7A4520"/>
+          <stop offset="84%"  stop-color="#5C3010"/>
+          <stop offset="90%"  stop-color="#8C5528"/>
+          <stop offset="100%" stop-color="#6B3A18"/>
+        </linearGradient>
+        <pattern id="grainPat" width="300" height="900" patternUnits="userSpaceOnUse">
+          <path d="M-10 0 Q80 450 -10 900"  stroke="#3D1A06" stroke-width="2.5" fill="none" opacity="0.22"/>
+          <path d="M40 0 Q130 450 40 900"   stroke="#2E1204" stroke-width="3"   fill="none" opacity="0.15"/>
+          <path d="M90 0 Q180 450 90 900"   stroke="#3D1A06" stroke-width="1.8" fill="none" opacity="0.2"/>
+          <path d="M140 0 Q230 450 140 900" stroke="#2E1204" stroke-width="2.2" fill="none" opacity="0.16"/>
+          <path d="M200 0 Q290 450 200 900" stroke="#3D1A06" stroke-width="1.5" fill="none" opacity="0.2"/>
+          <path d="M260 0 Q350 450 260 900" stroke="#2E1204" stroke-width="1.1" fill="none" opacity="0.19"/>
+        </pattern>
+        <radialGradient id="woodKnot1" cx="50%" cy="50%" r="50%">
+          <stop offset="0%"   stop-color="#2E1204" stop-opacity="0.5"/>
+          <stop offset="40%"  stop-color="#5C2E0E" stop-opacity="0.25"/>
+          <stop offset="100%" stop-color="#7A4520" stop-opacity="0"/>
+        </radialGradient>
+        <linearGradient id="varnish" x1="0%" y1="0%" x2="15%" y2="100%">
+          <stop offset="0%"   stop-color="#FFFFFF" stop-opacity="0.08"/>
+          <stop offset="100%" stop-color="#000000" stop-opacity="0.12"/>
+        </linearGradient>
+        <linearGradient id="goldBorder" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%"   stop-color="#D4A840"/>
+          <stop offset="50%"  stop-color="#F0C860"/>
+          <stop offset="100%" stop-color="#B88828"/>
+        </linearGradient>
+        <linearGradient id="wCardio" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#5C1A10"/><stop offset="50%" stop-color="#4A1208"/><stop offset="100%" stop-color="#5C1A10"/>
+        </linearGradient>
+        <pattern id="grainCardio" width="75" height="120" patternUnits="userSpaceOnUse">
+          <path d="M0 0 Q37 60 0 120"  stroke="#3A0E08" stroke-width="1.5" fill="none" opacity="0.3"/>
+          <path d="M45 0 Q82 60 45 120" stroke="#3A0E08" stroke-width="2" fill="none" opacity="0.22"/>
+        </pattern>
+        <linearGradient id="wNutri" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#1A3D18"/><stop offset="50%" stop-color="#142E10"/><stop offset="100%" stop-color="#1A3D18"/>
+        </linearGradient>
+        <pattern id="grainNutri" width="75" height="120" patternUnits="userSpaceOnUse">
+          <path d="M0 0 Q37 60 0 120"  stroke="#0E2008" stroke-width="1.5" fill="none" opacity="0.3"/>
+          <path d="M48 0 Q85 60 48 120" stroke="#0E2008" stroke-width="2" fill="none" opacity="0.22"/>
+        </pattern>
+        <linearGradient id="wDiab" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#4A3A08"/><stop offset="50%" stop-color="#382C04"/><stop offset="100%" stop-color="#4A3A08"/>
+        </linearGradient>
+        <pattern id="grainDiab" width="75" height="120" patternUnits="userSpaceOnUse">
+          <path d="M0 0 Q37 60 0 120"  stroke="#2A1E02" stroke-width="1.5" fill="none" opacity="0.3"/>
+          <path d="M45 0 Q82 60 45 120" stroke="#2A1E02" stroke-width="2" fill="none" opacity="0.22"/>
+        </pattern>
+        <linearGradient id="wResp" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#0E2038"/><stop offset="50%" stop-color="#081828"/><stop offset="100%" stop-color="#0E2038"/>
+        </linearGradient>
+        <pattern id="grainResp" width="75" height="120" patternUnits="userSpaceOnUse">
+          <path d="M0 0 Q37 60 0 120"  stroke="#061018" stroke-width="1.5" fill="none" opacity="0.35"/>
+          <path d="M48 0 Q85 60 48 120" stroke="#061018" stroke-width="2" fill="none" opacity="0.25"/>
+        </pattern>
+        <linearGradient id="wOnco" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#2E1040"/><stop offset="50%" stop-color="#220830"/><stop offset="100%" stop-color="#2E1040"/>
+        </linearGradient>
+        <pattern id="grainOnco" width="75" height="120" patternUnits="userSpaceOnUse">
+          <path d="M0 0 Q37 60 0 120"  stroke="#180620" stroke-width="1.5" fill="none" opacity="0.35"/>
+          <path d="M48 0 Q85 60 48 120" stroke="#180620" stroke-width="2" fill="none" opacity="0.25"/>
+        </pattern>
+        <linearGradient id="wSalud" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#0C3828"/><stop offset="50%" stop-color="#082C1C"/><stop offset="100%" stop-color="#0C3828"/>
+        </linearGradient>
+        <pattern id="grainSalud" width="75" height="120" patternUnits="userSpaceOnUse">
+          <path d="M0 0 Q37 60 0 120"  stroke="#041810" stroke-width="1.5" fill="none" opacity="0.35"/>
+          <path d="M48 0 Q85 60 48 120" stroke="#041810" stroke-width="2" fill="none" opacity="0.25"/>
+        </pattern>
+        <linearGradient id="wRiesgo" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#3A1050"/><stop offset="50%" stop-color="#2C0840"/><stop offset="100%" stop-color="#3A1050"/>
+        </linearGradient>
+        <pattern id="grainRiesgo" width="75" height="120" patternUnits="userSpaceOnUse">
+          <path d="M0 0 Q37 60 0 120"  stroke="#1E0428" stroke-width="1.5" fill="none" opacity="0.35"/>
+          <path d="M48 0 Q85 60 48 120" stroke="#1E0428" stroke-width="2" fill="none" opacity="0.25"/>
+        </pattern>
+        <linearGradient id="wPago" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#4A3808"/><stop offset="50%" stop-color="#382C04"/><stop offset="100%" stop-color="#4A3808"/>
+        </linearGradient>
+        <pattern id="grainPago" width="75" height="120" patternUnits="userSpaceOnUse">
+          <path d="M0 0 Q37 60 0 120"  stroke="#281E02" stroke-width="1.5" fill="none" opacity="0.3"/>
+          <path d="M45 0 Q82 60 45 120" stroke="#281E02" stroke-width="2" fill="none" opacity="0.22"/>
+        </pattern>
+        <radialGradient id="centerWood" cx="50%" cy="50%" r="60%">
+          <stop offset="0%"   stop-color="#3A1C08"/>
+          <stop offset="100%" stop-color="#1E0C02"/>
+        </radialGradient>
+        <pattern id="grainCenter" width="400" height="400" patternUnits="userSpaceOnUse" x="112" y="112">
+          <path d="M0 0 Q200 200 0 400"    stroke="#1A0A02" stroke-width="3"   fill="none" opacity="0.2"/>
+          <path d="M100 0 Q300 200 100 400" stroke="#1A0A02" stroke-width="4"  fill="none" opacity="0.12"/>
+          <path d="M220 0 Q420 200 220 400" stroke="#1A0A02" stroke-width="1.5" fill="none" opacity="0.16"/>
+          <path d="M340 0 Q140 200 340 400" stroke="#1A0A02" stroke-width="1.8" fill="none" opacity="0.15"/>
+        </pattern>
+        <linearGradient id="gCardio" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#C0392B"/><stop offset="100%" stop-color="#7B241C"/>
+        </linearGradient>
+        <linearGradient id="gNutri" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#1E8449"/><stop offset="100%" stop-color="#145A32"/>
+        </linearGradient>
+        <linearGradient id="gDiab" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#D4AC0D"/><stop offset="100%" stop-color="#9A7D0A"/>
+        </linearGradient>
+        <linearGradient id="gResp" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#1A5276"/><stop offset="100%" stop-color="#0E2F44"/>
+        </linearGradient>
+        <linearGradient id="gOnco" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#7D3C98"/><stop offset="100%" stop-color="#4A235A"/>
+        </linearGradient>
+        <linearGradient id="gSalud" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#117A65"/><stop offset="100%" stop-color="#0E6655"/>
+        </linearGradient>
+        <linearGradient id="gRiesgo" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#7D3C98"/><stop offset="100%" stop-color="#6C3483"/>
+        </linearGradient>
+        <linearGradient id="gPago" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#B7950B"/><stop offset="100%" stop-color="#7D6608"/>
+        </linearGradient>
+        <linearGradient id="cornerTeal" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#028090"/><stop offset="100%" stop-color="#02C39A"/>
+        </linearGradient>
+        <filter id="shadow">
+          <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.6"/>
+        </filter>
+        <filter id="innerShadow">
+          <feDropShadow dx="1" dy="1" stdDeviation="2" flood-color="#000" flood-opacity="0.4"/>
+        </filter>
+        <filter id="glow2" x="-10%" y="-10%" width="120%" height="120%">
+          <feGaussianBlur stdDeviation="1.5" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+
+      <!-- FONDO MADERA -->
+      <rect width="900" height="900" fill="url(#woodMain)" rx="14"/>
+      <rect width="900" height="900" fill="url(#grainPat)" rx="14" opacity="0.85"/>
+      <rect width="900" height="900" fill="url(#varnish)"  rx="14"/>
+      <ellipse cx="200" cy="180" rx="55" ry="35" fill="url(#woodKnot1)" opacity="0.6"/>
+      <ellipse cx="700" cy="720" rx="65" ry="40" fill="url(#woodKnot1)" opacity="0.5"/>
+      <rect x="2"  y="2"  width="896" height="896" fill="none" stroke="url(#goldBorder)" stroke-width="5"   rx="13"/>
+      <rect x="7"  y="7"  width="886" height="886" fill="none" stroke="#2E1204"          stroke-width="3"   rx="10"/>
+      <rect x="11" y="11" width="878" height="878" fill="none" stroke="#D4A840"          stroke-width="1.2" rx="8" opacity="0.7"/>
+      <circle cx="22"  cy="22"  r="8" fill="#5C2E0E" stroke="#D4A840" stroke-width="1.5"/>
+      <circle cx="22"  cy="22"  r="3" fill="#D4A840"/>
+      <circle cx="878" cy="22"  r="8" fill="#5C2E0E" stroke="#D4A840" stroke-width="1.5"/>
+      <circle cx="878" cy="22"  r="3" fill="#D4A840"/>
+      <circle cx="22"  cy="878" r="8" fill="#5C2E0E" stroke="#D4A840" stroke-width="1.5"/>
+      <circle cx="22"  cy="878" r="3" fill="#D4A840"/>
+      <circle cx="878" cy="878" r="8" fill="#5C2E0E" stroke="#D4A840" stroke-width="1.5"/>
+      <circle cx="878" cy="878" r="3" fill="#D4A840"/>
+
+      <!-- CORNERS -->
+      <g transform="translate(788,788)">
+        <rect width="110" height="110" fill="url(#cornerTeal)" rx="7" filter="url(#shadow)"/>
+        <rect x="0" y="0" width="110" height="10" fill="#02C39A" rx="5"/>
+        <rect x="44" y="24" width="22" height="7" fill="white" rx="2"/>
+        <rect x="50" y="18" width="10" height="19" fill="white" rx="2"/>
+        <text x="55" y="60"  text-anchor="middle" fill="white"  font-size="11" font-family="Georgia" font-weight="bold">SALIDA</text>
+        <text x="55" y="76"  text-anchor="middle" fill="#d0fff5" font-size="9"  font-family="Georgia">AL PASAR</text>
+        <text x="55" y="93"  text-anchor="middle" fill="white"  font-size="12" font-family="Georgia" font-weight="bold">COBRA $200</text>
+        <text x="55" y="107" text-anchor="middle" fill="#d0fff5" font-size="8"  font-family="Georgia">🏥 INICIO</text>
+      </g>
+      <g transform="translate(2,788)">
+        <rect width="110" height="110" fill="#1A0A02" rx="7" filter="url(#shadow)"/>
+        <rect width="110" height="110" fill="url(#grainPat)" rx="7" opacity="0.5"/>
+        <rect x="0" y="0" width="110" height="10" fill="#028090" rx="5"/>
+        <circle cx="55" cy="55" r="22" fill="#0D2B45" stroke="#028090" stroke-width="1.5"/>
+        <circle cx="55" cy="55" r="12" fill="#1E8449"/>
+        <rect x="50" y="52" width="10" height="2.5" fill="white" rx="1"/>
+        <rect x="53.5" y="49" width="2.5" height="10" fill="white" rx="1"/>
+        <text x="55" y="90"  text-anchor="middle" fill="white"   font-size="9.5" font-family="Georgia" font-weight="bold">VISITA</text>
+        <text x="55" y="103" text-anchor="middle" fill="#4ab8c8"  font-size="8"   font-family="Georgia">HOSPITAL</text>
+      </g>
+      <g transform="translate(2,2)">
+        <rect width="110" height="110" fill="#1A0A02" rx="7" filter="url(#shadow)"/>
+        <rect width="110" height="110" fill="url(#grainPat)" rx="7" opacity="0.4"/>
+        <rect x="0" y="0" width="110" height="10" fill="#C0392B" rx="5"/>
+        <polygon points="55,22 80,62 30,62" fill="none" stroke="#F96167" stroke-width="2.5" stroke-linejoin="round"/>
+        <text x="55" y="57"  text-anchor="middle" fill="#F96167" font-size="16" font-weight="bold">!</text>
+        <text x="55" y="78"  text-anchor="middle" fill="#F96167" font-size="13" font-family="Georgia" font-weight="bold">UCI</text>
+        <text x="55" y="92"  text-anchor="middle" fill="white"   font-size="9"  font-family="Georgia">EMERGENCIA</text>
+        <text x="55" y="106" text-anchor="middle" fill="#C8A060"  font-size="8"  font-family="Georgia">Pierde 2 turnos</text>
+      </g>
+      <g transform="translate(788,2)">
+        <rect width="110" height="110" fill="#1A0A02" rx="7" filter="url(#shadow)"/>
+        <rect width="110" height="110" fill="url(#grainPat)" rx="7" opacity="0.4"/>
+        <rect x="0" y="0" width="110" height="10" fill="url(#cornerTeal)" rx="5"/>
+        <text x="55" y="50"  text-anchor="middle" fill="#02C39A" font-size="26">🛡</text>
+        <text x="55" y="72"  text-anchor="middle" fill="white"   font-size="13" font-family="Georgia" font-weight="bold">ZONA</text>
+        <text x="55" y="88"  text-anchor="middle" fill="#02C39A" font-size="13" font-family="Georgia" font-weight="bold">LIBRE</text>
+        <text x="55" y="104" text-anchor="middle" fill="#C8A060"  font-size="8"  font-family="Georgia">sin pagar 🌿</text>
+      </g>
+
+      <!-- BOTTOM ROW -->
+      <g transform="translate(713,788)"><rect width="75" height="110" fill="url(#wCardio)" rx="4" filter="url(#innerShadow)"/><rect width="75" height="110" fill="url(#grainCardio)" rx="4" opacity="0.6"/><rect x="0" y="0" width="75" height="9" fill="url(#gCardio)" rx="3"/><text x="37" y="28" text-anchor="middle" fill="#ff9090" font-size="17">❤</text><text x="37" y="48" text-anchor="middle" fill="#FFD0C0" font-size="8" font-family="Georgia" font-weight="bold">CARDIO</text><text x="37" y="61" text-anchor="middle" fill="#FFB8A8" font-size="7" font-family="Georgia">Hipertensión</text><text x="37" y="87" text-anchor="middle" fill="#F0C860" font-size="10" font-weight="bold" font-family="Georgia">$120</text><text x="37" y="103" text-anchor="middle" fill="#A08060" font-size="7" font-family="Georgia">C-1</text></g>
+      <g transform="translate(638,788)"><rect width="75" height="110" fill="url(#wSalud)" rx="4" filter="url(#innerShadow)"/><rect width="75" height="110" fill="url(#grainSalud)" rx="4" opacity="0.6"/><rect x="0" y="0" width="75" height="9" fill="url(#gSalud)" rx="3"/><text x="37" y="30" text-anchor="middle" fill="white" font-size="8" font-family="Georgia" font-weight="bold">TARJETA</text><text x="37" y="44" text-anchor="middle" fill="#90E8A0" font-size="8" font-family="Georgia" font-weight="bold">SALUD</text><rect x="22" y="52" width="31" height="31" fill="#117A65" rx="5" opacity="0.9"/><rect x="31" y="59" width="13" height="4" fill="white" rx="1.5"/><rect x="36" y="54" width="4" height="13" fill="white" rx="1.5"/><text x="37" y="100" text-anchor="middle" fill="#90E8A0" font-size="7" font-family="Georgia">Beneficio (+)</text></g>
+      <g transform="translate(563,788)"><rect width="75" height="110" fill="url(#wNutri)" rx="4" filter="url(#innerShadow)"/><rect width="75" height="110" fill="url(#grainNutri)" rx="4" opacity="0.6"/><rect x="0" y="0" width="75" height="9" fill="url(#gNutri)" rx="3"/><text x="37" y="28" text-anchor="middle" fill="#90E898" font-size="16">🥦</text><text x="37" y="48" text-anchor="middle" fill="#C8F0C0" font-size="8" font-family="Georgia" font-weight="bold">NUTRICIÓN</text><text x="37" y="61" text-anchor="middle" fill="#A8D8A0" font-size="7" font-family="Georgia">Alimentación</text><text x="37" y="87" text-anchor="middle" fill="#F0C860" font-size="10" font-weight="bold" font-family="Georgia">$100</text><text x="37" y="103" text-anchor="middle" fill="#A08060" font-size="7" font-family="Georgia">N-1</text></g>
+      <g transform="translate(488,788)"><rect width="75" height="110" fill="url(#wNutri)" rx="4" filter="url(#innerShadow)"/><rect width="75" height="110" fill="url(#grainNutri)" rx="4" opacity="0.6"/><rect x="0" y="0" width="75" height="9" fill="url(#gNutri)" rx="3"/><text x="37" y="28" text-anchor="middle" fill="#90E898" font-size="16">🥗</text><text x="37" y="48" text-anchor="middle" fill="#C8F0C0" font-size="8" font-family="Georgia" font-weight="bold">NUTRICIÓN</text><text x="37" y="61" text-anchor="middle" fill="#A8D8A0" font-size="7" font-family="Georgia">Obesidad</text><text x="37" y="87" text-anchor="middle" fill="#F0C860" font-size="10" font-weight="bold" font-family="Georgia">$120</text><text x="37" y="103" text-anchor="middle" fill="#A08060" font-size="7" font-family="Georgia">N-2</text></g>
+      <g transform="translate(413,788)"><rect width="75" height="110" fill="url(#wPago)" rx="4" filter="url(#innerShadow)"/><rect width="75" height="110" fill="url(#grainPago)" rx="4" opacity="0.6"/><rect x="0" y="0" width="75" height="9" fill="url(#gPago)" rx="3"/><text x="37" y="28" text-anchor="middle" fill="#F8E890" font-size="16">💊</text><text x="37" y="48" text-anchor="middle" fill="#F8E890" font-size="8" font-family="Georgia" font-weight="bold">CONSULTA</text><text x="37" y="61" text-anchor="middle" fill="#D8C870" font-size="7" font-family="Georgia">Médica</text><text x="37" y="87" text-anchor="middle" fill="#E8C840" font-size="9" font-weight="bold" font-family="Georgia">PAGA $75</text></g>
+      <g transform="translate(338,788)"><rect width="75" height="110" fill="url(#wDiab)" rx="4" filter="url(#innerShadow)"/><rect width="75" height="110" fill="url(#grainDiab)" rx="4" opacity="0.6"/><rect x="0" y="0" width="75" height="9" fill="url(#gDiab)" rx="3"/><text x="37" y="28" text-anchor="middle" fill="#F8E898" font-size="16">🩸</text><text x="37" y="48" text-anchor="middle" fill="#F8E898" font-size="8" font-family="Georgia" font-weight="bold">DIABETES</text><text x="37" y="61" text-anchor="middle" fill="#D8C878" font-size="7" font-family="Georgia">Tipo 2</text><text x="37" y="87" text-anchor="middle" fill="#F0C860" font-size="10" font-weight="bold" font-family="Georgia">$140</text><text x="37" y="103" text-anchor="middle" fill="#A08060" font-size="7" font-family="Georgia">D-1</text></g>
+      <g transform="translate(263,788)"><rect width="75" height="110" fill="url(#wCardio)" rx="4" filter="url(#innerShadow)"/><rect width="75" height="110" fill="url(#grainCardio)" rx="4" opacity="0.6"/><rect x="0" y="0" width="75" height="9" fill="url(#gCardio)" rx="3"/><text x="37" y="28" text-anchor="middle" fill="#FF9090" font-size="16">🫀</text><text x="37" y="48" text-anchor="middle" fill="#FFD0C0" font-size="8" font-family="Georgia" font-weight="bold">CARDIO</text><text x="37" y="61" text-anchor="middle" fill="#FFB8A8" font-size="7" font-family="Georgia">Infarto</text><text x="37" y="87" text-anchor="middle" fill="#F0C860" font-size="10" font-weight="bold" font-family="Georgia">$160</text><text x="37" y="103" text-anchor="middle" fill="#A08060" font-size="7" font-family="Georgia">C-2</text></g>
+      <g transform="translate(188,788)"><rect width="75" height="110" fill="url(#wRiesgo)" rx="4" filter="url(#innerShadow)"/><rect width="75" height="110" fill="url(#grainRiesgo)" rx="4" opacity="0.6"/><rect x="0" y="0" width="75" height="9" fill="url(#gRiesgo)" rx="3"/><text x="37" y="30" text-anchor="middle" fill="white" font-size="8" font-family="Georgia" font-weight="bold">TARJETA</text><text x="37" y="44" text-anchor="middle" fill="#D8B8F0" font-size="8" font-family="Georgia" font-weight="bold">RIESGO</text><rect x="22" y="52" width="31" height="31" fill="#7D3C98" rx="5" opacity="0.9"/><text x="37" y="74" text-anchor="middle" fill="white" font-size="18" font-weight="bold">!</text><text x="37" y="100" text-anchor="middle" fill="#D8B8F0" font-size="7" font-family="Georgia">Penalidad (!)</text></g>
+      <g transform="translate(113,788)"><rect width="75" height="110" fill="url(#wResp)" rx="4" filter="url(#innerShadow)"/><rect width="75" height="110" fill="url(#grainResp)" rx="4" opacity="0.6"/><rect x="0" y="0" width="75" height="9" fill="url(#gResp)" rx="3"/><text x="37" y="28" text-anchor="middle" fill="#A8D8F8" font-size="16">🫁</text><text x="37" y="48" text-anchor="middle" fill="#C0E0F8" font-size="8" font-family="Georgia" font-weight="bold">PULMONAR</text><text x="37" y="61" text-anchor="middle" fill="#A0C8E8" font-size="7" font-family="Georgia">EPOC</text><text x="37" y="87" text-anchor="middle" fill="#F0C860" font-size="10" font-weight="bold" font-family="Georgia">$180</text><text x="37" y="103" text-anchor="middle" fill="#A08060" font-size="7" font-family="Georgia">R-1</text></g>
+
+      <!-- TOP ROW -->
+      <g transform="translate(113,2)"><rect width="75" height="110" fill="url(#wNutri)" rx="4" filter="url(#innerShadow)"/><rect width="75" height="110" fill="url(#grainNutri)" rx="4" opacity="0.6"/><rect x="0" y="101" width="75" height="9" fill="url(#gNutri)" rx="3"/><text x="37" y="24" text-anchor="middle" fill="#A08060" font-size="7" font-family="Georgia">N-4</text><text x="37" y="38" text-anchor="middle" fill="#F0C860" font-size="10" font-weight="bold" font-family="Georgia">$140</text><text x="37" y="62" text-anchor="middle" fill="#A8D8A0" font-size="7" font-family="Georgia">Vitaminas</text><text x="37" y="77" text-anchor="middle" fill="#C8F0C0" font-size="8" font-family="Georgia" font-weight="bold">NUTRICIÓN</text><text x="37" y="97" text-anchor="middle" fill="#90E898" font-size="14">🥕</text></g>
+      <g transform="translate(188,2)"><rect width="75" height="110" fill="url(#wOnco)" rx="4" filter="url(#innerShadow)"/><rect width="75" height="110" fill="url(#grainOnco)" rx="4" opacity="0.6"/><rect x="0" y="101" width="75" height="9" fill="url(#gOnco)" rx="3"/><text x="37" y="24" text-anchor="middle" fill="#A08060" font-size="7" font-family="Georgia">O-3</text><text x="37" y="38" text-anchor="middle" fill="#F0C860" font-size="10" font-weight="bold" font-family="Georgia">$200</text><text x="37" y="62" text-anchor="middle" fill="#D8B8F0" font-size="7" font-family="Georgia">Prevención</text><text x="37" y="77" text-anchor="middle" fill="#E8D0FF" font-size="8" font-family="Georgia" font-weight="bold">ONCOLOGÍA</text><text x="37" y="97" text-anchor="middle" fill="#D8B8F0" font-size="14">🧬</text></g>
+      <g transform="translate(263,2)"><rect width="75" height="110" fill="url(#wPago)" rx="4" filter="url(#innerShadow)"/><rect width="75" height="110" fill="url(#grainPago)" rx="4" opacity="0.6"/><rect x="0" y="101" width="75" height="9" fill="url(#gPago)" rx="3"/><text x="37" y="24" text-anchor="middle" fill="#E8C840" font-size="8" font-family="Georgia" font-weight="bold">PAGA $80</text><text x="37" y="51" text-anchor="middle" fill="#D8C870" font-size="7" font-family="Georgia">Examen</text><text x="37" y="65" text-anchor="middle" fill="#F8E890" font-size="8" font-family="Georgia" font-weight="bold">DE SALUD</text><text x="37" y="89" text-anchor="middle" fill="#F8E890" font-size="14">🧾</text></g>
+      <g transform="translate(338,2)"><rect width="75" height="110" fill="url(#wDiab)" rx="4" filter="url(#innerShadow)"/><rect width="75" height="110" fill="url(#grainDiab)" rx="4" opacity="0.6"/><rect x="0" y="101" width="75" height="9" fill="url(#gDiab)" rx="3"/><text x="37" y="24" text-anchor="middle" fill="#A08060" font-size="7" font-family="Georgia">D-3</text><text x="37" y="38" text-anchor="middle" fill="#F0C860" font-size="10" font-weight="bold" font-family="Georgia">$160</text><text x="37" y="62" text-anchor="middle" fill="#D8C878" font-size="7" font-family="Georgia">Insulina</text><text x="37" y="77" text-anchor="middle" fill="#F8E898" font-size="8" font-family="Georgia" font-weight="bold">DIABETES</text><text x="37" y="97" text-anchor="middle" fill="#F8E898" font-size="14">💉</text></g>
+      <g transform="translate(413,2)"><rect width="75" height="110" fill="url(#wCardio)" rx="4" filter="url(#innerShadow)"/><rect width="75" height="110" fill="url(#grainCardio)" rx="4" opacity="0.6"/><rect x="0" y="101" width="75" height="9" fill="url(#gCardio)" rx="3"/><text x="37" y="24" text-anchor="middle" fill="#A08060" font-size="7" font-family="Georgia">C-4</text><text x="37" y="38" text-anchor="middle" fill="#F0C860" font-size="10" font-weight="bold" font-family="Georgia">$200</text><text x="37" y="62" text-anchor="middle" fill="#FFB8A8" font-size="7" font-family="Georgia">Colesterol</text><text x="37" y="77" text-anchor="middle" fill="#FFD0C0" font-size="8" font-family="Georgia" font-weight="bold">CARDIO</text><text x="37" y="97" text-anchor="middle" fill="#FF9090" font-size="14">💓</text></g>
+      <g transform="translate(488,2)"><rect width="75" height="110" fill="url(#wSalud)" rx="4" filter="url(#innerShadow)"/><rect width="75" height="110" fill="url(#grainSalud)" rx="4" opacity="0.6"/><rect x="0" y="101" width="75" height="9" fill="url(#gSalud)" rx="3"/><text x="37" y="20" text-anchor="middle" fill="#90E8A0" font-size="7" font-family="Georgia" font-weight="bold">TARJETA</text><text x="37" y="34" text-anchor="middle" fill="white" font-size="8" font-family="Georgia" font-weight="bold">SALUD</text><rect x="22" y="44" width="31" height="31" fill="#117A65" rx="5" opacity="0.9"/><rect x="31" y="51" width="13" height="4" fill="white" rx="1.5"/><rect x="36" y="46" width="4" height="13" fill="white" rx="1.5"/><text x="37" y="94" text-anchor="middle" fill="#90E8A0" font-size="7" font-family="Georgia">Beneficio (+)</text></g>
+      <g transform="translate(563,2)"><rect width="75" height="110" fill="url(#wResp)" rx="4" filter="url(#innerShadow)"/><rect width="75" height="110" fill="url(#grainResp)" rx="4" opacity="0.6"/><rect x="0" y="101" width="75" height="9" fill="url(#gResp)" rx="3"/><text x="37" y="24" text-anchor="middle" fill="#A08060" font-size="7" font-family="Georgia">R-3</text><text x="37" y="38" text-anchor="middle" fill="#F0C860" font-size="10" font-weight="bold" font-family="Georgia">$180</text><text x="37" y="62" text-anchor="middle" fill="#A0C8E8" font-size="7" font-family="Georgia">Tabaquismo</text><text x="37" y="77" text-anchor="middle" fill="#C0E0F8" font-size="8" font-family="Georgia" font-weight="bold">PULMONAR</text><text x="37" y="97" text-anchor="middle" fill="#A8D8F8" font-size="14">🌬</text></g>
+      <g transform="translate(638,2)"><rect width="75" height="110" fill="url(#wOnco)" rx="4" filter="url(#innerShadow)"/><rect width="75" height="110" fill="url(#grainOnco)" rx="4" opacity="0.6"/><rect x="0" y="101" width="75" height="9" fill="url(#gOnco)" rx="3"/><text x="37" y="24" text-anchor="middle" fill="#A08060" font-size="7" font-family="Georgia">O-4</text><text x="37" y="38" text-anchor="middle" fill="#F0C860" font-size="10" font-weight="bold" font-family="Georgia">$240</text><text x="37" y="62" text-anchor="middle" fill="#D8B8F0" font-size="7" font-family="Georgia">Diagnóst.</text><text x="37" y="77" text-anchor="middle" fill="#E8D0FF" font-size="8" font-family="Georgia" font-weight="bold">ONCOLOGÍA</text><text x="37" y="97" text-anchor="middle" fill="#D8B8F0" font-size="14">⚕</text></g>
+      <g transform="translate(713,2)"><rect width="75" height="110" fill="url(#wRiesgo)" rx="4" filter="url(#innerShadow)"/><rect width="75" height="110" fill="url(#grainRiesgo)" rx="4" opacity="0.6"/><rect x="0" y="101" width="75" height="9" fill="url(#gRiesgo)" rx="3"/><text x="37" y="20" text-anchor="middle" fill="#D8B8F0" font-size="7" font-family="Georgia" font-weight="bold">TARJETA</text><text x="37" y="34" text-anchor="middle" fill="white" font-size="8" font-family="Georgia" font-weight="bold">RIESGO</text><rect x="22" y="44" width="31" height="31" fill="#7D3C98" rx="5" opacity="0.9"/><text x="37" y="66" text-anchor="middle" fill="white" font-size="18" font-weight="bold">!</text><text x="37" y="94" text-anchor="middle" fill="#D8B8F0" font-size="7" font-family="Georgia">Penalidad (!)</text></g>
+
+      <!-- LEFT COL -->
+      <g transform="translate(2,713)"><rect width="110" height="75" fill="url(#wResp)" rx="4" filter="url(#innerShadow)"/><rect width="110" height="75" fill="url(#grainResp)" rx="4" opacity="0.6"/><rect x="0" y="0" width="10" height="75" fill="url(#gResp)" rx="3"/><text x="65" y="23" text-anchor="middle" fill="#A8D8F8" font-size="14">🫁</text><text x="65" y="40" text-anchor="middle" fill="#C0E0F8" font-size="8" font-family="Georgia" font-weight="bold">PULMONAR</text><text x="65" y="53" text-anchor="middle" fill="#A0C8E8" font-size="7" font-family="Georgia">Asma</text><text x="65" y="68" text-anchor="middle" fill="#F0C860" font-size="8.5" font-weight="bold" font-family="Georgia">$160 · R-2</text></g>
+      <g transform="translate(2,638)"><rect width="110" height="75" fill="url(#wDiab)" rx="4" filter="url(#innerShadow)"/><rect width="110" height="75" fill="url(#grainDiab)" rx="4" opacity="0.6"/><rect x="0" y="0" width="10" height="75" fill="url(#gDiab)" rx="3"/><text x="65" y="23" text-anchor="middle" fill="#F8E898" font-size="14">🩺</text><text x="65" y="40" text-anchor="middle" fill="#F8E898" font-size="8" font-family="Georgia" font-weight="bold">DIABETES</text><text x="65" y="53" text-anchor="middle" fill="#D8C878" font-size="7" font-family="Georgia">Glucemia</text><text x="65" y="68" text-anchor="middle" fill="#F0C860" font-size="8.5" font-weight="bold" font-family="Georgia">$140 · D-2</text></g>
+      <g transform="translate(2,563)"><rect width="110" height="75" fill="url(#wSalud)" rx="4" filter="url(#innerShadow)"/><rect width="110" height="75" fill="url(#grainSalud)" rx="4" opacity="0.6"/><rect x="0" y="0" width="10" height="75" fill="url(#gSalud)" rx="3"/><text x="65" y="20" text-anchor="middle" fill="white" font-size="8" font-family="Georgia" font-weight="bold">TARJETA SALUD</text><rect x="44" y="27" width="24" height="24" fill="#117A65" rx="4" opacity="0.9"/><rect x="51" y="32" width="10" height="3.5" fill="white" rx="1"/><rect x="54.7" y="28" width="3.5" height="10" fill="white" rx="1"/><text x="65" y="66" text-anchor="middle" fill="#90E8A0" font-size="7.5" font-family="Georgia">Beneficio (+)</text></g>
+      <g transform="translate(2,488)"><rect width="110" height="75" fill="url(#wOnco)" rx="4" filter="url(#innerShadow)"/><rect width="110" height="75" fill="url(#grainOnco)" rx="4" opacity="0.6"/><rect x="0" y="0" width="10" height="75" fill="url(#gOnco)" rx="3"/><text x="65" y="23" text-anchor="middle" fill="#D8B8F0" font-size="14">🔬</text><text x="65" y="40" text-anchor="middle" fill="#E8D0FF" font-size="8" font-family="Georgia" font-weight="bold">ONCOLOGÍA</text><text x="65" y="53" text-anchor="middle" fill="#D8B8F0" font-size="7" font-family="Georgia">Detección</text><text x="65" y="68" text-anchor="middle" fill="#F0C860" font-size="8.5" font-weight="bold" font-family="Georgia">$200 · O-1</text></g>
+      <g transform="translate(2,413)"><rect width="110" height="75" fill="url(#wPago)" rx="4" filter="url(#innerShadow)"/><rect width="110" height="75" fill="url(#grainPago)" rx="4" opacity="0.6"/><rect x="0" y="0" width="10" height="75" fill="url(#gPago)" rx="3"/><text x="65" y="23" text-anchor="middle" fill="#F8E890" font-size="14">💰</text><text x="65" y="40" text-anchor="middle" fill="#F8E890" font-size="8" font-family="Georgia" font-weight="bold">SEGURO</text><text x="65" y="53" text-anchor="middle" fill="#D8C870" font-size="7" font-family="Georgia">Médico</text><text x="65" y="68" text-anchor="middle" fill="#E8C840" font-size="8.5" font-weight="bold" font-family="Georgia">COBRA $100</text></g>
+      <g transform="translate(2,338)"><rect width="110" height="75" fill="url(#wCardio)" rx="4" filter="url(#innerShadow)"/><rect width="110" height="75" fill="url(#grainCardio)" rx="4" opacity="0.6"/><rect x="0" y="0" width="10" height="75" fill="url(#gCardio)" rx="3"/><text x="65" y="23" text-anchor="middle" fill="#FF9090" font-size="14">🏃</text><text x="65" y="40" text-anchor="middle" fill="#FFD0C0" font-size="8" font-family="Georgia" font-weight="bold">CARDIO</text><text x="65" y="53" text-anchor="middle" fill="#FFB8A8" font-size="7" font-family="Georgia">Ejercicio</text><text x="65" y="68" text-anchor="middle" fill="#F0C860" font-size="8.5" font-weight="bold" font-family="Georgia">$180 · C-3</text></g>
+      <g transform="translate(2,263)"><rect width="110" height="75" fill="url(#wNutri)" rx="4" filter="url(#innerShadow)"/><rect width="110" height="75" fill="url(#grainNutri)" rx="4" opacity="0.6"/><rect x="0" y="0" width="10" height="75" fill="url(#gNutri)" rx="3"/><text x="65" y="23" text-anchor="middle" fill="#90E898" font-size="14">🥑</text><text x="65" y="40" text-anchor="middle" fill="#C8F0C0" font-size="8" font-family="Georgia" font-weight="bold">NUTRICIÓN</text><text x="65" y="53" text-anchor="middle" fill="#A8D8A0" font-size="7" font-family="Georgia">Dieta Sana</text><text x="65" y="68" text-anchor="middle" fill="#F0C860" font-size="8.5" font-weight="bold" font-family="Georgia">$160 · N-3</text></g>
+      <g transform="translate(2,188)"><rect width="110" height="75" fill="url(#wRiesgo)" rx="4" filter="url(#innerShadow)"/><rect width="110" height="75" fill="url(#grainRiesgo)" rx="4" opacity="0.6"/><rect x="0" y="0" width="10" height="75" fill="url(#gRiesgo)" rx="3"/><text x="65" y="20" text-anchor="middle" fill="white" font-size="8" font-family="Georgia" font-weight="bold">TARJETA RIESGO</text><rect x="44" y="27" width="24" height="24" fill="#7D3C98" rx="4" opacity="0.9"/><text x="56" y="45" text-anchor="middle" fill="white" font-size="15" font-weight="bold">!</text><text x="65" y="66" text-anchor="middle" fill="#D8B8F0" font-size="7.5" font-family="Georgia">Penalidad (!)</text></g>
+      <g transform="translate(2,113)"><rect width="110" height="75" fill="url(#wOnco)" rx="4" filter="url(#innerShadow)"/><rect width="110" height="75" fill="url(#grainOnco)" rx="4" opacity="0.6"/><rect x="0" y="0" width="10" height="75" fill="url(#gOnco)" rx="3"/><text x="65" y="23" text-anchor="middle" fill="#D8B8F0" font-size="14">🔬</text><text x="65" y="40" text-anchor="middle" fill="#E8D0FF" font-size="8" font-family="Georgia" font-weight="bold">ONCOLOGÍA</text><text x="65" y="53" text-anchor="middle" fill="#D8B8F0" font-size="7" font-family="Georgia">Tratamiento</text><text x="65" y="68" text-anchor="middle" fill="#F0C860" font-size="8.5" font-weight="bold" font-family="Georgia">$220 · O-2</text></g>
+
+      <!-- RIGHT COL -->
+      <g transform="translate(788,113)"><rect width="110" height="75" fill="url(#wDiab)" rx="4" filter="url(#innerShadow)"/><rect width="110" height="75" fill="url(#grainDiab)" rx="4" opacity="0.6"/><rect x="100" y="0" width="10" height="75" fill="url(#gDiab)" rx="3"/><text x="45" y="23" text-anchor="middle" fill="#F8E898" font-size="14">🩸</text><text x="45" y="40" text-anchor="middle" fill="#F8E898" font-size="8" font-family="Georgia" font-weight="bold">DIABETES</text><text x="45" y="53" text-anchor="middle" fill="#D8C878" font-size="7" font-family="Georgia">Resistencia</text><text x="45" y="68" text-anchor="middle" fill="#F0C860" font-size="8.5" font-weight="bold" font-family="Georgia">$180 · D-4</text></g>
+      <g transform="translate(788,188)"><rect width="110" height="75" fill="url(#wNutri)" rx="4" filter="url(#innerShadow)"/><rect width="110" height="75" fill="url(#grainNutri)" rx="4" opacity="0.6"/><rect x="100" y="0" width="10" height="75" fill="url(#gNutri)" rx="3"/><text x="45" y="23" text-anchor="middle" fill="#90E898" font-size="14">🌽</text><text x="45" y="40" text-anchor="middle" fill="#C8F0C0" font-size="8" font-family="Georgia" font-weight="bold">NUTRICIÓN</text><text x="45" y="53" text-anchor="middle" fill="#A8D8A0" font-size="7" font-family="Georgia">Ultra-proc.</text><text x="45" y="68" text-anchor="middle" fill="#F0C860" font-size="8.5" font-weight="bold" font-family="Georgia">$160 · N-5</text></g>
+      <g transform="translate(788,263)"><rect width="110" height="75" fill="url(#wPago)" rx="4" filter="url(#innerShadow)"/><rect width="110" height="75" fill="url(#grainPago)" rx="4" opacity="0.6"/><rect x="100" y="0" width="10" height="75" fill="url(#gPago)" rx="3"/><text x="45" y="23" text-anchor="middle" fill="#F8E890" font-size="14">🧪</text><text x="45" y="40" text-anchor="middle" fill="#F8E890" font-size="8" font-family="Georgia" font-weight="bold">ANÁLISIS</text><text x="45" y="53" text-anchor="middle" fill="#D8C870" font-size="7" font-family="Georgia">Clínicos</text><text x="45" y="68" text-anchor="middle" fill="#E8C840" font-size="8.5" font-weight="bold" font-family="Georgia">PAGA $90</text></g>
+      <g transform="translate(788,338)"><rect width="110" height="75" fill="url(#wCardio)" rx="4" filter="url(#innerShadow)"/><rect width="110" height="75" fill="url(#grainCardio)" rx="4" opacity="0.6"/><rect x="100" y="0" width="10" height="75" fill="url(#gCardio)" rx="3"/><text x="45" y="23" text-anchor="middle" fill="#FF9090" font-size="14">💊</text><text x="45" y="40" text-anchor="middle" fill="#FFD0C0" font-size="8" font-family="Georgia" font-weight="bold">CARDIO</text><text x="45" y="53" text-anchor="middle" fill="#FFB8A8" font-size="7" font-family="Georgia">ACV</text><text x="45" y="68" text-anchor="middle" fill="#F0C860" font-size="8.5" font-weight="bold" font-family="Georgia">$220 · C-5</text></g>
+      <g transform="translate(788,413)"><rect width="110" height="75" fill="url(#wSalud)" rx="4" filter="url(#innerShadow)"/><rect width="110" height="75" fill="url(#grainSalud)" rx="4" opacity="0.6"/><rect x="100" y="0" width="10" height="75" fill="url(#gSalud)" rx="3"/><text x="45" y="20" text-anchor="middle" fill="white" font-size="8" font-family="Georgia" font-weight="bold">TARJETA SALUD</text><rect x="32" y="27" width="24" height="24" fill="#117A65" rx="4" opacity="0.9"/><rect x="39" y="32" width="10" height="3.5" fill="white" rx="1"/><rect x="42.7" y="28" width="3.5" height="10" fill="white" rx="1"/><text x="45" y="66" text-anchor="middle" fill="#90E8A0" font-size="7.5" font-family="Georgia">Beneficio (+)</text></g>
+      <g transform="translate(788,488)"><rect width="110" height="75" fill="url(#wResp)" rx="4" filter="url(#innerShadow)"/><rect width="110" height="75" fill="url(#grainResp)" rx="4" opacity="0.6"/><rect x="100" y="0" width="10" height="75" fill="url(#gResp)" rx="3"/><text x="45" y="23" text-anchor="middle" fill="#A8D8F8" font-size="14">🌡</text><text x="45" y="40" text-anchor="middle" fill="#C0E0F8" font-size="8" font-family="Georgia" font-weight="bold">PULMONAR</text><text x="45" y="53" text-anchor="middle" fill="#A0C8E8" font-size="7" font-family="Georgia">Fibrosis</text><text x="45" y="68" text-anchor="middle" fill="#F0C860" font-size="8.5" font-weight="bold" font-family="Georgia">$200 · R-4</text></g>
+      <g transform="translate(788,563)"><rect width="110" height="75" fill="url(#wOnco)" rx="4" filter="url(#innerShadow)"/><rect width="110" height="75" fill="url(#grainOnco)" rx="4" opacity="0.6"/><rect x="100" y="0" width="10" height="75" fill="url(#gOnco)" rx="3"/><text x="45" y="23" text-anchor="middle" fill="#D8B8F0" font-size="14">🧫</text><text x="45" y="40" text-anchor="middle" fill="#E8D0FF" font-size="8" font-family="Georgia" font-weight="bold">ONCOLOGÍA</text><text x="45" y="53" text-anchor="middle" fill="#D8B8F0" font-size="7" font-family="Georgia">Biología</text><text x="45" y="68" text-anchor="middle" fill="#F0C860" font-size="8.5" font-weight="bold" font-family="Georgia">$240 · O-5</text></g>
+      <g transform="translate(788,638)"><rect width="110" height="75" fill="url(#wRiesgo)" rx="4" filter="url(#innerShadow)"/><rect width="110" height="75" fill="url(#grainRiesgo)" rx="4" opacity="0.6"/><rect x="100" y="0" width="10" height="75" fill="url(#gRiesgo)" rx="3"/><text x="45" y="20" text-anchor="middle" fill="white" font-size="8" font-family="Georgia" font-weight="bold">TARJETA RIESGO</text><rect x="32" y="27" width="24" height="24" fill="#7D3C98" rx="4" opacity="0.9"/><text x="44" y="45" text-anchor="middle" fill="white" font-size="15" font-weight="bold">!</text><text x="45" y="66" text-anchor="middle" fill="#D8B8F0" font-size="7.5" font-family="Georgia">Penalidad (!)</text></g>
+      <g transform="translate(788,713)"><rect width="110" height="75" fill="url(#wNutri)" rx="4" filter="url(#innerShadow)"/><rect width="110" height="75" fill="url(#grainNutri)" rx="4" opacity="0.6"/><rect x="100" y="0" width="10" height="75" fill="url(#gNutri)" rx="3"/><text x="45" y="23" text-anchor="middle" fill="#90E898" font-size="14">💧</text><text x="45" y="40" text-anchor="middle" fill="#C8F0C0" font-size="8" font-family="Georgia" font-weight="bold">NUTRICIÓN</text><text x="45" y="53" text-anchor="middle" fill="#A8D8A0" font-size="7" font-family="Georgia">Hidratación</text><text x="45" y="68" text-anchor="middle" fill="#F0C860" font-size="8.5" font-weight="bold" font-family="Georgia">$180 · N-6</text></g>
+
+      <!-- CENTRO -->
+      <rect x="112" y="112" width="676" height="676" fill="url(#centerWood)" rx="8"/>
+      <rect x="112" y="112" width="676" height="676" fill="url(#grainCenter)" rx="8" opacity="0.8"/>
+      <rect x="112" y="112" width="676" height="676" fill="url(#varnish)" rx="8"/>
+      <rect x="112" y="112" width="676" height="676" fill="none" stroke="#5C2E0E" stroke-width="4" rx="8" opacity="0.9"/>
+      <rect x="115" y="115" width="670" height="670" fill="none" stroke="#D4A840" stroke-width="1.5" rx="7" opacity="0.7"/>
+      <circle cx="450" cy="450" r="295" fill="none" stroke="#8A5530" stroke-width="0.8" stroke-dasharray="5 9" opacity="0.3"/>
+      <circle cx="450" cy="450" r="220" fill="none" stroke="#D4A840" stroke-width="0.4" stroke-dasharray="3 7" opacity="0.22"/>
+
+      <!-- LOGO ELIPSE — parte superior -->
+      <ellipse cx="450" cy="270" rx="235" ry="138" fill="#180A02" opacity="0.96"/>
+      <ellipse cx="450" cy="270" rx="235" ry="138" fill="none" stroke="#D4A840" stroke-width="2.5" opacity="0.8" filter="url(#glow2)"/>
+      <ellipse cx="450" cy="270" rx="229" ry="132" fill="none" stroke="#5C2E0E" stroke-width="1" opacity="0.5"/>
+      <rect x="437" y="140" width="26" height="9"  fill="#C0392B" rx="2.5" filter="url(#glow2)"/>
+      <rect x="446" y="131" width="9"  height="27" fill="#C0392B" rx="2.5" filter="url(#glow2)"/>
+      <text x="450" y="228" text-anchor="middle" fill="#FFFFFF" font-size="66" font-family="Georgia, serif" font-weight="bold" letter-spacing="2" filter="url(#glow2)">MEDICO</text>
+      <text x="450" y="288" text-anchor="middle" fill="#D4A840" font-size="58" font-family="Georgia, serif" font-weight="bold" letter-spacing="9" filter="url(#glow)">POLIS</text>
+      <text x="450" y="322" text-anchor="middle" fill="#8A6030" font-size="10" font-family="Georgia" font-style="italic" letter-spacing="1.2">Juego Educativo · Enfermedades Crónicas No Transmisibles</text>
+      <line x1="290" y1="334" x2="610" y2="334" stroke="#8A5530" stroke-width="1" opacity="0.6"/>
+      <circle cx="450" cy="334" r="4" fill="#D4A840" opacity="0.8"/>
+
+      <!-- SEPARADOR -->
+      <line x1="160" y1="420" x2="740" y2="420" stroke="#5C2E0E" stroke-width="1" opacity="0.6"/>
+      <text x="450" y="414" text-anchor="middle" fill="#7A5020" font-size="9" font-family="Georgia" letter-spacing="4">— REGLAS DEL JUEGO —</text>
+
+      <!-- REGLAS col izquierda -->
+      <text x="178" y="444" fill="#A88050" font-size="10.5" font-family="Georgia">🎲  Tira ambos dados y avanza tu ficha</text>
+      <text x="178" y="462" fill="#A88050" font-size="10.5" font-family="Georgia">🏥  Cae en propiedad: compra o paga renta</text>
+      <text x="178" y="480" fill="#A88050" font-size="10.5" font-family="Georgia">💚  Tarjeta Salud: recibe dinero del banco</text>
+      <text x="178" y="498" fill="#A88050" font-size="10.5" font-family="Georgia">⚠️  Tarjeta Riesgo: paga penalidad al banco</text>
+      <text x="178" y="516" fill="#A88050" font-size="10.5" font-family="Georgia">🚨  UCI: pierde 2 turnos o paga $150</text>
+      <text x="178" y="534" fill="#A88050" font-size="10.5" font-family="Georgia">🏁  Al pasar SALIDA cobra $200</text>
+      <text x="178" y="552" fill="#A88050" font-size="10.5" font-family="Georgia">🏠  Construye Clínicas en tus propiedades</text>
+      <text x="178" y="570" fill="#A88050" font-size="10.5" font-family="Georgia">🏨  4 Clínicas = 1 Hospital (renta ×5)</text>
+      <text x="178" y="588" fill="#A88050" font-size="10.5" font-family="Georgia">🏆  Gana quien lleve a todos a bancarrota</text>
+
+      <!-- SEPARADOR CENTRAL vertical -->
+      <line x1="450" y1="425" x2="450" y2="750" stroke="#5C2E0E" stroke-width="0.8" opacity="0.4"/>
+
+      <!-- CATEGORÍAS col derecha -->
+      <text x="468" y="444" fill="#D4A840" font-size="9.5" font-family="Georgia" letter-spacing="2">CATEGORÍAS</text>
+      <line x1="468" y1="450" x2="730" y2="450" stroke="#5C2E0E" stroke-width="0.6" opacity="0.5"/>
+
+      <rect x="468" y="458" width="10" height="10" fill="#C0392B" rx="2"/>
+      <text x="484" y="468" fill="#C8A878" font-size="10.5" font-family="Georgia">Cardiología (C-1 a C-5)</text>
+      <rect x="468" y="476" width="10" height="10" fill="#1E8449" rx="2"/>
+      <text x="484" y="486" fill="#C8A878" font-size="10.5" font-family="Georgia">Nutrición (N-1 a N-6)</text>
+      <rect x="468" y="494" width="10" height="10" fill="#D4AC0D" rx="2"/>
+      <text x="484" y="504" fill="#C8A878" font-size="10.5" font-family="Georgia">Diabetes (D-1 a D-4)</text>
+      <rect x="468" y="512" width="10" height="10" fill="#1A5276" rx="2"/>
+      <text x="484" y="522" fill="#C8A878" font-size="10.5" font-family="Georgia">Pulmonar (R-1 a R-4)</text>
+      <rect x="468" y="530" width="10" height="10" fill="#7D3C98" rx="2"/>
+      <text x="484" y="540" fill="#C8A878" font-size="10.5" font-family="Georgia">Oncología (O-1 a O-5)</text>
+
+      <line x1="468" y1="550" x2="730" y2="550" stroke="#5C2E0E" stroke-width="0.6" opacity="0.5"/>
+      <text x="468" y="564" fill="#D4A840" font-size="9.5" font-family="Georgia" letter-spacing="2">CASILLAS ESPECIALES</text>
+      <line x1="468" y1="570" x2="730" y2="570" stroke="#5C2E0E" stroke-width="0.6" opacity="0.5"/>
+
+      <rect x="468" y="578" width="10" height="10" fill="#117A65" rx="2"/>
+      <text x="484" y="588" fill="#C8A878" font-size="10.5" font-family="Georgia">Tarjeta Salud — cobra bonus</text>
+      <rect x="468" y="596" width="10" height="10" fill="#7D3C98" rx="2"/>
+      <text x="484" y="606" fill="#C8A878" font-size="10.5" font-family="Georgia">Tarjeta Riesgo — paga multa</text>
+      <rect x="468" y="614" width="10" height="10" fill="#B7950B" rx="2"/>
+      <text x="484" y="624" fill="#C8A878" font-size="10.5" font-family="Georgia">Consulta / Análisis — pago fijo</text>
+      <rect x="468" y="632" width="10" height="10" fill="#028090" rx="2"/>
+      <text x="484" y="642" fill="#C8A878" font-size="10.5" font-family="Georgia">Zona Libre — descansa gratis</text>
+      <rect x="468" y="650" width="10" height="10" fill="#C0392B" rx="2"/>
+      <text x="484" y="660" fill="#C8A878" font-size="10.5" font-family="Georgia">UCI Emergencia — pierde turnos</text>
+
+      <!-- SEPARADOR INFERIOR -->
+      <line x1="160" y1="672" x2="740" y2="672" stroke="#5C2E0E" stroke-width="1" opacity="0.5"/>
+
+      <!-- FICHAS Y CAPITAL INICIAL -->
+      <text x="450" y="692" text-anchor="middle" fill="#7A5020" font-size="9" font-family="Georgia" letter-spacing="3">— FICHAS · CAPITAL INICIAL $1,500 —</text>
+
+      <circle cx="280" cy="725" r="20" fill="#C0392B" stroke="#FF9090" stroke-width="2"/>
+      <text x="280" y="731" text-anchor="middle" font-size="15">🧑</text>
+      <text x="280" y="754" text-anchor="middle" fill="#A08060" font-size="9" font-family="Georgia">Jug. 1</text>
+
+      <circle cx="340" cy="725" r="20" fill="#1A5276" stroke="#85C1E9" stroke-width="2"/>
+      <text x="340" y="731" text-anchor="middle" font-size="15">👩</text>
+      <text x="340" y="754" text-anchor="middle" fill="#A08060" font-size="9" font-family="Georgia">Jug. 2</text>
+
+      <circle cx="400" cy="725" r="20" fill="#1E8449" stroke="#90E898" stroke-width="2"/>
+      <text x="400" y="731" text-anchor="middle" font-size="15">👦</text>
+      <text x="400" y="754" text-anchor="middle" fill="#A08060" font-size="9" font-family="Georgia">Jug. 3</text>
+
+      <circle cx="460" cy="725" r="20" fill="#7D3C98" stroke="#D8B8F0" stroke-width="2"/>
+      <text x="460" y="731" text-anchor="middle" font-size="15">👧</text>
+      <text x="460" y="754" text-anchor="middle" fill="#A08060" font-size="9" font-family="Georgia">Jug. 4</text>
+
+      <circle cx="520" cy="725" r="20" fill="#B7950B" stroke="#F8E890" stroke-width="2"/>
+      <text x="520" y="731" text-anchor="middle" font-size="15">🧓</text>
+      <text x="520" y="754" text-anchor="middle" fill="#A08060" font-size="9" font-family="Georgia">Jug. 5</text>
+
+      <circle cx="580" cy="725" r="20" fill="#5C2E0E" stroke="#D4A840" stroke-width="2"/>
+      <text x="580" y="731" text-anchor="middle" font-size="15">🧑‍⚕️</text>
+      <text x="580" y="754" text-anchor="middle" fill="#A08060" font-size="9" font-family="Georgia">Jug. 6</text>
+
+      <!-- Línea latido decorativa -->
+      <polyline points="160,775 180,775 190,758 202,792 214,750 226,775 740,775"
+        fill="none" stroke="#8A5530" stroke-width="1.2" opacity="0.28" stroke-linejoin="round"/>
+
+      <!-- Fichas SVG jugadores activos — posición inicial SALIDA -->
+      <circle id="pawn0" cx="820" cy="843" r="14" fill="#C0392B" stroke="#FF9090" stroke-width="2.5" filter="url(#shadow)"/>
+      <text id="pawn0t" x="820" y="849" text-anchor="middle" font-size="13">🧑</text>
+      <circle id="pawn1" cx="843" cy="820" r="14" fill="#1A5276" stroke="#85C1E9" stroke-width="2.5" filter="url(#shadow)"/>
+      <text id="pawn1t" x="843" y="826" text-anchor="middle" font-size="13">👩</text>
+      <circle id="pawn2" cx="856" cy="856" r="14" fill="#1E8449" stroke="#90E898" stroke-width="2.5" filter="url(#shadow)"/>
+      <text id="pawn2t" x="856" y="862" text-anchor="middle" font-size="13">👦</text>
+
+      </svg>
+    </div>
+  </main>
+
+</div><!-- end game-layout -->
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <span class="footer-cross">✚</span>
+      <span class="footer-logo">MEDICOPOLIS</span>
+      <p class="footer-tagline">Juego Educativo sobre<br>Enfermedades Crónicas No Transmisibles</p>
+    </div>
+    <div class="footer-section">
+      <h4>Contáctanos</h4>
+      <ul>
+        <li>📞 <a href="tel:+593958605284">+593 95 860 5284</a></li>
+        <li>📱 <a href="https://wa.me/593958605284">WhatsApp</a></li>
+        <li>✉️ <a href="mailto:info@medicopolis.edu.ec">info@medicopolis.edu.ec</a></li>
+      </ul>
+    </div>
+    <div class="footer-section">
+      <h4>Ubicación</h4>
+      <ul>
+        <li>📍 Cuenca, Azuay, Ecuador</li>
+        <li>🕘 Lun – Vie: 08:00 – 17:00</li>
+        <li>🌐 <a href="#">www.medicopolis.edu.ec</a></li>
+      </ul>
+    </div>
+    <div class="footer-section">
+      <h4>Síguenos</h4>
+      <ul class="footer-social">
+        <li><a href="https://www.facebook.com/andy.otg/">📘 Facebook</a></li>
+        <li><a href="https://www.instagram.com/andy.otg/">📸 Instagram</a></li>
+        <li><a href="https://www.youtube.com/@andyLaunchVision">▶️ YouTube</a></li>
+        <li><a href="https://github.com/andyortega07/MEDICOPOLIS">💼 GitHub</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 MEDICOPOLIS · Todos los derechos reservados · Desarrollado en Cuenca, Ecuador</p>
+  </div>
+</footer>
+
+<script src="tablero.js"></script>
+</body>
+</html>

@@ -25,10 +25,13 @@
   <button class="nav-hamburger" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
 </nav>
 
+<!-- TOOLTIP EDUCATIVO -->
+<div id="squareTip" class="square-tooltip"></div>
+
 <!-- GAME LAYOUT -->
 <div class="game-layout">
 
-  <!-- PANEL IZQUIERDO: jugadores y turno -->
+  <!-- PANEL IZQUIERDO -->
   <aside class="side-panel left-panel">
     <h3 class="panel-title">Jugadores</h3>
 
@@ -37,6 +40,7 @@
       <div class="player-info">
         <span class="player-name">Jugador 1</span>
         <span class="player-money" id="p0money">$1,500</span>
+        <span class="player-props" id="p0props">Props: 0</span>
       </div>
       <div class="turn-indicator" id="p0turn">◀ TURNO</div>
     </div>
@@ -46,6 +50,7 @@
       <div class="player-info">
         <span class="player-name">Jugador 2</span>
         <span class="player-money" id="p1money">$1,500</span>
+        <span class="player-props" id="p1props">Props: 0</span>
       </div>
       <div class="turn-indicator hidden" id="p1turn">◀ TURNO</div>
     </div>
@@ -55,8 +60,40 @@
       <div class="player-info">
         <span class="player-name">Jugador 3</span>
         <span class="player-money" id="p2money">$1,500</span>
+        <span class="player-props" id="p2props">Props: 0</span>
       </div>
       <div class="turn-indicator hidden" id="p2turn">◀ TURNO</div>
+    </div>
+
+    <div class="panel-sep"></div>
+
+    <!-- CONSTRUCCIÓN -->
+    <h3 class="panel-title">Construcciones 🏗</h3>
+    <div class="build-info" id="buildInfo">
+      <div class="build-row">
+        <span class="build-label">🏢 Consultorios</span>
+        <span class="build-val" id="bConsult0">J1: 0</span>
+      </div>
+      <div class="build-row">
+        <span class="build-label">🏥 Clínicas</span>
+        <span class="build-val" id="bClinic0">J1: 0</span>
+      </div>
+      <div class="build-row">
+        <span class="build-label">🏨 Hospitales</span>
+        <span class="build-val" id="bHosp0">J1: 0</span>
+      </div>
+      <div class="build-sep"></div>
+      <div class="tarjetas-row">
+        <span>💚 T.Salud (J1):</span><span id="tSalud0" class="t-count">0</span>
+      </div>
+      <div class="tarjetas-row">
+        <span>⚠️ T.Riesgo (J1):</span><span id="tRiesgo0" class="t-count">0</span>
+      </div>
+      <div class="build-note">
+        3 T.Salud → construye Consultorio<br>
+        3 Consultorios → Clínica<br>
+        4 Clínicas = Hospital
+      </div>
     </div>
 
     <div class="panel-sep"></div>
@@ -125,6 +162,7 @@
           <stop offset="50%"  stop-color="#F0C860"/>
           <stop offset="100%" stop-color="#B88828"/>
         </linearGradient>
+        <!-- Category fills -->
         <linearGradient id="wCardio" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stop-color="#5C1A10"/><stop offset="50%" stop-color="#4A1208"/><stop offset="100%" stop-color="#5C1A10"/>
         </linearGradient>
@@ -243,6 +281,7 @@
       <rect x="2"  y="2"  width="896" height="896" fill="none" stroke="url(#goldBorder)" stroke-width="5"   rx="13"/>
       <rect x="7"  y="7"  width="886" height="886" fill="none" stroke="#2E1204"          stroke-width="3"   rx="10"/>
       <rect x="11" y="11" width="878" height="878" fill="none" stroke="#D4A840"          stroke-width="1.2" rx="8" opacity="0.7"/>
+      <!-- corner rivets -->
       <circle cx="22"  cy="22"  r="8" fill="#5C2E0E" stroke="#D4A840" stroke-width="1.5"/>
       <circle cx="22"  cy="22"  r="3" fill="#D4A840"/>
       <circle cx="878" cy="22"  r="8" fill="#5C2E0E" stroke="#D4A840" stroke-width="1.5"/>
@@ -252,18 +291,23 @@
       <circle cx="878" cy="878" r="8" fill="#5C2E0E" stroke="#D4A840" stroke-width="1.5"/>
       <circle cx="878" cy="878" r="3" fill="#D4A840"/>
 
-      <!-- CORNERS -->
-      <g transform="translate(788,788)">
+      <!-- ═══════════════════════════════
+           CORNERS
+      ═══════════════════════════════ -->
+      <!-- SALIDA (bottom-right) sq 0 -->
+      <g id="sq0" class="sq-hover" data-sq="0" transform="translate(788,788)">
         <rect width="110" height="110" fill="url(#cornerTeal)" rx="7" filter="url(#shadow)"/>
         <rect x="0" y="0" width="110" height="10" fill="#02C39A" rx="5"/>
-        <rect x="44" y="24" width="22" height="7" fill="white" rx="2"/>
-        <rect x="50" y="18" width="10" height="19" fill="white" rx="2"/>
-        <text x="55" y="60"  text-anchor="middle" fill="white"  font-size="11" font-family="Georgia" font-weight="bold">SALIDA</text>
-        <text x="55" y="76"  text-anchor="middle" fill="#d0fff5" font-size="9"  font-family="Georgia">AL PASAR</text>
-        <text x="55" y="93"  text-anchor="middle" fill="white"  font-size="12" font-family="Georgia" font-weight="bold">COBRA $200</text>
-        <text x="55" y="107" text-anchor="middle" fill="#d0fff5" font-size="8"  font-family="Georgia">🏥 INICIO</text>
+        <rect x="44" y="20" width="22" height="7"  fill="white" rx="2"/>
+        <rect x="50" y="14" width="10" height="19" fill="white" rx="2"/>
+        <text x="55" y="58"  text-anchor="middle" fill="white"  font-size="11" font-family="Georgia" font-weight="bold">SALIDA</text>
+        <text x="55" y="74"  text-anchor="middle" fill="#d0fff5" font-size="9"  font-family="Georgia">AL PASAR</text>
+        <text x="55" y="91"  text-anchor="middle" fill="white"  font-size="12" font-family="Georgia" font-weight="bold">COBRA $200</text>
+        <text x="55" y="106" text-anchor="middle" fill="#d0fff5" font-size="8"  font-family="Georgia">🏁 INICIO</text>
       </g>
-      <g transform="translate(2,788)">
+
+      <!-- VISITA HOSPITAL (bottom-left) sq 10 -->
+      <g id="sq10" class="sq-hover" data-sq="10" transform="translate(2,788)">
         <rect width="110" height="110" fill="#1A0A02" rx="7" filter="url(#shadow)"/>
         <rect width="110" height="110" fill="url(#grainPat)" rx="7" opacity="0.5"/>
         <rect x="0" y="0" width="110" height="10" fill="#028090" rx="5"/>
@@ -271,74 +315,464 @@
         <circle cx="55" cy="55" r="12" fill="#1E8449"/>
         <rect x="50" y="52" width="10" height="2.5" fill="white" rx="1"/>
         <rect x="53.5" y="49" width="2.5" height="10" fill="white" rx="1"/>
-        <text x="55" y="90"  text-anchor="middle" fill="white"   font-size="9.5" font-family="Georgia" font-weight="bold">VISITA</text>
+        <text x="55" y="88"  text-anchor="middle" fill="white"   font-size="9.5" font-family="Georgia" font-weight="bold">VISITA</text>
         <text x="55" y="103" text-anchor="middle" fill="#4ab8c8"  font-size="8"   font-family="Georgia">HOSPITAL</text>
       </g>
-      <g transform="translate(2,2)">
+
+      <!-- UCI (top-left) sq 20 -->
+      <g id="sq20" class="sq-hover" data-sq="20" transform="translate(2,2)">
         <rect width="110" height="110" fill="#1A0A02" rx="7" filter="url(#shadow)"/>
         <rect width="110" height="110" fill="url(#grainPat)" rx="7" opacity="0.4"/>
         <rect x="0" y="0" width="110" height="10" fill="#C0392B" rx="5"/>
-        <polygon points="55,22 80,62 30,62" fill="none" stroke="#F96167" stroke-width="2.5" stroke-linejoin="round"/>
-        <text x="55" y="57"  text-anchor="middle" fill="#F96167" font-size="16" font-weight="bold">!</text>
-        <text x="55" y="78"  text-anchor="middle" fill="#F96167" font-size="13" font-family="Georgia" font-weight="bold">UCI</text>
-        <text x="55" y="92"  text-anchor="middle" fill="white"   font-size="9"  font-family="Georgia">EMERGENCIA</text>
-        <text x="55" y="106" text-anchor="middle" fill="#C8A060"  font-size="8"  font-family="Georgia">Pierde 2 turnos</text>
+        <polygon points="55,20 82,65 28,65" fill="none" stroke="#F96167" stroke-width="2.5" stroke-linejoin="round"/>
+        <text x="55" y="61"  text-anchor="middle" fill="#F96167" font-size="16" font-weight="bold">!</text>
+        <text x="55" y="80"  text-anchor="middle" fill="#F96167" font-size="13" font-family="Georgia" font-weight="bold">UCI</text>
+        <text x="55" y="94"  text-anchor="middle" fill="white"   font-size="9"  font-family="Georgia">EMERGENCIA</text>
+        <text x="55" y="107" text-anchor="middle" fill="#C8A060"  font-size="8"  font-family="Georgia">Pierde 2 turnos</text>
       </g>
-      <g transform="translate(788,2)">
+
+      <!-- ZONA LIBRE (top-right) sq 30 -->
+      <g id="sq30" class="sq-hover" data-sq="30" transform="translate(788,2)">
         <rect width="110" height="110" fill="#1A0A02" rx="7" filter="url(#shadow)"/>
         <rect width="110" height="110" fill="url(#grainPat)" rx="7" opacity="0.4"/>
         <rect x="0" y="0" width="110" height="10" fill="url(#cornerTeal)" rx="5"/>
-        <text x="55" y="50"  text-anchor="middle" fill="#02C39A" font-size="26">🛡</text>
-        <text x="55" y="72"  text-anchor="middle" fill="white"   font-size="13" font-family="Georgia" font-weight="bold">ZONA</text>
-        <text x="55" y="88"  text-anchor="middle" fill="#02C39A" font-size="13" font-family="Georgia" font-weight="bold">LIBRE</text>
-        <text x="55" y="104" text-anchor="middle" fill="#C8A060"  font-size="8"  font-family="Georgia">sin pagar 🌿</text>
+        <text x="55" y="52"  text-anchor="middle" fill="#02C39A" font-size="28">🛡</text>
+        <text x="55" y="74"  text-anchor="middle" fill="white"   font-size="13" font-family="Georgia" font-weight="bold">ZONA</text>
+        <text x="55" y="90"  text-anchor="middle" fill="#02C39A" font-size="13" font-family="Georgia" font-weight="bold">LIBRE</text>
+        <text x="55" y="106" text-anchor="middle" fill="#C8A060"  font-size="8"  font-family="Georgia">sin pagar 🌿</text>
       </g>
 
-      <!-- BOTTOM ROW -->
-      <g transform="translate(713,788)"><rect width="75" height="110" fill="url(#wCardio)" rx="4" filter="url(#innerShadow)"/><rect width="75" height="110" fill="url(#grainCardio)" rx="4" opacity="0.6"/><rect x="0" y="0" width="75" height="9" fill="url(#gCardio)" rx="3"/><text x="37" y="28" text-anchor="middle" fill="#ff9090" font-size="17">❤</text><text x="37" y="48" text-anchor="middle" fill="#FFD0C0" font-size="8" font-family="Georgia" font-weight="bold">CARDIO</text><text x="37" y="61" text-anchor="middle" fill="#FFB8A8" font-size="7" font-family="Georgia">Hipertensión</text><text x="37" y="87" text-anchor="middle" fill="#F0C860" font-size="10" font-weight="bold" font-family="Georgia">$60</text><text x="37" y="103" text-anchor="middle" fill="#A08060" font-size="7" font-family="Georgia">C-1</text></g>
-      <g transform="translate(638,788)"><rect width="75" height="110" fill="url(#wSalud)" rx="4" filter="url(#innerShadow)"/><rect width="75" height="110" fill="url(#grainSalud)" rx="4" opacity="0.6"/><rect x="0" y="0" width="75" height="9" fill="url(#gSalud)" rx="3"/><text x="37" y="30" text-anchor="middle" fill="white" font-size="8" font-family="Georgia" font-weight="bold">TARJETA</text><text x="37" y="44" text-anchor="middle" fill="#90E8A0" font-size="8" font-family="Georgia" font-weight="bold">SALUD</text><rect x="22" y="52" width="31" height="31" fill="#117A65" rx="5" opacity="0.9"/><rect x="31" y="59" width="13" height="4" fill="white" rx="1.5"/><rect x="36" y="54" width="4" height="13" fill="white" rx="1.5"/><text x="37" y="100" text-anchor="middle" fill="#90E8A0" font-size="7" font-family="Georgia">Beneficio (+)</text></g>
-      <g transform="translate(563,788)"><rect width="75" height="110" fill="url(#wNutri)" rx="4" filter="url(#innerShadow)"/><rect width="75" height="110" fill="url(#grainNutri)" rx="4" opacity="0.6"/><rect x="0" y="0" width="75" height="9" fill="url(#gNutri)" rx="3"/><text x="37" y="28" text-anchor="middle" fill="#90E898" font-size="16">🥦</text><text x="37" y="48" text-anchor="middle" fill="#C8F0C0" font-size="8" font-family="Georgia" font-weight="bold">NUTRICIÓN</text><text x="37" y="61" text-anchor="middle" fill="#A8D8A0" font-size="7" font-family="Georgia">Alimentación</text><text x="37" y="87" text-anchor="middle" fill="#F0C860" font-size="10" font-weight="bold" font-family="Georgia">$35</text><text x="37" y="103" text-anchor="middle" fill="#A08060" font-size="7" font-family="Georgia">N-1</text></g>
-      <g transform="translate(488,788)"><rect width="75" height="110" fill="url(#wNutri)" rx="4" filter="url(#innerShadow)"/><rect width="75" height="110" fill="url(#grainNutri)" rx="4" opacity="0.6"/><rect x="0" y="0" width="75" height="9" fill="url(#gNutri)" rx="3"/><text x="37" y="28" text-anchor="middle" fill="#90E898" font-size="16">🥗</text><text x="37" y="48" text-anchor="middle" fill="#C8F0C0" font-size="8" font-family="Georgia" font-weight="bold">NUTRICIÓN</text><text x="37" y="61" text-anchor="middle" fill="#A8D8A0" font-size="7" font-family="Georgia">Obesidad</text><text x="37" y="87" text-anchor="middle" fill="#F0C860" font-size="10" font-weight="bold" font-family="Georgia">$50</text><text x="37" y="103" text-anchor="middle" fill="#A08060" font-size="7" font-family="Georgia">N-2</text></g>
-      <g transform="translate(413,788)"><rect width="75" height="110" fill="url(#wPago)" rx="4" filter="url(#innerShadow)"/><rect width="75" height="110" fill="url(#grainPago)" rx="4" opacity="0.6"/><rect x="0" y="0" width="75" height="9" fill="url(#gPago)" rx="3"/><text x="37" y="28" text-anchor="middle" fill="#F8E890" font-size="16">💊</text><text x="37" y="48" text-anchor="middle" fill="#F8E890" font-size="8" font-family="Georgia" font-weight="bold">CONSULTA</text><text x="37" y="61" text-anchor="middle" fill="#D8C870" font-size="7" font-family="Georgia">Médica</text><text x="37" y="87" text-anchor="middle" fill="#E8C840" font-size="9" font-weight="bold" font-family="Georgia">PAGA $30</text></g>
-      <g transform="translate(338,788)"><rect width="75" height="110" fill="url(#wDiab)" rx="4" filter="url(#innerShadow)"/><rect width="75" height="110" fill="url(#grainDiab)" rx="4" opacity="0.6"/><rect x="0" y="0" width="75" height="9" fill="url(#gDiab)" rx="3"/><text x="37" y="28" text-anchor="middle" fill="#F8E898" font-size="16">🩸</text><text x="37" y="48" text-anchor="middle" fill="#F8E898" font-size="8" font-family="Georgia" font-weight="bold">DIABETES</text><text x="37" y="61" text-anchor="middle" fill="#D8C878" font-size="7" font-family="Georgia">Tipo 2</text><text x="37" y="87" text-anchor="middle" fill="#F0C860" font-size="10" font-weight="bold" font-family="Georgia">$60</text><text x="37" y="103" text-anchor="middle" fill="#A08060" font-size="7" font-family="Georgia">D-1</text></g>
-      <g transform="translate(263,788)"><rect width="75" height="110" fill="url(#wCardio)" rx="4" filter="url(#innerShadow)"/><rect width="75" height="110" fill="url(#grainCardio)" rx="4" opacity="0.6"/><rect x="0" y="0" width="75" height="9" fill="url(#gCardio)" rx="3"/><text x="37" y="28" text-anchor="middle" fill="#FF9090" font-size="16">🫀</text><text x="37" y="48" text-anchor="middle" fill="#FFD0C0" font-size="8" font-family="Georgia" font-weight="bold">CARDIO</text><text x="37" y="61" text-anchor="middle" fill="#FFB8A8" font-size="7" font-family="Georgia">Infarto</text><text x="37" y="87" text-anchor="middle" fill="#F0C860" font-size="10" font-weight="bold" font-family="Georgia">$150</text><text x="37" y="103" text-anchor="middle" fill="#A08060" font-size="7" font-family="Georgia">C-2</text></g>
-      <g transform="translate(188,788)"><rect width="75" height="110" fill="url(#wRiesgo)" rx="4" filter="url(#innerShadow)"/><rect width="75" height="110" fill="url(#grainRiesgo)" rx="4" opacity="0.6"/><rect x="0" y="0" width="75" height="9" fill="url(#gRiesgo)" rx="3"/><text x="37" y="30" text-anchor="middle" fill="white" font-size="8" font-family="Georgia" font-weight="bold">TARJETA</text><text x="37" y="44" text-anchor="middle" fill="#D8B8F0" font-size="8" font-family="Georgia" font-weight="bold">RIESGO</text><rect x="22" y="52" width="31" height="31" fill="#7D3C98" rx="5" opacity="0.9"/><text x="37" y="74" text-anchor="middle" fill="white" font-size="18" font-weight="bold">!</text><text x="37" y="100" text-anchor="middle" fill="#D8B8F0" font-size="7" font-family="Georgia">Penalidad (!)</text></g>
-      <g transform="translate(113,788)"><rect width="75" height="110" fill="url(#wResp)" rx="4" filter="url(#innerShadow)"/><rect width="75" height="110" fill="url(#grainResp)" rx="4" opacity="0.6"/><rect x="0" y="0" width="75" height="9" fill="url(#gResp)" rx="3"/><text x="37" y="28" text-anchor="middle" fill="#A8D8F8" font-size="16">🫁</text><text x="37" y="48" text-anchor="middle" fill="#C0E0F8" font-size="8" font-family="Georgia" font-weight="bold">PULMONAR</text><text x="37" y="61" text-anchor="middle" fill="#A0C8E8" font-size="7" font-family="Georgia">EPOC</text><text x="37" y="87" text-anchor="middle" fill="#F0C860" font-size="10" font-weight="bold" font-family="Georgia">$90</text><text x="37" y="103" text-anchor="middle" fill="#A08060" font-size="7" font-family="Georgia">R-1</text></g>
+      <!-- ═══════════════════════════════
+           BOTTOM ROW (sq 1-9, right→left)
+      ═══════════════════════════════ -->
+      <!-- sq1 C-1 Hipertensión -->
+      <g id="sq1" class="sq-hover" data-sq="1" transform="translate(713,788)">
+        <rect width="75" height="110" fill="url(#wCardio)" rx="4" filter="url(#innerShadow)"/>
+        <rect width="75" height="110" fill="url(#grainCardio)" rx="4" opacity="0.6"/>
+        <rect x="0" y="0" width="75" height="9" fill="url(#gCardio)" rx="3"/>
+        <text x="37" y="27" text-anchor="middle" fill="#ff8080" font-size="18">🩺</text>
+        <text x="37" y="46" text-anchor="middle" fill="#FFD0C0" font-size="7.5" font-family="Georgia" font-weight="bold">CARDIO</text>
+        <text x="37" y="59" text-anchor="middle" fill="#FFB8A8" font-size="7" font-family="Georgia">Hipertensión</text>
+        <text x="37" y="82" text-anchor="middle" fill="#F0C860" font-size="9.5" font-weight="bold" font-family="Georgia">PAGA $60</text>
+        <text x="37" y="97" text-anchor="middle" fill="#A08060" font-size="7" font-family="Georgia">C-1</text>
+      </g>
 
-      <!-- TOP ROW -->
-      <g transform="translate(113,2)"><rect width="75" height="110" fill="url(#wNutri)" rx="4" filter="url(#innerShadow)"/><rect width="75" height="110" fill="url(#grainNutri)" rx="4" opacity="0.6"/><rect x="0" y="101" width="75" height="9" fill="url(#gNutri)" rx="3"/><text x="37" y="24" text-anchor="middle" fill="#A08060" font-size="7" font-family="Georgia">N-4</text><text x="37" y="38" text-anchor="middle" fill="#F0C860" font-size="10" font-weight="bold" font-family="Georgia">$45</text><text x="37" y="62" text-anchor="middle" fill="#A8D8A0" font-size="7" font-family="Georgia">Vitaminas</text><text x="37" y="77" text-anchor="middle" fill="#C8F0C0" font-size="8" font-family="Georgia" font-weight="bold">NUTRICIÓN</text><text x="37" y="97" text-anchor="middle" fill="#90E898" font-size="14">🥕</text></g>
-      <g transform="translate(188,2)"><rect width="75" height="110" fill="url(#wOnco)" rx="4" filter="url(#innerShadow)"/><rect width="75" height="110" fill="url(#grainOnco)" rx="4" opacity="0.6"/><rect x="0" y="101" width="75" height="9" fill="url(#gOnco)" rx="3"/><text x="37" y="24" text-anchor="middle" fill="#A08060" font-size="7" font-family="Georgia">O-3</text><text x="37" y="38" text-anchor="middle" fill="#F0C860" font-size="10" font-weight="bold" font-family="Georgia">$100</text><text x="37" y="62" text-anchor="middle" fill="#D8B8F0" font-size="7" font-family="Georgia">Prevención</text><text x="37" y="77" text-anchor="middle" fill="#E8D0FF" font-size="8" font-family="Georgia" font-weight="bold">ONCOLOGÍA</text><text x="37" y="97" text-anchor="middle" fill="#D8B8F0" font-size="14">🧬</text></g>
-      <g transform="translate(263,2)"><rect width="75" height="110" fill="url(#wPago)" rx="4" filter="url(#innerShadow)"/><rect width="75" height="110" fill="url(#grainPago)" rx="4" opacity="0.6"/><rect x="0" y="101" width="75" height="9" fill="url(#gPago)" rx="3"/><text x="37" y="24" text-anchor="middle" fill="#E8C840" font-size="8" font-family="Georgia" font-weight="bold">PAGA $25</text><text x="37" y="51" text-anchor="middle" fill="#D8C870" font-size="7" font-family="Georgia">Examen</text><text x="37" y="65" text-anchor="middle" fill="#F8E890" font-size="8" font-family="Georgia" font-weight="bold">DE SALUD</text><text x="37" y="89" text-anchor="middle" fill="#F8E890" font-size="14">🧾</text></g>
-      <g transform="translate(338,2)"><rect width="75" height="110" fill="url(#wDiab)" rx="4" filter="url(#innerShadow)"/><rect width="75" height="110" fill="url(#grainDiab)" rx="4" opacity="0.6"/><rect x="0" y="101" width="75" height="9" fill="url(#gDiab)" rx="3"/><text x="37" y="24" text-anchor="middle" fill="#A08060" font-size="7" font-family="Georgia">D-3</text><text x="37" y="38" text-anchor="middle" fill="#F0C860" font-size="10" font-weight="bold" font-family="Georgia">$80</text><text x="37" y="62" text-anchor="middle" fill="#D8C878" font-size="7" font-family="Georgia">Insulina</text><text x="37" y="77" text-anchor="middle" fill="#F8E898" font-size="8" font-family="Georgia" font-weight="bold">DIABETES</text><text x="37" y="97" text-anchor="middle" fill="#F8E898" font-size="14">💉</text></g>
-      <g transform="translate(413,2)"><rect width="75" height="110" fill="url(#wCardio)" rx="4" filter="url(#innerShadow)"/><rect width="75" height="110" fill="url(#grainCardio)" rx="4" opacity="0.6"/><rect x="0" y="101" width="75" height="9" fill="url(#gCardio)" rx="3"/><text x="37" y="24" text-anchor="middle" fill="#A08060" font-size="7" font-family="Georgia">C-4</text><text x="37" y="38" text-anchor="middle" fill="#F0C860" font-size="10" font-weight="bold" font-family="Georgia">$90</text><text x="37" y="62" text-anchor="middle" fill="#FFB8A8" font-size="7" font-family="Georgia">Colesterol</text><text x="37" y="77" text-anchor="middle" fill="#FFD0C0" font-size="8" font-family="Georgia" font-weight="bold">CARDIO</text><text x="37" y="97" text-anchor="middle" fill="#FF9090" font-size="14">💓</text></g>
-      <g transform="translate(488,2)"><rect width="75" height="110" fill="url(#wSalud)" rx="4" filter="url(#innerShadow)"/><rect width="75" height="110" fill="url(#grainSalud)" rx="4" opacity="0.6"/><rect x="0" y="101" width="75" height="9" fill="url(#gSalud)" rx="3"/><text x="37" y="20" text-anchor="middle" fill="#90E8A0" font-size="7" font-family="Georgia" font-weight="bold">TARJETA</text><text x="37" y="34" text-anchor="middle" fill="white" font-size="8" font-family="Georgia" font-weight="bold">SALUD</text><rect x="22" y="44" width="31" height="31" fill="#117A65" rx="5" opacity="0.9"/><rect x="31" y="51" width="13" height="4" fill="white" rx="1.5"/><rect x="36" y="46" width="4" height="13" fill="white" rx="1.5"/><text x="37" y="94" text-anchor="middle" fill="#90E8A0" font-size="7" font-family="Georgia">Beneficio (+)</text></g>
-      <g transform="translate(563,2)"><rect width="75" height="110" fill="url(#wResp)" rx="4" filter="url(#innerShadow)"/><rect width="75" height="110" fill="url(#grainResp)" rx="4" opacity="0.6"/><rect x="0" y="101" width="75" height="9" fill="url(#gResp)" rx="3"/><text x="37" y="24" text-anchor="middle" fill="#A08060" font-size="7" font-family="Georgia">R-3</text><text x="37" y="38" text-anchor="middle" fill="#F0C860" font-size="10" font-weight="bold" font-family="Georgia">$85</text><text x="37" y="62" text-anchor="middle" fill="#A0C8E8" font-size="7" font-family="Georgia">Tabaquismo</text><text x="37" y="77" text-anchor="middle" fill="#C0E0F8" font-size="8" font-family="Georgia" font-weight="bold">PULMONAR</text><text x="37" y="97" text-anchor="middle" fill="#A8D8F8" font-size="14">🌬</text></g>
-      <g transform="translate(638,2)"><rect width="75" height="110" fill="url(#wOnco)" rx="4" filter="url(#innerShadow)"/><rect width="75" height="110" fill="url(#grainOnco)" rx="4" opacity="0.6"/><rect x="0" y="101" width="75" height="9" fill="url(#gOnco)" rx="3"/><text x="37" y="24" text-anchor="middle" fill="#A08060" font-size="7" font-family="Georgia">O-4</text><text x="37" y="38" text-anchor="middle" fill="#F0C860" font-size="10" font-weight="bold" font-family="Georgia">$180</text><text x="37" y="62" text-anchor="middle" fill="#D8B8F0" font-size="7" font-family="Georgia">Diagnóst.</text><text x="37" y="77" text-anchor="middle" fill="#E8D0FF" font-size="8" font-family="Georgia" font-weight="bold">ONCOLOGÍA</text><text x="37" y="97" text-anchor="middle" fill="#D8B8F0" font-size="14">⚕</text></g>
-      <g transform="translate(713,2)"><rect width="75" height="110" fill="url(#wRiesgo)" rx="4" filter="url(#innerShadow)"/><rect width="75" height="110" fill="url(#grainRiesgo)" rx="4" opacity="0.6"/><rect x="0" y="101" width="75" height="9" fill="url(#gRiesgo)" rx="3"/><text x="37" y="20" text-anchor="middle" fill="#D8B8F0" font-size="7" font-family="Georgia" font-weight="bold">TARJETA</text><text x="37" y="34" text-anchor="middle" fill="white" font-size="8" font-family="Georgia" font-weight="bold">RIESGO</text><rect x="22" y="44" width="31" height="31" fill="#7D3C98" rx="5" opacity="0.9"/><text x="37" y="66" text-anchor="middle" fill="white" font-size="18" font-weight="bold">!</text><text x="37" y="94" text-anchor="middle" fill="#D8B8F0" font-size="7" font-family="Georgia">Penalidad (!)</text></g>
+      <!-- sq2 Tarjeta Salud -->
+      <g id="sq2" class="sq-hover" data-sq="2" transform="translate(638,788)">
+        <rect width="75" height="110" fill="url(#wSalud)" rx="4" filter="url(#innerShadow)"/>
+        <rect width="75" height="110" fill="url(#grainSalud)" rx="4" opacity="0.6"/>
+        <rect x="0" y="0" width="75" height="9" fill="url(#gSalud)" rx="3"/>
+        <text x="37" y="29" text-anchor="middle" fill="white" font-size="7.5" font-family="Georgia" font-weight="bold">TARJETA</text>
+        <text x="37" y="43" text-anchor="middle" fill="#90E8A0" font-size="7.5" font-family="Georgia" font-weight="bold">SALUD</text>
+        <rect x="22" y="51" width="31" height="31" fill="#117A65" rx="5" opacity="0.9"/>
+        <rect x="31" y="58" width="13" height="4"  fill="white" rx="1.5"/>
+        <rect x="36" y="53" width="4"  height="13" fill="white" rx="1.5"/>
+        <text x="37" y="100" text-anchor="middle" fill="#90E8A0" font-size="7" font-family="Georgia">COBRA $50-$100</text>
+      </g>
 
-      <!-- LEFT COL -->
-      <g transform="translate(2,713)"><rect width="110" height="75" fill="url(#wResp)" rx="4" filter="url(#innerShadow)"/><rect width="110" height="75" fill="url(#grainResp)" rx="4" opacity="0.6"/><rect x="0" y="0" width="10" height="75" fill="url(#gResp)" rx="3"/><text x="65" y="23" text-anchor="middle" fill="#A8D8F8" font-size="14">🫁</text><text x="65" y="40" text-anchor="middle" fill="#C0E0F8" font-size="8" font-family="Georgia" font-weight="bold">PULMONAR</text><text x="65" y="53" text-anchor="middle" fill="#A0C8E8" font-size="7" font-family="Georgia">Asma</text><text x="65" y="68" text-anchor="middle" fill="#F0C860" font-size="8.5" font-weight="bold" font-family="Georgia">$70 · R-2</text></g>
-      <g transform="translate(2,638)"><rect width="110" height="75" fill="url(#wDiab)" rx="4" filter="url(#innerShadow)"/><rect width="110" height="75" fill="url(#grainDiab)" rx="4" opacity="0.6"/><rect x="0" y="0" width="10" height="75" fill="url(#gDiab)" rx="3"/><text x="65" y="23" text-anchor="middle" fill="#F8E898" font-size="14">🩺</text><text x="65" y="40" text-anchor="middle" fill="#F8E898" font-size="8" font-family="Georgia" font-weight="bold">DIABETES</text><text x="65" y="53" text-anchor="middle" fill="#D8C878" font-size="7" font-family="Georgia">Glucemia</text><text x="65" y="68" text-anchor="middle" fill="#F0C860" font-size="8.5" font-weight="bold" font-family="Georgia">$40 · D-2</text></g>
-      <g transform="translate(2,563)"><rect width="110" height="75" fill="url(#wSalud)" rx="4" filter="url(#innerShadow)"/><rect width="110" height="75" fill="url(#grainSalud)" rx="4" opacity="0.6"/><rect x="0" y="0" width="10" height="75" fill="url(#gSalud)" rx="3"/><text x="65" y="20" text-anchor="middle" fill="white" font-size="8" font-family="Georgia" font-weight="bold">TARJETA SALUD</text><rect x="44" y="27" width="24" height="24" fill="#117A65" rx="4" opacity="0.9"/><rect x="51" y="32" width="10" height="3.5" fill="white" rx="1"/><rect x="54.7" y="28" width="3.5" height="10" fill="white" rx="1"/><text x="65" y="66" text-anchor="middle" fill="#90E8A0" font-size="7.5" font-family="Georgia">Beneficio (+)</text></g>
-      <g transform="translate(2,488)"><rect width="110" height="75" fill="url(#wOnco)" rx="4" filter="url(#innerShadow)"/><rect width="110" height="75" fill="url(#grainOnco)" rx="4" opacity="0.6"/><rect x="0" y="0" width="10" height="75" fill="url(#gOnco)" rx="3"/><text x="65" y="23" text-anchor="middle" fill="#D8B8F0" font-size="14">🔬</text><text x="65" y="40" text-anchor="middle" fill="#E8D0FF" font-size="8" font-family="Georgia" font-weight="bold">ONCOLOGÍA</text><text x="65" y="53" text-anchor="middle" fill="#D8B8F0" font-size="7" font-family="Georgia">Detección</text><text x="65" y="68" text-anchor="middle" fill="#F0C860" font-size="8.5" font-weight="bold" font-family="Georgia">$120 · O-1</text></g>
-      <g transform="translate(2,413)"><rect width="110" height="75" fill="url(#wPago)" rx="4" filter="url(#innerShadow)"/><rect width="110" height="75" fill="url(#grainPago)" rx="4" opacity="0.6"/><rect x="0" y="0" width="10" height="75" fill="url(#gPago)" rx="3"/><text x="65" y="23" text-anchor="middle" fill="#F8E890" font-size="14">💰</text><text x="65" y="40" text-anchor="middle" fill="#F8E890" font-size="8" font-family="Georgia" font-weight="bold">SEGURO</text><text x="65" y="53" text-anchor="middle" fill="#D8C870" font-size="7" font-family="Georgia">Médico</text><text x="65" y="68" text-anchor="middle" fill="#E8C840" font-size="8.5" font-weight="bold" font-family="Georgia">COBRA $100</text></g>
-      <g transform="translate(2,338)"><rect width="110" height="75" fill="url(#wCardio)" rx="4" filter="url(#innerShadow)"/><rect width="110" height="75" fill="url(#grainCardio)" rx="4" opacity="0.6"/><rect x="0" y="0" width="10" height="75" fill="url(#gCardio)" rx="3"/><text x="65" y="23" text-anchor="middle" fill="#FF9090" font-size="14">🏃</text><text x="65" y="40" text-anchor="middle" fill="#FFD0C0" font-size="8" font-family="Georgia" font-weight="bold">CARDIO</text><text x="65" y="53" text-anchor="middle" fill="#FFB8A8" font-size="7" font-family="Georgia">Ejercicio</text><text x="65" y="68" text-anchor="middle" fill="#F0C860" font-size="8.5" font-weight="bold" font-family="Georgia">$80 · C-3</text></g>
-      <g transform="translate(2,263)"><rect width="110" height="75" fill="url(#wNutri)" rx="4" filter="url(#innerShadow)"/><rect width="110" height="75" fill="url(#grainNutri)" rx="4" opacity="0.6"/><rect x="0" y="0" width="10" height="75" fill="url(#gNutri)" rx="3"/><text x="65" y="23" text-anchor="middle" fill="#90E898" font-size="14">🥑</text><text x="65" y="40" text-anchor="middle" fill="#C8F0C0" font-size="8" font-family="Georgia" font-weight="bold">NUTRICIÓN</text><text x="65" y="53" text-anchor="middle" fill="#A8D8A0" font-size="7" font-family="Georgia">Dieta Sana</text><text x="65" y="68" text-anchor="middle" fill="#F0C860" font-size="8.5" font-weight="bold" font-family="Georgia">$60 · N-3</text></g>
-      <g transform="translate(2,188)"><rect width="110" height="75" fill="url(#wRiesgo)" rx="4" filter="url(#innerShadow)"/><rect width="110" height="75" fill="url(#grainRiesgo)" rx="4" opacity="0.6"/><rect x="0" y="0" width="10" height="75" fill="url(#gRiesgo)" rx="3"/><text x="65" y="20" text-anchor="middle" fill="white" font-size="8" font-family="Georgia" font-weight="bold">TARJETA RIESGO</text><rect x="44" y="27" width="24" height="24" fill="#7D3C98" rx="4" opacity="0.9"/><text x="56" y="45" text-anchor="middle" fill="white" font-size="15" font-weight="bold">!</text><text x="65" y="66" text-anchor="middle" fill="#D8B8F0" font-size="7.5" font-family="Georgia">Penalidad (!)</text></g>
-      <g transform="translate(2,113)"><rect width="110" height="75" fill="url(#wOnco)" rx="4" filter="url(#innerShadow)"/><rect width="110" height="75" fill="url(#grainOnco)" rx="4" opacity="0.6"/><rect x="0" y="0" width="10" height="75" fill="url(#gOnco)" rx="3"/><text x="65" y="23" text-anchor="middle" fill="#D8B8F0" font-size="14">🔬</text><text x="65" y="40" text-anchor="middle" fill="#E8D0FF" font-size="8" font-family="Georgia" font-weight="bold">ONCOLOGÍA</text><text x="65" y="53" text-anchor="middle" fill="#D8B8F0" font-size="7" font-family="Georgia">Tratamiento</text><text x="65" y="68" text-anchor="middle" fill="#F0C860" font-size="8.5" font-weight="bold" font-family="Georgia">$300 · O-2</text></g>
+      <!-- sq3 N-1 Alimentación -->
+      <g id="sq3" class="sq-hover" data-sq="3" transform="translate(563,788)">
+        <rect width="75" height="110" fill="url(#wNutri)" rx="4" filter="url(#innerShadow)"/>
+        <rect width="75" height="110" fill="url(#grainNutri)" rx="4" opacity="0.6"/>
+        <rect x="0" y="0" width="75" height="9" fill="url(#gNutri)" rx="3"/>
+        <text x="37" y="27" text-anchor="middle" fill="#90E898" font-size="18">🥗</text>
+        <text x="37" y="46" text-anchor="middle" fill="#C8F0C0" font-size="7.5" font-family="Georgia" font-weight="bold">NUTRICIÓN</text>
+        <text x="37" y="59" text-anchor="middle" fill="#A8D8A0" font-size="7" font-family="Georgia">Alimentación</text>
+        <text x="37" y="82" text-anchor="middle" fill="#F0C860" font-size="9.5" font-weight="bold" font-family="Georgia">PAGA $35</text>
+        <text x="37" y="97" text-anchor="middle" fill="#A08060" font-size="7" font-family="Georgia">N-1</text>
+      </g>
 
-      <!-- RIGHT COL -->
-      <g transform="translate(788,113)"><rect width="110" height="75" fill="url(#wDiab)" rx="4" filter="url(#innerShadow)"/><rect width="110" height="75" fill="url(#grainDiab)" rx="4" opacity="0.6"/><rect x="100" y="0" width="10" height="75" fill="url(#gDiab)" rx="3"/><text x="45" y="23" text-anchor="middle" fill="#F8E898" font-size="14">🩸</text><text x="45" y="40" text-anchor="middle" fill="#F8E898" font-size="8" font-family="Georgia" font-weight="bold">DIABETES</text><text x="45" y="53" text-anchor="middle" fill="#D8C878" font-size="7" font-family="Georgia">Resistencia</text><text x="45" y="68" text-anchor="middle" fill="#F0C860" font-size="8.5" font-weight="bold" font-family="Georgia">$90 · D-4</text></g>
-      <g transform="translate(788,188)"><rect width="110" height="75" fill="url(#wNutri)" rx="4" filter="url(#innerShadow)"/><rect width="110" height="75" fill="url(#grainNutri)" rx="4" opacity="0.6"/><rect x="100" y="0" width="10" height="75" fill="url(#gNutri)" rx="3"/><text x="45" y="23" text-anchor="middle" fill="#90E898" font-size="14">🌽</text><text x="45" y="40" text-anchor="middle" fill="#C8F0C0" font-size="8" font-family="Georgia" font-weight="bold">NUTRICIÓN</text><text x="45" y="53" text-anchor="middle" fill="#A8D8A0" font-size="7" font-family="Georgia">Ultra-proc.</text><text x="45" y="68" text-anchor="middle" fill="#F0C860" font-size="8.5" font-weight="bold" font-family="Georgia">$55 · N-5</text></g>
-      <g transform="translate(788,263)"><rect width="110" height="75" fill="url(#wPago)" rx="4" filter="url(#innerShadow)"/><rect width="110" height="75" fill="url(#grainPago)" rx="4" opacity="0.6"/><rect x="100" y="0" width="10" height="75" fill="url(#gPago)" rx="3"/><text x="45" y="23" text-anchor="middle" fill="#F8E890" font-size="14">🧪</text><text x="45" y="40" text-anchor="middle" fill="#F8E890" font-size="8" font-family="Georgia" font-weight="bold">ANÁLISIS</text><text x="45" y="53" text-anchor="middle" fill="#D8C870" font-size="7" font-family="Georgia">Clínicos</text><text x="45" y="68" text-anchor="middle" fill="#E8C840" font-size="8.5" font-weight="bold" font-family="Georgia">PAGA $90</text></g>
-      <g transform="translate(788,338)"><rect width="110" height="75" fill="url(#wCardio)" rx="4" filter="url(#innerShadow)"/><rect width="110" height="75" fill="url(#grainCardio)" rx="4" opacity="0.6"/><rect x="100" y="0" width="10" height="75" fill="url(#gCardio)" rx="3"/><text x="45" y="23" text-anchor="middle" fill="#FF9090" font-size="14">💊</text><text x="45" y="40" text-anchor="middle" fill="#FFD0C0" font-size="8" font-family="Georgia" font-weight="bold">CARDIO</text><text x="45" y="53" text-anchor="middle" fill="#FFB8A8" font-size="7" font-family="Georgia">ACV</text><text x="45" y="68" text-anchor="middle" fill="#F0C860" font-size="8.5" font-weight="bold" font-family="Georgia">$180 · C-5</text></g>
-      <g transform="translate(788,413)"><rect width="110" height="75" fill="url(#wSalud)" rx="4" filter="url(#innerShadow)"/><rect width="110" height="75" fill="url(#grainSalud)" rx="4" opacity="0.6"/><rect x="100" y="0" width="10" height="75" fill="url(#gSalud)" rx="3"/><text x="45" y="20" text-anchor="middle" fill="white" font-size="8" font-family="Georgia" font-weight="bold">TARJETA SALUD</text><rect x="32" y="27" width="24" height="24" fill="#117A65" rx="4" opacity="0.9"/><rect x="39" y="32" width="10" height="3.5" fill="white" rx="1"/><rect x="42.7" y="28" width="3.5" height="10" fill="white" rx="1"/><text x="45" y="66" text-anchor="middle" fill="#90E8A0" font-size="7.5" font-family="Georgia">Beneficio (+)</text></g>
-      <g transform="translate(788,488)"><rect width="110" height="75" fill="url(#wResp)" rx="4" filter="url(#innerShadow)"/><rect width="110" height="75" fill="url(#grainResp)" rx="4" opacity="0.6"/><rect x="100" y="0" width="10" height="75" fill="url(#gResp)" rx="3"/><text x="45" y="23" text-anchor="middle" fill="#A8D8F8" font-size="14">🌡</text><text x="45" y="40" text-anchor="middle" fill="#C0E0F8" font-size="8" font-family="Georgia" font-weight="bold">PULMONAR</text><text x="45" y="53" text-anchor="middle" fill="#A0C8E8" font-size="7" font-family="Georgia">Fibrosis</text><text x="45" y="68" text-anchor="middle" fill="#F0C860" font-size="8.5" font-weight="bold" font-family="Georgia">$180 · R-4</text></g>
-      <g transform="translate(788,563)"><rect width="110" height="75" fill="url(#wOnco)" rx="4" filter="url(#innerShadow)"/><rect width="110" height="75" fill="url(#grainOnco)" rx="4" opacity="0.6"/><rect x="100" y="0" width="10" height="75" fill="url(#gOnco)" rx="3"/><text x="45" y="23" text-anchor="middle" fill="#D8B8F0" font-size="14">🧫</text><text x="45" y="40" text-anchor="middle" fill="#E8D0FF" font-size="8" font-family="Georgia" font-weight="bold">ONCOLOGÍA</text><text x="45" y="53" text-anchor="middle" fill="#D8B8F0" font-size="7" font-family="Georgia">Biología</text><text x="45" y="68" text-anchor="middle" fill="#F0C860" font-size="8.5" font-weight="bold" font-family="Georgia">$180 · O-5</text></g>
-      <g transform="translate(788,638)"><rect width="110" height="75" fill="url(#wRiesgo)" rx="4" filter="url(#innerShadow)"/><rect width="110" height="75" fill="url(#grainRiesgo)" rx="4" opacity="0.6"/><rect x="100" y="0" width="10" height="75" fill="url(#gRiesgo)" rx="3"/><text x="45" y="20" text-anchor="middle" fill="white" font-size="8" font-family="Georgia" font-weight="bold">TARJETA RIESGO</text><rect x="32" y="27" width="24" height="24" fill="#7D3C98" rx="4" opacity="0.9"/><text x="44" y="45" text-anchor="middle" fill="white" font-size="15" font-weight="bold">!</text><text x="45" y="66" text-anchor="middle" fill="#D8B8F0" font-size="7.5" font-family="Georgia">Penalidad (!)</text></g>
-      <g transform="translate(788,713)"><rect width="110" height="75" fill="url(#wNutri)" rx="4" filter="url(#innerShadow)"/><rect width="110" height="75" fill="url(#grainNutri)" rx="4" opacity="0.6"/><rect x="100" y="0" width="10" height="75" fill="url(#gNutri)" rx="3"/><text x="45" y="23" text-anchor="middle" fill="#90E898" font-size="14">💧</text><text x="45" y="40" text-anchor="middle" fill="#C8F0C0" font-size="8" font-family="Georgia" font-weight="bold">NUTRICIÓN</text><text x="45" y="53" text-anchor="middle" fill="#A8D8A0" font-size="7" font-family="Georgia">Hidratación</text><text x="45" y="68" text-anchor="middle" fill="#F0C860" font-size="8.5" font-weight="bold" font-family="Georgia">$65 · N-6</text></g>
+      <!-- sq4 N-2 Obesidad -->
+      <g id="sq4" class="sq-hover" data-sq="4" transform="translate(488,788)">
+        <rect width="75" height="110" fill="url(#wNutri)" rx="4" filter="url(#innerShadow)"/>
+        <rect width="75" height="110" fill="url(#grainNutri)" rx="4" opacity="0.6"/>
+        <rect x="0" y="0" width="75" height="9" fill="url(#gNutri)" rx="3"/>
+        <text x="37" y="27" text-anchor="middle" fill="#90E898" font-size="18">⚖️</text>
+        <text x="37" y="46" text-anchor="middle" fill="#C8F0C0" font-size="7.5" font-family="Georgia" font-weight="bold">NUTRICIÓN</text>
+        <text x="37" y="59" text-anchor="middle" fill="#A8D8A0" font-size="7" font-family="Georgia">Obesidad</text>
+        <text x="37" y="82" text-anchor="middle" fill="#F0C860" font-size="9.5" font-weight="bold" font-family="Georgia">PAGA $50</text>
+        <text x="37" y="97" text-anchor="middle" fill="#A08060" font-size="7" font-family="Georgia">N-2</text>
+      </g>
 
-      <!-- CENTRO -->
+      <!-- sq5 Consulta Médica -->
+      <g id="sq5" class="sq-hover" data-sq="5" transform="translate(413,788)">
+        <rect width="75" height="110" fill="url(#wPago)" rx="4" filter="url(#innerShadow)"/>
+        <rect width="75" height="110" fill="url(#grainPago)" rx="4" opacity="0.6"/>
+        <rect x="0" y="0" width="75" height="9" fill="url(#gPago)" rx="3"/>
+        <text x="37" y="27" text-anchor="middle" fill="#F8E890" font-size="18">🩻</text>
+        <text x="37" y="46" text-anchor="middle" fill="#F8E890" font-size="7.5" font-family="Georgia" font-weight="bold">CONSULTA</text>
+        <text x="37" y="59" text-anchor="middle" fill="#D8C870" font-size="7" font-family="Georgia">Médica</text>
+        <text x="37" y="82" text-anchor="middle" fill="#FF9090" font-size="9" font-weight="bold" font-family="Georgia">PAGA $30</text>
+      </g>
+
+      <!-- sq6 D-1 Diabetes T2 -->
+      <g id="sq6" class="sq-hover" data-sq="6" transform="translate(338,788)">
+        <rect width="75" height="110" fill="url(#wDiab)" rx="4" filter="url(#innerShadow)"/>
+        <rect width="75" height="110" fill="url(#grainDiab)" rx="4" opacity="0.6"/>
+        <rect x="0" y="0" width="75" height="9" fill="url(#gDiab)" rx="3"/>
+        <text x="37" y="27" text-anchor="middle" fill="#F8E898" font-size="18">🩸</text>
+        <text x="37" y="46" text-anchor="middle" fill="#F8E898" font-size="7.5" font-family="Georgia" font-weight="bold">DIABETES</text>
+        <text x="37" y="59" text-anchor="middle" fill="#D8C878" font-size="7" font-family="Georgia">Tipo 2</text>
+        <text x="37" y="82" text-anchor="middle" fill="#F0C860" font-size="9.5" font-weight="bold" font-family="Georgia">PAGA $60</text>
+        <text x="37" y="97" text-anchor="middle" fill="#A08060" font-size="7" font-family="Georgia">D-1</text>
+      </g>
+
+      <!-- sq7 C-2 Infarto -->
+      <g id="sq7" class="sq-hover" data-sq="7" transform="translate(263,788)">
+        <rect width="75" height="110" fill="url(#wCardio)" rx="4" filter="url(#innerShadow)"/>
+        <rect width="75" height="110" fill="url(#grainCardio)" rx="4" opacity="0.6"/>
+        <rect x="0" y="0" width="75" height="9" fill="url(#gCardio)" rx="3"/>
+        <text x="37" y="27" text-anchor="middle" fill="#FF9090" font-size="18">💔</text>
+        <text x="37" y="46" text-anchor="middle" fill="#FFD0C0" font-size="7.5" font-family="Georgia" font-weight="bold">CARDIO</text>
+        <text x="37" y="59" text-anchor="middle" fill="#FFB8A8" font-size="7" font-family="Georgia">Infarto IAM</text>
+        <text x="37" y="82" text-anchor="middle" fill="#F0C860" font-size="9.5" font-weight="bold" font-family="Georgia">PAGA $150</text>
+        <text x="37" y="97" text-anchor="middle" fill="#A08060" font-size="7" font-family="Georgia">C-2</text>
+      </g>
+
+      <!-- sq8 Tarjeta Riesgo -->
+      <g id="sq8" class="sq-hover" data-sq="8" transform="translate(188,788)">
+        <rect width="75" height="110" fill="url(#wRiesgo)" rx="4" filter="url(#innerShadow)"/>
+        <rect width="75" height="110" fill="url(#grainRiesgo)" rx="4" opacity="0.6"/>
+        <rect x="0" y="0" width="75" height="9" fill="url(#gRiesgo)" rx="3"/>
+        <text x="37" y="29" text-anchor="middle" fill="white" font-size="7.5" font-family="Georgia" font-weight="bold">TARJETA</text>
+        <text x="37" y="43" text-anchor="middle" fill="#D8B8F0" font-size="7.5" font-family="Georgia" font-weight="bold">RIESGO</text>
+        <rect x="22" y="51" width="31" height="31" fill="#7D3C98" rx="5" opacity="0.9"/>
+        <text x="37" y="73" text-anchor="middle" fill="white" font-size="18" font-weight="bold">!</text>
+        <text x="37" y="100" text-anchor="middle" fill="#D8B8F0" font-size="7" font-family="Georgia">PAGA $50-$100</text>
+      </g>
+
+      <!-- sq9 R-1 EPOC -->
+      <g id="sq9" class="sq-hover" data-sq="9" transform="translate(113,788)">
+        <rect width="75" height="110" fill="url(#wResp)" rx="4" filter="url(#innerShadow)"/>
+        <rect width="75" height="110" fill="url(#grainResp)" rx="4" opacity="0.6"/>
+        <rect x="0" y="0" width="75" height="9" fill="url(#gResp)" rx="3"/>
+        <text x="37" y="27" text-anchor="middle" fill="#A8D8F8" font-size="18">🫁</text>
+        <text x="37" y="46" text-anchor="middle" fill="#C0E0F8" font-size="7.5" font-family="Georgia" font-weight="bold">PULMONAR</text>
+        <text x="37" y="59" text-anchor="middle" fill="#A0C8E8" font-size="7" font-family="Georgia">EPOC</text>
+        <text x="37" y="82" text-anchor="middle" fill="#F0C860" font-size="9.5" font-weight="bold" font-family="Georgia">PAGA $90</text>
+        <text x="37" y="97" text-anchor="middle" fill="#A08060" font-size="7" font-family="Georgia">R-1</text>
+      </g>
+
+      <!-- ═══════════════════════════════
+           TOP ROW (sq 21-29, left→right)
+      ═══════════════════════════════ -->
+      <!-- sq21 N-4 Vitaminas -->
+      <g id="sq21" class="sq-hover" data-sq="21" transform="translate(113,2)">
+        <rect width="75" height="110" fill="url(#wNutri)" rx="4" filter="url(#innerShadow)"/>
+        <rect width="75" height="110" fill="url(#grainNutri)" rx="4" opacity="0.6"/>
+        <rect x="0" y="101" width="75" height="9" fill="url(#gNutri)" rx="3"/>
+        <text x="37" y="22" text-anchor="middle" fill="#A08060" font-size="7" font-family="Georgia">N-4</text>
+        <text x="37" y="36" text-anchor="middle" fill="#F0C860" font-size="9.5" font-weight="bold" font-family="Georgia">PAGA $45</text>
+        <text x="37" y="60" text-anchor="middle" fill="#A8D8A0" font-size="7" font-family="Georgia">Vitaminas</text>
+        <text x="37" y="75" text-anchor="middle" fill="#C8F0C0" font-size="7.5" font-family="Georgia" font-weight="bold">NUTRICIÓN</text>
+        <text x="37" y="96" text-anchor="middle" fill="#90E898" font-size="18">🥕</text>
+      </g>
+
+      <!-- sq22 O-3 Prevención -->
+      <g id="sq22" class="sq-hover" data-sq="22" transform="translate(188,2)">
+        <rect width="75" height="110" fill="url(#wOnco)" rx="4" filter="url(#innerShadow)"/>
+        <rect width="75" height="110" fill="url(#grainOnco)" rx="4" opacity="0.6"/>
+        <rect x="0" y="101" width="75" height="9" fill="url(#gOnco)" rx="3"/>
+        <text x="37" y="22" text-anchor="middle" fill="#A08060" font-size="7" font-family="Georgia">O-3</text>
+        <text x="37" y="36" text-anchor="middle" fill="#F0C860" font-size="9.5" font-weight="bold" font-family="Georgia">PAGA $100</text>
+        <text x="37" y="60" text-anchor="middle" fill="#D8B8F0" font-size="7" font-family="Georgia">Prevención</text>
+        <text x="37" y="75" text-anchor="middle" fill="#E8D0FF" font-size="7.5" font-family="Georgia" font-weight="bold">ONCOLOGÍA</text>
+        <text x="37" y="96" text-anchor="middle" fill="#D8B8F0" font-size="18">🧬</text>
+      </g>
+
+      <!-- sq23 Examen de Salud -->
+      <g id="sq23" class="sq-hover" data-sq="23" transform="translate(263,2)">
+        <rect width="75" height="110" fill="url(#wPago)" rx="4" filter="url(#innerShadow)"/>
+        <rect width="75" height="110" fill="url(#grainPago)" rx="4" opacity="0.6"/>
+        <rect x="0" y="101" width="75" height="9" fill="url(#gPago)" rx="3"/>
+        <text x="37" y="22" text-anchor="middle" fill="#FF9090" font-size="8" font-family="Georgia" font-weight="bold">PAGA $25</text>
+        <text x="37" y="50" text-anchor="middle" fill="#D8C870" font-size="7" font-family="Georgia">Examen</text>
+        <text x="37" y="64" text-anchor="middle" fill="#F8E890" font-size="7.5" font-family="Georgia" font-weight="bold">DE SALUD</text>
+        <text x="37" y="88" text-anchor="middle" fill="#F8E890" font-size="18">🧾</text>
+      </g>
+
+      <!-- sq24 D-3 Insulina -->
+      <g id="sq24" class="sq-hover" data-sq="24" transform="translate(338,2)">
+        <rect width="75" height="110" fill="url(#wDiab)" rx="4" filter="url(#innerShadow)"/>
+        <rect width="75" height="110" fill="url(#grainDiab)" rx="4" opacity="0.6"/>
+        <rect x="0" y="101" width="75" height="9" fill="url(#gDiab)" rx="3"/>
+        <text x="37" y="22" text-anchor="middle" fill="#A08060" font-size="7" font-family="Georgia">D-3</text>
+        <text x="37" y="36" text-anchor="middle" fill="#F0C860" font-size="9.5" font-weight="bold" font-family="Georgia">PAGA $80</text>
+        <text x="37" y="60" text-anchor="middle" fill="#D8C878" font-size="7" font-family="Georgia">Insulina</text>
+        <text x="37" y="75" text-anchor="middle" fill="#F8E898" font-size="7.5" font-family="Georgia" font-weight="bold">DIABETES</text>
+        <text x="37" y="96" text-anchor="middle" fill="#F8E898" font-size="18">💉</text>
+      </g>
+
+      <!-- sq25 C-4 Colesterol -->
+      <g id="sq25" class="sq-hover" data-sq="25" transform="translate(413,2)">
+        <rect width="75" height="110" fill="url(#wCardio)" rx="4" filter="url(#innerShadow)"/>
+        <rect width="75" height="110" fill="url(#grainCardio)" rx="4" opacity="0.6"/>
+        <rect x="0" y="101" width="75" height="9" fill="url(#gCardio)" rx="3"/>
+        <text x="37" y="22" text-anchor="middle" fill="#A08060" font-size="7" font-family="Georgia">C-4</text>
+        <text x="37" y="36" text-anchor="middle" fill="#F0C860" font-size="9.5" font-weight="bold" font-family="Georgia">PAGA $90</text>
+        <text x="37" y="60" text-anchor="middle" fill="#FFB8A8" font-size="7" font-family="Georgia">Colesterol</text>
+        <text x="37" y="75" text-anchor="middle" fill="#FFD0C0" font-size="7.5" font-family="Georgia" font-weight="bold">CARDIO</text>
+        <text x="37" y="96" text-anchor="middle" fill="#FF9090" font-size="18">🫀</text>
+      </g>
+
+      <!-- sq26 Tarjeta Salud -->
+      <g id="sq26" class="sq-hover" data-sq="26" transform="translate(488,2)">
+        <rect width="75" height="110" fill="url(#wSalud)" rx="4" filter="url(#innerShadow)"/>
+        <rect width="75" height="110" fill="url(#grainSalud)" rx="4" opacity="0.6"/>
+        <rect x="0" y="101" width="75" height="9" fill="url(#gSalud)" rx="3"/>
+        <text x="37" y="18" text-anchor="middle" fill="#90E8A0" font-size="7" font-family="Georgia" font-weight="bold">TARJETA</text>
+        <text x="37" y="32" text-anchor="middle" fill="white" font-size="7.5" font-family="Georgia" font-weight="bold">SALUD</text>
+        <rect x="22" y="42" width="31" height="31" fill="#117A65" rx="5" opacity="0.9"/>
+        <rect x="31" y="49" width="13" height="4"  fill="white" rx="1.5"/>
+        <rect x="36" y="44" width="4"  height="13" fill="white" rx="1.5"/>
+        <text x="37" y="93" text-anchor="middle" fill="#90E8A0" font-size="7" font-family="Georgia">COBRA $50-$100</text>
+      </g>
+
+      <!-- sq27 R-3 Tabaquismo -->
+      <g id="sq27" class="sq-hover" data-sq="27" transform="translate(563,2)">
+        <rect width="75" height="110" fill="url(#wResp)" rx="4" filter="url(#innerShadow)"/>
+        <rect width="75" height="110" fill="url(#grainResp)" rx="4" opacity="0.6"/>
+        <rect x="0" y="101" width="75" height="9" fill="url(#gResp)" rx="3"/>
+        <text x="37" y="22" text-anchor="middle" fill="#A08060" font-size="7" font-family="Georgia">R-3</text>
+        <text x="37" y="36" text-anchor="middle" fill="#F0C860" font-size="9.5" font-weight="bold" font-family="Georgia">PAGA $85</text>
+        <text x="37" y="60" text-anchor="middle" fill="#A0C8E8" font-size="7" font-family="Georgia">Tabaquismo</text>
+        <text x="37" y="75" text-anchor="middle" fill="#C0E0F8" font-size="7.5" font-family="Georgia" font-weight="bold">PULMONAR</text>
+        <text x="37" y="96" text-anchor="middle" fill="#A8D8F8" font-size="18">🚬</text>
+      </g>
+
+      <!-- sq28 O-4 Diagnóstico -->
+      <g id="sq28" class="sq-hover" data-sq="28" transform="translate(638,2)">
+        <rect width="75" height="110" fill="url(#wOnco)" rx="4" filter="url(#innerShadow)"/>
+        <rect width="75" height="110" fill="url(#grainOnco)" rx="4" opacity="0.6"/>
+        <rect x="0" y="101" width="75" height="9" fill="url(#gOnco)" rx="3"/>
+        <text x="37" y="22" text-anchor="middle" fill="#A08060" font-size="7" font-family="Georgia">O-4</text>
+        <text x="37" y="36" text-anchor="middle" fill="#F0C860" font-size="9.5" font-weight="bold" font-family="Georgia">PAGA $180</text>
+        <text x="37" y="60" text-anchor="middle" fill="#D8B8F0" font-size="7" font-family="Georgia">Diagnóstico</text>
+        <text x="37" y="75" text-anchor="middle" fill="#E8D0FF" font-size="7.5" font-family="Georgia" font-weight="bold">ONCOLOGÍA</text>
+        <text x="37" y="96" text-anchor="middle" fill="#D8B8F0" font-size="18">🔭</text>
+      </g>
+
+      <!-- sq29 Tarjeta Riesgo -->
+      <g id="sq29" class="sq-hover" data-sq="29" transform="translate(713,2)">
+        <rect width="75" height="110" fill="url(#wRiesgo)" rx="4" filter="url(#innerShadow)"/>
+        <rect width="75" height="110" fill="url(#grainRiesgo)" rx="4" opacity="0.6"/>
+        <rect x="0" y="101" width="75" height="9" fill="url(#gRiesgo)" rx="3"/>
+        <text x="37" y="18" text-anchor="middle" fill="#D8B8F0" font-size="7" font-family="Georgia" font-weight="bold">TARJETA</text>
+        <text x="37" y="32" text-anchor="middle" fill="white" font-size="7.5" font-family="Georgia" font-weight="bold">RIESGO</text>
+        <rect x="22" y="42" width="31" height="31" fill="#7D3C98" rx="5" opacity="0.9"/>
+        <text x="37" y="64" text-anchor="middle" fill="white" font-size="18" font-weight="bold">!</text>
+        <text x="37" y="93" text-anchor="middle" fill="#D8B8F0" font-size="7" font-family="Georgia">PAGA $50-$100</text>
+      </g>
+
+      <!-- ═══════════════════════════════
+           LEFT COL (sq 11-19, bottom→top)
+      ═══════════════════════════════ -->
+      <!-- sq11 R-2 Asma -->
+      <g id="sq11" class="sq-hover" data-sq="11" transform="translate(2,713)">
+        <rect width="110" height="75" fill="url(#wResp)" rx="4" filter="url(#innerShadow)"/>
+        <rect width="110" height="75" fill="url(#grainResp)" rx="4" opacity="0.6"/>
+        <rect x="0" y="0" width="10" height="75" fill="url(#gResp)" rx="3"/>
+        <text x="65" y="22" text-anchor="middle" fill="#A8D8F8" font-size="15">😮‍💨</text>
+        <text x="65" y="38" text-anchor="middle" fill="#C0E0F8" font-size="7.5" font-family="Georgia" font-weight="bold">PULMONAR</text>
+        <text x="65" y="51" text-anchor="middle" fill="#A0C8E8" font-size="7" font-family="Georgia">Asma</text>
+        <text x="65" y="66" text-anchor="middle" fill="#F0C860" font-size="8" font-weight="bold" font-family="Georgia">PAGA $70 · R-2</text>
+      </g>
+
+      <!-- sq12 D-2 Glucemia -->
+      <g id="sq12" class="sq-hover" data-sq="12" transform="translate(2,638)">
+        <rect width="110" height="75" fill="url(#wDiab)" rx="4" filter="url(#innerShadow)"/>
+        <rect width="110" height="75" fill="url(#grainDiab)" rx="4" opacity="0.6"/>
+        <rect x="0" y="0" width="10" height="75" fill="url(#gDiab)" rx="3"/>
+        <text x="65" y="22" text-anchor="middle" fill="#F8E898" font-size="15">📊</text>
+        <text x="65" y="38" text-anchor="middle" fill="#F8E898" font-size="7.5" font-family="Georgia" font-weight="bold">DIABETES</text>
+        <text x="65" y="51" text-anchor="middle" fill="#D8C878" font-size="7" font-family="Georgia">Glucemia</text>
+        <text x="65" y="66" text-anchor="middle" fill="#F0C860" font-size="8" font-weight="bold" font-family="Georgia">PAGA $40 · D-2</text>
+      </g>
+
+      <!-- sq13 Tarjeta Salud -->
+      <g id="sq13" class="sq-hover" data-sq="13" transform="translate(2,563)">
+        <rect width="110" height="75" fill="url(#wSalud)" rx="4" filter="url(#innerShadow)"/>
+        <rect width="110" height="75" fill="url(#grainSalud)" rx="4" opacity="0.6"/>
+        <rect x="0" y="0" width="10" height="75" fill="url(#gSalud)" rx="3"/>
+        <text x="65" y="18" text-anchor="middle" fill="white" font-size="7.5" font-family="Georgia" font-weight="bold">TARJETA SALUD</text>
+        <rect x="44" y="24" width="24" height="24" fill="#117A65" rx="4" opacity="0.9"/>
+        <rect x="51" y="30" width="10" height="3.5" fill="white" rx="1"/>
+        <rect x="54.7" y="26" width="3.5" height="10" fill="white" rx="1"/>
+        <text x="65" y="64" text-anchor="middle" fill="#90E8A0" font-size="7" font-family="Georgia">COBRA $50-$100</text>
+      </g>
+
+      <!-- sq14 O-1 Detección -->
+      <g id="sq14" class="sq-hover" data-sq="14" transform="translate(2,488)">
+        <rect width="110" height="75" fill="url(#wOnco)" rx="4" filter="url(#innerShadow)"/>
+        <rect width="110" height="75" fill="url(#grainOnco)" rx="4" opacity="0.6"/>
+        <rect x="0" y="0" width="10" height="75" fill="url(#gOnco)" rx="3"/>
+        <text x="65" y="22" text-anchor="middle" fill="#D8B8F0" font-size="15">🔬</text>
+        <text x="65" y="38" text-anchor="middle" fill="#E8D0FF" font-size="7.5" font-family="Georgia" font-weight="bold">ONCOLOGÍA</text>
+        <text x="65" y="51" text-anchor="middle" fill="#D8B8F0" font-size="7" font-family="Georgia">Detección</text>
+        <text x="65" y="66" text-anchor="middle" fill="#F0C860" font-size="8" font-weight="bold" font-family="Georgia">PAGA $120 · O-1</text>
+      </g>
+
+      <!-- sq15 Seguro Médico (cobrar) -->
+      <g id="sq15" class="sq-hover" data-sq="15" transform="translate(2,413)">
+        <rect width="110" height="75" fill="url(#wPago)" rx="4" filter="url(#innerShadow)"/>
+        <rect width="110" height="75" fill="url(#grainPago)" rx="4" opacity="0.6"/>
+        <rect x="0" y="0" width="10" height="75" fill="url(#gPago)" rx="3"/>
+        <text x="65" y="22" text-anchor="middle" fill="#F8E890" font-size="15">🛡️</text>
+        <text x="65" y="38" text-anchor="middle" fill="#F8E890" font-size="7.5" font-family="Georgia" font-weight="bold">SEGURO</text>
+        <text x="65" y="51" text-anchor="middle" fill="#D8C870" font-size="7" font-family="Georgia">Médico</text>
+        <text x="65" y="66" text-anchor="middle" fill="#90E8A0" font-size="8" font-weight="bold" font-family="Georgia">COBRA $100</text>
+      </g>
+
+      <!-- sq16 C-3 Ejercicio -->
+      <g id="sq16" class="sq-hover" data-sq="16" transform="translate(2,338)">
+        <rect width="110" height="75" fill="url(#wCardio)" rx="4" filter="url(#innerShadow)"/>
+        <rect width="110" height="75" fill="url(#grainCardio)" rx="4" opacity="0.6"/>
+        <rect x="0" y="0" width="10" height="75" fill="url(#gCardio)" rx="3"/>
+        <text x="65" y="22" text-anchor="middle" fill="#FF9090" font-size="15">🏃</text>
+        <text x="65" y="38" text-anchor="middle" fill="#FFD0C0" font-size="7.5" font-family="Georgia" font-weight="bold">CARDIO</text>
+        <text x="65" y="51" text-anchor="middle" fill="#FFB8A8" font-size="7" font-family="Georgia">Ejercicio</text>
+        <text x="65" y="66" text-anchor="middle" fill="#F0C860" font-size="8" font-weight="bold" font-family="Georgia">PAGA $80 · C-3</text>
+      </g>
+
+      <!-- sq17 N-3 Dieta Sana -->
+      <g id="sq17" class="sq-hover" data-sq="17" transform="translate(2,263)">
+        <rect width="110" height="75" fill="url(#wNutri)" rx="4" filter="url(#innerShadow)"/>
+        <rect width="110" height="75" fill="url(#grainNutri)" rx="4" opacity="0.6"/>
+        <rect x="0" y="0" width="10" height="75" fill="url(#gNutri)" rx="3"/>
+        <text x="65" y="22" text-anchor="middle" fill="#90E898" font-size="15">🥑</text>
+        <text x="65" y="38" text-anchor="middle" fill="#C8F0C0" font-size="7.5" font-family="Georgia" font-weight="bold">NUTRICIÓN</text>
+        <text x="65" y="51" text-anchor="middle" fill="#A8D8A0" font-size="7" font-family="Georgia">Dieta Sana</text>
+        <text x="65" y="66" text-anchor="middle" fill="#F0C860" font-size="8" font-weight="bold" font-family="Georgia">PAGA $60 · N-3</text>
+      </g>
+
+      <!-- sq18 Tarjeta Riesgo -->
+      <g id="sq18" class="sq-hover" data-sq="18" transform="translate(2,188)">
+        <rect width="110" height="75" fill="url(#wRiesgo)" rx="4" filter="url(#innerShadow)"/>
+        <rect width="110" height="75" fill="url(#grainRiesgo)" rx="4" opacity="0.6"/>
+        <rect x="0" y="0" width="10" height="75" fill="url(#gRiesgo)" rx="3"/>
+        <text x="65" y="18" text-anchor="middle" fill="white" font-size="7.5" font-family="Georgia" font-weight="bold">TARJETA RIESGO</text>
+        <rect x="44" y="24" width="24" height="24" fill="#7D3C98" rx="4" opacity="0.9"/>
+        <text x="56" y="43" text-anchor="middle" fill="white" font-size="15" font-weight="bold">!</text>
+        <text x="65" y="64" text-anchor="middle" fill="#D8B8F0" font-size="7" font-family="Georgia">PAGA $50-$100</text>
+      </g>
+
+      <!-- sq19 O-2 Tratamiento -->
+      <g id="sq19" class="sq-hover" data-sq="19" transform="translate(2,113)">
+        <rect width="110" height="75" fill="url(#wOnco)" rx="4" filter="url(#innerShadow)"/>
+        <rect width="110" height="75" fill="url(#grainOnco)" rx="4" opacity="0.6"/>
+        <rect x="0" y="0" width="10" height="75" fill="url(#gOnco)" rx="3"/>
+        <text x="65" y="22" text-anchor="middle" fill="#D8B8F0" font-size="15">💊</text>
+        <text x="65" y="38" text-anchor="middle" fill="#E8D0FF" font-size="7.5" font-family="Georgia" font-weight="bold">ONCOLOGÍA</text>
+        <text x="65" y="51" text-anchor="middle" fill="#D8B8F0" font-size="7" font-family="Georgia">Tratamiento</text>
+        <text x="65" y="66" text-anchor="middle" fill="#F0C860" font-size="8" font-weight="bold" font-family="Georgia">PAGA $300 · O-2</text>
+      </g>
+
+      <!-- ═══════════════════════════════
+           RIGHT COL (sq 31-39, top→bottom)
+      ═══════════════════════════════ -->
+      <!-- sq31 D-4 Resistencia -->
+      <g id="sq31" class="sq-hover" data-sq="31" transform="translate(788,113)">
+        <rect width="110" height="75" fill="url(#wDiab)" rx="4" filter="url(#innerShadow)"/>
+        <rect width="110" height="75" fill="url(#grainDiab)" rx="4" opacity="0.6"/>
+        <rect x="100" y="0" width="10" height="75" fill="url(#gDiab)" rx="3"/>
+        <text x="45" y="22" text-anchor="middle" fill="#F8E898" font-size="15">🧬</text>
+        <text x="45" y="38" text-anchor="middle" fill="#F8E898" font-size="7.5" font-family="Georgia" font-weight="bold">DIABETES</text>
+        <text x="45" y="51" text-anchor="middle" fill="#D8C878" font-size="7" font-family="Georgia">Resistencia</text>
+        <text x="45" y="66" text-anchor="middle" fill="#F0C860" font-size="8" font-weight="bold" font-family="Georgia">PAGA $90 · D-4</text>
+      </g>
+
+      <!-- sq32 N-5 Ultraprocesados -->
+      <g id="sq32" class="sq-hover" data-sq="32" transform="translate(788,188)">
+        <rect width="110" height="75" fill="url(#wNutri)" rx="4" filter="url(#innerShadow)"/>
+        <rect width="110" height="75" fill="url(#grainNutri)" rx="4" opacity="0.6"/>
+        <rect x="100" y="0" width="10" height="75" fill="url(#gNutri)" rx="3"/>
+        <text x="45" y="22" text-anchor="middle" fill="#90E898" font-size="15">🍔</text>
+        <text x="45" y="38" text-anchor="middle" fill="#C8F0C0" font-size="7.5" font-family="Georgia" font-weight="bold">NUTRICIÓN</text>
+        <text x="45" y="51" text-anchor="middle" fill="#A8D8A0" font-size="7" font-family="Georgia">Ultra-proc.</text>
+        <text x="45" y="66" text-anchor="middle" fill="#F0C860" font-size="8" font-weight="bold" font-family="Georgia">PAGA $55 · N-5</text>
+      </g>
+
+      <!-- sq33 Análisis Clínicos -->
+      <g id="sq33" class="sq-hover" data-sq="33" transform="translate(788,263)">
+        <rect width="110" height="75" fill="url(#wPago)" rx="4" filter="url(#innerShadow)"/>
+        <rect width="110" height="75" fill="url(#grainPago)" rx="4" opacity="0.6"/>
+        <rect x="100" y="0" width="10" height="75" fill="url(#gPago)" rx="3"/>
+        <text x="45" y="22" text-anchor="middle" fill="#F8E890" font-size="15">🧪</text>
+        <text x="45" y="38" text-anchor="middle" fill="#F8E890" font-size="7.5" font-family="Georgia" font-weight="bold">ANÁLISIS</text>
+        <text x="45" y="51" text-anchor="middle" fill="#D8C870" font-size="7" font-family="Georgia">Clínicos</text>
+        <text x="45" y="66" text-anchor="middle" fill="#FF9090" font-size="8" font-weight="bold" font-family="Georgia">PAGA $90</text>
+      </g>
+
+      <!-- sq34 C-5 ACV -->
+      <g id="sq34" class="sq-hover" data-sq="34" transform="translate(788,338)">
+        <rect width="110" height="75" fill="url(#wCardio)" rx="4" filter="url(#innerShadow)"/>
+        <rect width="110" height="75" fill="url(#grainCardio)" rx="4" opacity="0.6"/>
+        <rect x="100" y="0" width="10" height="75" fill="url(#gCardio)" rx="3"/>
+        <text x="45" y="22" text-anchor="middle" fill="#FF9090" font-size="15">🧠</text>
+        <text x="45" y="38" text-anchor="middle" fill="#FFD0C0" font-size="7.5" font-family="Georgia" font-weight="bold">CARDIO</text>
+        <text x="45" y="51" text-anchor="middle" fill="#FFB8A8" font-size="7" font-family="Georgia">ACV</text>
+        <text x="45" y="66" text-anchor="middle" fill="#F0C860" font-size="8" font-weight="bold" font-family="Georgia">PAGA $180 · C-5</text>
+      </g>
+
+      <!-- sq35 Tarjeta Salud -->
+      <g id="sq35" class="sq-hover" data-sq="35" transform="translate(788,413)">
+        <rect width="110" height="75" fill="url(#wSalud)" rx="4" filter="url(#innerShadow)"/>
+        <rect width="110" height="75" fill="url(#grainSalud)" rx="4" opacity="0.6"/>
+        <rect x="100" y="0" width="10" height="75" fill="url(#gSalud)" rx="3"/>
+        <text x="45" y="18" text-anchor="middle" fill="white" font-size="7.5" font-family="Georgia" font-weight="bold">TARJETA SALUD</text>
+        <rect x="32" y="24" width="24" height="24" fill="#117A65" rx="4" opacity="0.9"/>
+        <rect x="39" y="30" width="10" height="3.5" fill="white" rx="1"/>
+        <rect x="42.7" y="26" width="3.5" height="10" fill="white" rx="1"/>
+        <text x="45" y="64" text-anchor="middle" fill="#90E8A0" font-size="7" font-family="Georgia">COBRA $50-$100</text>
+      </g>
+
+      <!-- sq36 R-4 Fibrosis -->
+      <g id="sq36" class="sq-hover" data-sq="36" transform="translate(788,488)">
+        <rect width="110" height="75" fill="url(#wResp)" rx="4" filter="url(#innerShadow)"/>
+        <rect width="110" height="75" fill="url(#grainResp)" rx="4" opacity="0.6"/>
+        <rect x="100" y="0" width="10" height="75" fill="url(#gResp)" rx="3"/>
+        <text x="45" y="22" text-anchor="middle" fill="#A8D8F8" font-size="15">🌡️</text>
+        <text x="45" y="38" text-anchor="middle" fill="#C0E0F8" font-size="7.5" font-family="Georgia" font-weight="bold">PULMONAR</text>
+        <text x="45" y="51" text-anchor="middle" fill="#A0C8E8" font-size="7" font-family="Georgia">Fibrosis</text>
+        <text x="45" y="66" text-anchor="middle" fill="#F0C860" font-size="8" font-weight="bold" font-family="Georgia">PAGA $180 · R-4</text>
+      </g>
+
+      <!-- sq37 O-5 Biología -->
+      <g id="sq37" class="sq-hover" data-sq="37" transform="translate(788,563)">
+        <rect width="110" height="75" fill="url(#wOnco)" rx="4" filter="url(#innerShadow)"/>
+        <rect width="110" height="75" fill="url(#grainOnco)" rx="4" opacity="0.6"/>
+        <rect x="100" y="0" width="10" height="75" fill="url(#gOnco)" rx="3"/>
+        <text x="45" y="22" text-anchor="middle" fill="#D8B8F0" font-size="15">🧫</text>
+        <text x="45" y="38" text-anchor="middle" fill="#E8D0FF" font-size="7.5" font-family="Georgia" font-weight="bold">ONCOLOGÍA</text>
+        <text x="45" y="51" text-anchor="middle" fill="#D8B8F0" font-size="7" font-family="Georgia">Biología</text>
+        <text x="45" y="66" text-anchor="middle" fill="#F0C860" font-size="8" font-weight="bold" font-family="Georgia">PAGA $180 · O-5</text>
+      </g>
+
+      <!-- sq38 Tarjeta Riesgo -->
+      <g id="sq38" class="sq-hover" data-sq="38" transform="translate(788,638)">
+        <rect width="110" height="75" fill="url(#wRiesgo)" rx="4" filter="url(#innerShadow)"/>
+        <rect width="110" height="75" fill="url(#grainRiesgo)" rx="4" opacity="0.6"/>
+        <rect x="100" y="0" width="10" height="75" fill="url(#gRiesgo)" rx="3"/>
+        <text x="45" y="18" text-anchor="middle" fill="white" font-size="7.5" font-family="Georgia" font-weight="bold">TARJETA RIESGO</text>
+        <rect x="32" y="24" width="24" height="24" fill="#7D3C98" rx="4" opacity="0.9"/>
+        <text x="44" y="43" text-anchor="middle" fill="white" font-size="15" font-weight="bold">!</text>
+        <text x="45" y="64" text-anchor="middle" fill="#D8B8F0" font-size="7" font-family="Georgia">PAGA $50-$100</text>
+      </g>
+
+      <!-- sq39 N-6 Hidratación -->
+      <g id="sq39" class="sq-hover" data-sq="39" transform="translate(788,713)">
+        <rect width="110" height="75" fill="url(#wNutri)" rx="4" filter="url(#innerShadow)"/>
+        <rect width="110" height="75" fill="url(#grainNutri)" rx="4" opacity="0.6"/>
+        <rect x="100" y="0" width="10" height="75" fill="url(#gNutri)" rx="3"/>
+        <text x="45" y="22" text-anchor="middle" fill="#90E898" font-size="15">💧</text>
+        <text x="45" y="38" text-anchor="middle" fill="#C8F0C0" font-size="7.5" font-family="Georgia" font-weight="bold">NUTRICIÓN</text>
+        <text x="45" y="51" text-anchor="middle" fill="#A8D8A0" font-size="7" font-family="Georgia">Hidratación</text>
+        <text x="45" y="66" text-anchor="middle" fill="#F0C860" font-size="8" font-weight="bold" font-family="Georgia">PAGA $65 · N-6</text>
+      </g>
+
+      <!-- ═══════════════════════════════
+           CENTRO DEL TABLERO (logo + leyenda tipo Monopoly)
+      ═══════════════════════════════ -->
       <rect x="112" y="112" width="676" height="676" fill="url(#centerWood)" rx="8"/>
       <rect x="112" y="112" width="676" height="676" fill="url(#grainCenter)" rx="8" opacity="0.8"/>
       <rect x="112" y="112" width="676" height="676" fill="url(#varnish)" rx="8"/>
@@ -347,101 +781,98 @@
       <circle cx="450" cy="450" r="295" fill="none" stroke="#8A5530" stroke-width="0.8" stroke-dasharray="5 9" opacity="0.3"/>
       <circle cx="450" cy="450" r="220" fill="none" stroke="#D4A840" stroke-width="0.4" stroke-dasharray="3 7" opacity="0.22"/>
 
-      <!-- LOGO ELIPSE — parte superior -->
-      <ellipse cx="450" cy="270" rx="235" ry="138" fill="#180A02" opacity="0.96"/>
-      <ellipse cx="450" cy="270" rx="235" ry="138" fill="none" stroke="#D4A840" stroke-width="2.5" opacity="0.8" filter="url(#glow2)"/>
-      <ellipse cx="450" cy="270" rx="229" ry="132" fill="none" stroke="#5C2E0E" stroke-width="1" opacity="0.5"/>
-      <rect x="437" y="140" width="26" height="9"  fill="#C0392B" rx="2.5" filter="url(#glow2)"/>
-      <rect x="446" y="131" width="9"  height="27" fill="#C0392B" rx="2.5" filter="url(#glow2)"/>
-      <text x="450" y="228" text-anchor="middle" fill="#FFFFFF" font-size="66" font-family="Georgia, serif" font-weight="bold" letter-spacing="2" filter="url(#glow2)">MEDICO</text>
-      <text x="450" y="288" text-anchor="middle" fill="#D4A840" font-size="58" font-family="Georgia, serif" font-weight="bold" letter-spacing="9" filter="url(#glow)">POLIS</text>
-      <text x="450" y="322" text-anchor="middle" fill="#8A6030" font-size="10" font-family="Georgia" font-style="italic" letter-spacing="1.2">Juego Educativo · Enfermedades Crónicas No Transmisibles</text>
-      <line x1="290" y1="334" x2="610" y2="334" stroke="#8A5530" stroke-width="1" opacity="0.6"/>
-      <circle cx="450" cy="334" r="4" fill="#D4A840" opacity="0.8"/>
+      <!-- ── LOGO centrado en la mitad superior del centro ── -->
+      <ellipse cx="450" cy="295" rx="220" ry="130" fill="#180A02" opacity="0.97"/>
+      <ellipse cx="450" cy="295" rx="220" ry="130" fill="none" stroke="#D4A840" stroke-width="2.5" opacity="0.8" filter="url(#glow2)"/>
+      <ellipse cx="450" cy="295" rx="214" ry="124" fill="none" stroke="#5C2E0E" stroke-width="1" opacity="0.5"/>
+      <!-- Cruz médica logo -->
+      <rect x="437" y="172" width="26" height="9"  fill="#C0392B" rx="2.5" filter="url(#glow2)"/>
+      <rect x="446" y="163" width="9"  height="27" fill="#C0392B" rx="2.5" filter="url(#glow2)"/>
+      <!-- Texto MEDICO -->
+      <text x="450" y="252" text-anchor="middle" fill="#FFFFFF" font-size="60" font-family="Georgia, serif" font-weight="bold" letter-spacing="2" filter="url(#glow2)">MEDICO</text>
+      <!-- Texto POLIS -->
+      <text x="450" y="310" text-anchor="middle" fill="#D4A840" font-size="54" font-family="Georgia, serif" font-weight="bold" letter-spacing="9" filter="url(#glow)">POLIS</text>
+      <!-- Subtítulo -->
+      <text x="450" y="342" text-anchor="middle" fill="#8A6030" font-size="10" font-family="Georgia" font-style="italic" letter-spacing="1.2">Juego Educativo · Enfermedades Crónicas No Transmisibles</text>
+      <line x1="290" y1="354" x2="610" y2="354" stroke="#8A5530" stroke-width="1" opacity="0.6"/>
+      <circle cx="450" cy="354" r="4" fill="#D4A840" opacity="0.8"/>
 
-      <!-- SEPARADOR -->
-      <line x1="160" y1="420" x2="740" y2="420" stroke="#5C2E0E" stroke-width="1" opacity="0.6"/>
-      <text x="450" y="414" text-anchor="middle" fill="#7A5020" font-size="9" font-family="Georgia" letter-spacing="4">— REGLAS DEL JUEGO —</text>
+      <!-- ── ÁREA TARJETAS (tipo Monopoly) ── -->
+      <!-- Zona Tarjetas Salud — izquierda -->
+      <rect x="128" y="370" width="142" height="238" fill="#082C1C" rx="6" stroke="#117A65" stroke-width="1.5" opacity="0.9"/>
+      <rect x="128" y="370" width="142" height="20"  fill="#117A65" rx="5"/>
+      <text x="199" y="384" text-anchor="middle" fill="white" font-size="9" font-family="Georgia" font-weight="bold" letter-spacing="1">TARJETAS SALUD</text>
+      <rect x="144" y="400" width="108" height="70"  fill="#0C3828" rx="4" stroke="#1E8449" stroke-width="1"/>
+      <rect x="151" y="420" width="28" height="9"    fill="#1E8449" rx="2"/>
+      <rect x="159" y="412" width="9"  height="27"   fill="#1E8449" rx="2"/>
+      <text x="199" y="490" text-anchor="middle" fill="#90E8A0" font-size="8" font-family="Georgia">Ejemplo: cobra $75</text>
+      <text x="199" y="504" text-anchor="middle" fill="#90E8A0" font-size="8" font-family="Georgia">"Control glucémico</text>
+      <text x="199" y="516" text-anchor="middle" fill="#90E8A0" font-size="8" font-family="Georgia">óptimo"</text>
+      <!-- separador -->
+      <line x1="144" y1="528" x2="260" y2="528" stroke="#117A65" stroke-width="0.8" opacity="0.5"/>
+      <text x="199" y="543" text-anchor="middle" fill="#6A9870" font-size="7.5" font-family="Georgia" font-style="italic">3 tarjetas → construye</text>
+      <text x="199" y="556" text-anchor="middle" fill="#6A9870" font-size="7.5" font-family="Georgia" font-style="italic">un Consultorio 🏢</text>
+      <text x="199" y="570" text-anchor="middle" fill="#6A9870" font-size="7.5" font-family="Georgia" font-style="italic">3 Consultorios → Clínica 🏥</text>
+      <text x="199" y="583" text-anchor="middle" fill="#6A9870" font-size="7.5" font-family="Georgia" font-style="italic">4 Clínicas → Hospital 🏨</text>
+      <text x="199" y="598" text-anchor="middle" fill="#4A7860" font-size="7" font-family="Georgia">Tener 5 T.Salud: avanza 3</text>
+      <text x="199" y="608" text-anchor="middle" fill="#4A7860" font-size="7" font-family="Georgia">casillas extra</text>
 
-      <!-- REGLAS col izquierda -->
-      <text x="178" y="444" fill="#A88050" font-size="10.5" font-family="Georgia">🎲  Tira ambos dados y avanza tu ficha</text>
-      <text x="178" y="462" fill="#A88050" font-size="10.5" font-family="Georgia">🏥  Cae en propiedad: compra o paga renta</text>
-      <text x="178" y="480" fill="#A88050" font-size="10.5" font-family="Georgia">💚  Tarjeta Salud: recibe dinero del banco</text>
-      <text x="178" y="498" fill="#A88050" font-size="10.5" font-family="Georgia">⚠️  Tarjeta Riesgo: paga penalidad al banco</text>
-      <text x="178" y="516" fill="#A88050" font-size="10.5" font-family="Georgia">🚨  UCI: pierde 2 turnos o paga $150</text>
-      <text x="178" y="534" fill="#A88050" font-size="10.5" font-family="Georgia">🏁  Al pasar SALIDA cobra $200</text>
-      <text x="178" y="552" fill="#A88050" font-size="10.5" font-family="Georgia">🏠  Construye Clínicas en tus propiedades</text>
-      <text x="178" y="570" fill="#A88050" font-size="10.5" font-family="Georgia">🏨  4 Clínicas = 1 Hospital (renta ×5)</text>
-      <text x="178" y="588" fill="#A88050" font-size="10.5" font-family="Georgia">🏆  Gana quien lleve a todos a bancarrota</text>
+      <!-- Zona Tarjetas Riesgo — derecha -->
+      <rect x="630" y="370" width="142" height="238" fill="#1E0428" rx="6" stroke="#7D3C98" stroke-width="1.5" opacity="0.9"/>
+      <rect x="630" y="370" width="142" height="20"  fill="#7D3C98" rx="5"/>
+      <text x="701" y="384" text-anchor="middle" fill="white" font-size="9" font-family="Georgia" font-weight="bold" letter-spacing="1">TARJETAS RIESGO</text>
+      <rect x="646" y="400" width="108" height="70"  fill="#2C0840" rx="4" stroke="#7D3C98" stroke-width="1"/>
+      <rect x="689" y="408" width="26" height="26"   fill="#7D3C98" rx="5"/>
+      <text x="702" y="428" text-anchor="middle" fill="white" font-size="16" font-weight="bold">!</text>
+      <text x="701" y="490" text-anchor="middle" fill="#D8B8F0" font-size="8" font-family="Georgia">Ejemplo: paga $80</text>
+      <text x="701" y="504" text-anchor="middle" fill="#D8B8F0" font-size="8" font-family="Georgia">"Sedentarismo</text>
+      <text x="701" y="516" text-anchor="middle" fill="#D8B8F0" font-size="8" font-family="Georgia">detectado"</text>
+      <!-- separador -->
+      <line x1="646" y1="528" x2="762" y2="528" stroke="#7D3C98" stroke-width="0.8" opacity="0.5"/>
+      <text x="701" y="543" text-anchor="middle" fill="#9878B0" font-size="7.5" font-family="Georgia" font-style="italic">3 T.Riesgo: pierde</text>
+      <text x="701" y="556" text-anchor="middle" fill="#9878B0" font-size="7.5" font-family="Georgia" font-style="italic">un turno adicional</text>
+      <text x="701" y="570" text-anchor="middle" fill="#9878B0" font-size="7.5" font-family="Georgia" font-style="italic">5 T.Riesgo: va a UCI</text>
+      <text x="701" y="583" text-anchor="middle" fill="#9878B0" font-size="7.5" font-family="Georgia" font-style="italic">directamente</text>
+      <text x="701" y="598" text-anchor="middle" fill="#6A4870" font-size="7" font-family="Georgia">Las tarjetas no se</text>
+      <text x="701" y="608" text-anchor="middle" fill="#6A4870" font-size="7" font-family="Georgia">acumulan entre rondas</text>
 
-      <!-- SEPARADOR CENTRAL vertical -->
-      <line x1="450" y1="425" x2="450" y2="750" stroke="#5C2E0E" stroke-width="0.8" opacity="0.4"/>
+      <!-- ── LEYENDA CATEGORÍAS (mitad inferior centro) ── -->
+      <line x1="128" y1="622" x2="772" y2="622" stroke="#5C2E0E" stroke-width="1.2" opacity="0.7"/>
+      <text x="450" y="641" text-anchor="middle" fill="#7A5020" font-size="9.5" font-family="Georgia" letter-spacing="3">— CATEGORÍAS —</text>
 
-      <!-- CATEGORÍAS col derecha -->
-      <text x="468" y="444" fill="#D4A840" font-size="9.5" font-family="Georgia" letter-spacing="2">CATEGORÍAS</text>
-      <line x1="468" y1="450" x2="730" y2="450" stroke="#5C2E0E" stroke-width="0.6" opacity="0.5"/>
+      <!-- Categorías col izq -->
+      <rect x="145" y="652" width="10" height="10" fill="#C0392B" rx="2"/>
+      <text x="162" y="662" fill="#C8A878" font-size="10" font-family="Georgia">🫀 Cardiología (C-1 a C-5)</text>
+      <rect x="145" y="668" width="10" height="10" fill="#1E8449" rx="2"/>
+      <text x="162" y="678" fill="#C8A878" font-size="10" font-family="Georgia">🥗 Nutrición (N-1 a N-6)</text>
+      <rect x="145" y="684" width="10" height="10" fill="#D4AC0D" rx="2"/>
+      <text x="162" y="694" fill="#C8A878" font-size="10" font-family="Georgia">🩸 Diabetes (D-1 a D-4)</text>
 
-      <rect x="468" y="458" width="10" height="10" fill="#C0392B" rx="2"/>
-      <text x="484" y="468" fill="#C8A878" font-size="10.5" font-family="Georgia">Cardiología (C-1 a C-5)</text>
-      <rect x="468" y="476" width="10" height="10" fill="#1E8449" rx="2"/>
-      <text x="484" y="486" fill="#C8A878" font-size="10.5" font-family="Georgia">Nutrición (N-1 a N-6)</text>
-      <rect x="468" y="494" width="10" height="10" fill="#D4AC0D" rx="2"/>
-      <text x="484" y="504" fill="#C8A878" font-size="10.5" font-family="Georgia">Diabetes (D-1 a D-4)</text>
-      <rect x="468" y="512" width="10" height="10" fill="#1A5276" rx="2"/>
-      <text x="484" y="522" fill="#C8A878" font-size="10.5" font-family="Georgia">Pulmonar (R-1 a R-4)</text>
-      <rect x="468" y="530" width="10" height="10" fill="#7D3C98" rx="2"/>
-      <text x="484" y="540" fill="#C8A878" font-size="10.5" font-family="Georgia">Oncología (O-1 a O-5)</text>
+      <!-- Categorías col der -->
+      <rect x="460" y="652" width="10" height="10" fill="#1A5276" rx="2"/>
+      <text x="477" y="662" fill="#C8A878" font-size="10" font-family="Georgia">🫁 Pulmonar (R-1 a R-4)</text>
+      <rect x="460" y="668" width="10" height="10" fill="#7D3C98" rx="2"/>
+      <text x="477" y="678" fill="#C8A878" font-size="10" font-family="Georgia">🔬 Oncología (O-1 a O-5)</text>
 
-      <line x1="468" y1="550" x2="730" y2="550" stroke="#5C2E0E" stroke-width="0.6" opacity="0.5"/>
-      <text x="468" y="564" fill="#D4A840" font-size="9.5" font-family="Georgia" letter-spacing="2">CASILLAS ESPECIALES</text>
-      <line x1="468" y1="570" x2="730" y2="570" stroke="#5C2E0E" stroke-width="0.6" opacity="0.5"/>
+      <!-- Casillas especiales -->
+      <line x1="128" y1="703" x2="772" y2="703" stroke="#5C2E0E" stroke-width="0.8" opacity="0.5"/>
+      <text x="450" y="718" text-anchor="middle" fill="#7A5020" font-size="8.5" font-family="Georgia" letter-spacing="2">— CASILLAS ESPECIALES —</text>
 
-      <rect x="468" y="578" width="10" height="10" fill="#117A65" rx="2"/>
-      <text x="484" y="588" fill="#C8A878" font-size="10.5" font-family="Georgia">Tarjeta Salud — cobra bonus</text>
-      <rect x="468" y="596" width="10" height="10" fill="#7D3C98" rx="2"/>
-      <text x="484" y="606" fill="#C8A878" font-size="10.5" font-family="Georgia">Tarjeta Riesgo — paga multa</text>
-      <rect x="468" y="614" width="10" height="10" fill="#B7950B" rx="2"/>
-      <text x="484" y="624" fill="#C8A878" font-size="10.5" font-family="Georgia">Consulta / Análisis — pago fijo</text>
-      <rect x="468" y="632" width="10" height="10" fill="#028090" rx="2"/>
-      <text x="484" y="642" fill="#C8A878" font-size="10.5" font-family="Georgia">Zona Libre — descansa gratis</text>
-      <rect x="468" y="650" width="10" height="10" fill="#C0392B" rx="2"/>
-      <text x="484" y="660" fill="#C8A878" font-size="10.5" font-family="Georgia">UCI Emergencia — pierde turnos</text>
+      <rect x="145" y="727" width="10" height="10" fill="#117A65" rx="2"/>
+      <text x="162" y="737" fill="#C8A878" font-size="9.5" font-family="Georgia">💚 T.Salud: cobra $50-$100</text>
+      <rect x="145" y="743" width="10" height="10" fill="#7D3C98" rx="2"/>
+      <text x="162" y="753" fill="#C8A878" font-size="9.5" font-family="Georgia">⚠️ T.Riesgo: paga $50-$100</text>
 
-      <!-- SEPARADOR INFERIOR -->
-      <line x1="160" y1="672" x2="740" y2="672" stroke="#5C2E0E" stroke-width="1" opacity="0.5"/>
+      <rect x="450" y="727" width="10" height="10" fill="#028090" rx="2"/>
+      <text x="467" y="737" fill="#C8A878" font-size="9.5" font-family="Georgia">🛡 Zona Libre: sin pagar</text>
+      <rect x="450" y="743" width="10" height="10" fill="#C0392B" rx="2"/>
+      <text x="467" y="753" fill="#C8A878" font-size="9.5" font-family="Georgia">🚑 UCI: pierde 2 turnos</text>
 
-      <!-- FICHAS Y CAPITAL INICIAL -->
-      <text x="450" y="692" text-anchor="middle" fill="#7A5020" font-size="9" font-family="Georgia" letter-spacing="3">— FICHAS · CAPITAL INICIAL $1,500 —</text>
+      <!-- Fichas línea decorativa -->
+      <polyline points="128,765 148,765 158,748 170,782 182,742 194,766 772,766"
+        fill="none" stroke="#8A5530" stroke-width="1.2" opacity="0.25" stroke-linejoin="round"/>
 
-      <circle cx="280" cy="725" r="20" fill="#C0392B" stroke="#FF9090" stroke-width="2"/>
-      <text x="280" y="731" text-anchor="middle" font-size="15">🧑</text>
-      <text x="280" y="754" text-anchor="middle" fill="#A08060" font-size="9" font-family="Georgia">Jug. 1</text>
-
-      <circle cx="340" cy="725" r="20" fill="#1A5276" stroke="#85C1E9" stroke-width="2"/>
-      <text x="340" y="731" text-anchor="middle" font-size="15">👩</text>
-      <text x="340" y="754" text-anchor="middle" fill="#A08060" font-size="9" font-family="Georgia">Jug. 2</text>
-
-      <circle cx="400" cy="725" r="20" fill="#1E8449" stroke="#90E898" stroke-width="2"/>
-      <text x="400" y="731" text-anchor="middle" font-size="15">👦</text>
-      <text x="400" y="754" text-anchor="middle" fill="#A08060" font-size="9" font-family="Georgia">Jug. 3</text>
-
-      <circle cx="460" cy="725" r="20" fill="#7D3C98" stroke="#D8B8F0" stroke-width="2"/>
-      <text x="460" y="731" text-anchor="middle" font-size="15">👧</text>
-      <text x="460" y="754" text-anchor="middle" fill="#A08060" font-size="9" font-family="Georgia">Jug. 4</text>
-
-      <circle cx="520" cy="725" r="20" fill="#B7950B" stroke="#F8E890" stroke-width="2"/>
-      <text x="520" y="731" text-anchor="middle" font-size="15">🧓</text>
-      <text x="520" y="754" text-anchor="middle" fill="#A08060" font-size="9" font-family="Georgia">Jug. 5</text>
-
-      <circle cx="580" cy="725" r="20" fill="#5C2E0E" stroke="#D4A840" stroke-width="2"/>
-      <text x="580" y="731" text-anchor="middle" font-size="15">🧑‍⚕️</text>
-      <text x="580" y="754" text-anchor="middle" fill="#A08060" font-size="9" font-family="Georgia">Jug. 6</text>
-
-      <!-- Línea latido decorativa -->
-      <polyline points="160,775 180,775 190,758 202,792 214,750 226,775 740,775"
-        fill="none" stroke="#8A5530" stroke-width="1.2" opacity="0.28" stroke-linejoin="round"/>
-
-      <!-- Fichas SVG jugadores activos — posición inicial SALIDA -->
+      <!-- ── FICHAS SVG jugadores activos ── -->
       <circle id="pawn0" cx="820" cy="843" r="14" fill="#C0392B" stroke="#FF9090" stroke-width="2.5" filter="url(#shadow)"/>
       <text id="pawn0t" x="820" y="849" text-anchor="middle" font-size="13">🧑</text>
       <circle id="pawn1" cx="843" cy="820" r="14" fill="#1A5276" stroke="#85C1E9" stroke-width="2.5" filter="url(#shadow)"/>

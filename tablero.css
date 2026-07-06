@@ -72,11 +72,12 @@
 .player-info {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
   flex: 1;
 }
 .player-name  { color: var(--text-warm); font-size: 12px; }
 .player-money { color: var(--gold); font-size: 13px; font-weight: bold; }
+.player-props { color: var(--teal); font-size: 10px; letter-spacing: 0.5px; }
 
 .turn-indicator {
   color: var(--teal);
@@ -86,6 +87,55 @@
   white-space: nowrap;
 }
 .turn-indicator.hidden { display: none; }
+
+/* ── PANEL CONSTRUCCIONES ── */
+.build-info {
+  background: rgba(0,0,0,0.2);
+  border: 1px solid var(--wood-mid);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.build-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.build-label { color: var(--text-dim); font-size: 10px; }
+.build-val   { color: var(--gold); font-size: 10px; font-weight: bold; }
+
+.build-sep {
+  height: 1px;
+  background: var(--wood-mid);
+  opacity: 0.4;
+  margin: 2px 0;
+}
+
+.tarjetas-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10px;
+  color: var(--text-dim);
+}
+.t-count {
+  color: var(--teal);
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.build-note {
+  color: #5C3A18;
+  font-size: 9px;
+  line-height: 1.6;
+  font-style: italic;
+  border-top: 1px solid rgba(92,46,14,0.3);
+  padding-top: 6px;
+  margin-top: 2px;
+}
 
 /* ── DADOS ── */
 .dice-area {
@@ -184,6 +234,7 @@
 .log-entry.highlight { color: var(--gold); }
 .log-entry.alert     { color: #FF9090; }
 .log-entry.good      { color: #90E8A0; }
+.log-entry.build     { color: var(--teal); font-weight: bold; }
 
 /* ── TABLERO ── */
 .board-area {
@@ -203,6 +254,18 @@
 }
 .board-wrap svg { width: 100%; height: 100%; display: block; }
 
+/* Hover sobre casillas */
+.sq-hover {
+  cursor: pointer;
+}
+.sq-hover:hover > rect:first-child {
+  filter: brightness(1.35);
+  transition: filter 0.2s;
+}
+.sq-hover > rect:first-child {
+  transition: filter 0.2s;
+}
+
 /* Animación de ficha al moverse */
 @keyframes pawnBounce {
   0%   { transform: translateY(0); }
@@ -211,6 +274,90 @@
   100% { transform: translateY(0) scale(1); }
 }
 .pawn-moving { animation: pawnBounce 0.4s ease; }
+
+/* ── TOOLTIP EDUCATIVO ── */
+.square-tooltip {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  max-width: 320px;
+  min-width: 240px;
+  background: linear-gradient(150deg, #1A0802, #2E1204, #1A0802);
+  border: 1px solid var(--gold);
+  border-radius: 12px;
+  padding: 14px 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.7), 0 0 12px rgba(212,168,64,0.15);
+  pointer-events: none;
+  font-family: Georgia, serif;
+  animation: fadeIn 0.18s ease both;
+}
+.square-tooltip.visible { display: block; }
+
+.tip-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--wood-mid);
+}
+.tip-icon { font-size: 22px; flex-shrink: 0; }
+.tip-name {
+  color: var(--gold);
+  font-size: 13px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+.tip-cat {
+  color: var(--text-dim);
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.tip-action {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  margin-bottom: 8px;
+}
+.tip-action.pay  { background: rgba(192,57,43,0.25); color: #FF9090; border: 1px solid #C0392B; }
+.tip-action.earn { background: rgba(30,132,73,0.25);  color: #90E8A0; border: 1px solid #1E8449; }
+.tip-action.free { background: rgba(2,195,154,0.2);   color: #02C39A; border: 1px solid #028090; }
+.tip-action.lose { background: rgba(192,57,43,0.2);   color: #FF6060; border: 1px solid #C0392B; }
+
+.tip-edu {
+  color: var(--text-warm);
+  font-size: 11px;
+  line-height: 1.7;
+  margin-bottom: 8px;
+}
+
+.tip-game {
+  color: var(--text-dim);
+  font-size: 10px;
+  line-height: 1.6;
+  font-style: italic;
+  border-top: 1px solid rgba(92,46,14,0.4);
+  padding-top: 7px;
+}
+
+.tip-stat {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(212,168,64,0.07);
+  border: 1px solid rgba(92,46,14,0.4);
+  border-radius: 6px;
+  padding: 5px 10px;
+  margin-top: 6px;
+  font-size: 10px;
+  color: #A88050;
+}
+.tip-stat strong { color: var(--gold); }
 
 /* ── RESPONSIVE ── */
 @media (max-width: 860px) {

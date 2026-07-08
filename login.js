@@ -85,6 +85,11 @@ function handleLogin() {
     btn.textContent = 'Entrar al Juego 🎲';
     btn.disabled = false;
     showMsg('✅ ¡Bienvenido/a! Redirigiendo al tablero...', 'success');
+
+    // Guardar jugador para que el tablero lo use como Jugador 1
+    const displayName = email.split('@')[0];
+    savePlayerToBoard(displayName, '🧑');
+
     setTimeout(() => { window.location.href = 'tablero.html'; }, 1400);
   }, 1200);
 }
@@ -117,6 +122,22 @@ function handleRegister() {
     btn.textContent = 'Crear Cuenta 🏥';
     btn.disabled = false;
     showMsg(`✅ ¡Cuenta creada! Ficha elegida: ${token}`, 'success');
+
+    // Guardar jugador para que el tablero lo use como Jugador 1
+    savePlayerToBoard(name, token);
+
     setTimeout(() => { window.location.href = 'tablero.html'; }, 1500);
   }, 1300);
+}
+
+/* ── Guardar datos del jugador para tablero.js ──
+   tablero.js lee esta clave con localStorage.getItem('medicopolisPlayer')
+   y la usa como Jugador 1 (nombre y ficha) al cargar el tablero. */
+function savePlayerToBoard(name, token) {
+  try {
+    localStorage.setItem('medicopolisPlayer', JSON.stringify({ name, token }));
+  } catch (e) {
+    // Si el navegador bloquea localStorage (modo privado, etc.), el tablero
+    // simplemente usará los valores por defecto ("Jugador 1", 🧑).
+  }
 }

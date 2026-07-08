@@ -1,6 +1,11 @@
 /* ==============================================
-   tablero.js — Dados, fichas, construcciones,
-   tooltips educativos y lógica de turno
+   tablero.js — MEDICOPOLIS
+   Dados, fichas, propiedades, construcciones,
+   estudiantes de enfermería, preguntas ECNT,
+   tooltips educativos y lógica de turno.
+
+   Fuentes verificadas: ver referencias APA 7 en
+   "MEDICOPOLIS - Referencias.docx"
 ============================================== */
 
 /* ── CARAS DE DADO ── */
@@ -8,295 +13,353 @@ const FACES = ['⚀','⚁','⚂','⚃','⚄','⚅'];
 
 /* ══════════════════════════════════════════════
    DATOS EDUCATIVOS Y DE JUEGO POR CASILLA
-   Cada casilla tiene:
-   - icon, name, cat, action ('pay'|'earn'|'free'|'lose')
-   - amount (para mostrar)
-   - edu: texto educativo clínico
-   - game: mecánica de juego
-   - stat: dato estadístico impactante
+
+   type:
+   - 'special'  : SALIDA, Tarjeta Salud/Riesgo, UCI, Zona Libre, Seguro
+   - 'property' : casilla de enfermedad/factor de riesgo → COMPRABLE,
+                  genera renta al dueño, se puede construir por categoría
+   - 'wellness' : casilla de conducta protectora → GANAS dinero al caer
+                  (no se compra, es un bono de bienestar)
+   - 'trivia'   : Pregunta ECNT, responde correctamente para ganar
+   - 'build'    : Centro de Construcción
 ══════════════════════════════════════════════ */
 const SQUARE_DATA = {
   0: {
-    icon: '🏁', name: 'SALIDA', cat: 'Casilla Especial',
+    icon: '🏁', name: 'SALIDA', cat: 'Casilla Especial', type: 'special',
     action: 'earn', amount: '$200',
-    edu: 'La prevención primaria en salud es como pasar por SALIDA: cada vuelta es una oportunidad de reforzar hábitos saludables. La OMS estima que el 80% de las enfermedades crónicas se pueden prevenir con intervenciones tempranas.',
+    edu: 'La prevención primaria en salud es como pasar por SALIDA: cada vuelta es una oportunidad de reforzar hábitos saludables. Las enfermedades no transmisibles (ECNT) son responsables del 74% de las muertes en el mundo (41 millones de personas al año), según la OMS.',
     game: 'Cada vez que pasas o caes en SALIDA, cobras $200 del banco. Es tu ingreso base por cada ronda completa.',
-    stat: '80% de las ECNT son prevenibles con dieta, ejercicio y no fumar.'
+    stat: 'Las ECNT causan 41 millones de muertes al año — el 74% de todas las muertes globales (OMS, 2023).'
   },
   1: {
-    icon: '🩺', name: 'Hipertensión Arterial', cat: 'Cardiología · C-1',
-    action: 'pay', amount: '$60',
-    edu: 'La hipertensión arterial (HTA) se define como PAS ≥140 mmHg y/o PAD ≥90 mmHg. Es el principal factor de riesgo cardiovascular modificable. Actúa dañando silenciosamente vasos sanguíneos, corazón, riñones y retina. El 90-95% corresponde a HTA esencial (sin causa identificable). El tratamiento incluye IECA, ARA II, calcioantagonistas y diuréticos tiazídicos.',
-    game: 'Casilla de propiedad Cardiología. Si no tiene dueño puedes comprarla. Si tiene dueño, pagas renta aumentada si tiene Consultorios, Clínicas u Hospital.',
-    stat: '1 de cada 3 adultos tiene hipertensión arterial en el mundo.'
+    icon: '🩺', name: 'Hipertensión Arterial', cat: 'Cardiología · C-1', type: 'property',
+    price: 300, rent: 60,
+    edu: 'La hipertensión arterial (HTA) se define como PAS ≥140 mmHg y/o PAD ≥90 mmHg. Es el principal factor de riesgo cardiovascular modificable y el factor metabólico al que más muertes se atribuyen a nivel mundial. Actúa dañando silenciosamente vasos sanguíneos, corazón, riñones y retina. El tratamiento incluye IECA, ARA II, calcioantagonistas y diuréticos tiazídicos.',
+    game: 'Propiedad de Cardiología. Cómprala por $300 si está libre. Si tiene dueño, pagas renta (más alta si el dueño construyó Consultorio, Clínica u Hospital en el grupo Cardio).',
+    stat: 'La presión arterial elevada es el factor de riesgo metabólico al que se atribuye el mayor número de muertes en el mundo (PAHO/WHO, 2024).'
   },
   2: {
-    icon: '💚', name: 'Tarjeta Salud', cat: 'Casilla Especial',
+    icon: '💚', name: 'Tarjeta Salud', cat: 'Casilla Especial', type: 'special',
     action: 'earn', amount: '$50–$100',
-    edu: 'Las conductas protectoras de salud —actividad física, dieta mediterránea, no fumar, control de estrés— reducen el riesgo cardiovascular hasta un 80%. Cada hábito positivo suma puntos de salud en la vida real, igual que esta tarjeta suma dinero en el juego.',
-    game: 'Toma la primera tarjeta del mazo Salud y aplica su beneficio. Cobra entre $50 y $100 según la tarjeta. Acumula tarjetas: al reunir 3, construyes un Consultorio gratis. Con 5 T.Salud en el mismo turno avanzas 3 casillas extra.',
-    stat: 'Acumular hábitos saludables reduce la mortalidad por ECNT en un 50%.'
+    edu: 'Las conductas protectoras de salud —actividad física, dieta mediterránea, no fumar, control de estrés— reducen el riesgo cardiovascular hasta un 30%. Cada hábito positivo suma en la vida real, igual que esta tarjeta suma dinero en el juego.',
+    game: 'Toma la primera tarjeta del mazo Salud y cobra entre $50 y $100. Con algo de suerte, un/a estudiante de enfermería se une a tu equipo (+1 Estudiante).',
+    stat: 'La adopción de hábitos saludables reduce significativamente la mortalidad por ECNT (OMS, 2023).'
   },
   3: {
-    icon: '🥗', name: 'Alimentación Saludable', cat: 'Nutrición · N-1',
-    action: 'pay', amount: '$35',
-    edu: 'Una dieta saludable debe incluir: ≥5 porciones diarias de frutas y verduras, granos enteros, proteína magra y grasas insaturadas. La dieta mediterránea reduce en 30% el riesgo de eventos cardiovasculares. En enfermería, la valoración nutricional (IMC, perímetro abdominal, albumina sérica) es esencial en el ingreso hospitalario.',
-    game: 'Casilla de propiedad Nutrición. Al poseer todo el grupo N puedes construir Consultorios. La renta base es $35; con Hospital puede superar $175.',
-    stat: 'Una dieta inadecuada causa el 11 millones de muertes anuales a nivel mundial.'
+    icon: '🥗', name: 'Alimentación Saludable', cat: 'Nutrición · N-1', type: 'wellness',
+    earn: 40,
+    edu: 'Una dieta saludable debe incluir: ≥5 porciones diarias de frutas y verduras, granos enteros, proteína magra y grasas insaturadas. La dieta mediterránea reduce en torno a un 30% el riesgo de eventos cardiovasculares mayores (estudio PREDIMED). En enfermería, la valoración nutricional (IMC, perímetro abdominal) es esencial en el ingreso hospitalario.',
+    game: 'Casilla de Bienestar: no se compra, simplemente cobras $40 por adoptar este hábito protector cada vez que caes aquí.',
+    stat: 'La dieta mediterránea reduce hasta un 30% el riesgo de eventos cardiovasculares mayores (Estruch et al., PREDIMED, NEJM).'
   },
   4: {
-    icon: '⚖️', name: 'Obesidad', cat: 'Nutrición · N-2',
-    action: 'pay', amount: '$50',
-    edu: 'La obesidad se clasifica por IMC: Sobrepeso IMC 25-29.9 kg/m², Obesidad grado I 30-34.9, II 35-39.9, III ≥40 (mórbida). El perímetro abdominal >88 cm en mujeres y >102 cm en hombres indica riesgo cardiometabólico. Comorbilidades: DM2, HTA, dislipidemia, apnea del sueño, esteatohepatitis. Tratamiento: cambio de estilo de vida, farmacológico, bariátrico.',
-    game: 'Casilla Nutrición de precio medio. Los jugadores con más propiedades Nutrición pueden cobrar renta mayor aquí. Si se hipoteca, el dueño no cobra.',
-    stat: 'El 13% de los adultos mundiales tiene obesidad; duplicó su prevalencia desde 1980.'
+    icon: '⚖️', name: 'Obesidad', cat: 'Nutrición · N-2', type: 'property',
+    price: 250, rent: 50,
+    edu: 'La obesidad se clasifica por IMC: Sobrepeso 25-29.9 kg/m², Obesidad grado I 30-34.9, II 35-39.9, III ≥40. El perímetro abdominal >88 cm en mujeres y >102 cm en hombres indica riesgo cardiometabólico. Comorbilidades: DM2, HTA, dislipidemia, apnea del sueño. Tratamiento: cambio de estilo de vida, farmacológico, bariátrico.',
+    game: 'Propiedad de Nutrición. Precio $250. Si el dueño construye en el grupo N, la renta aquí sube considerablemente.',
+    stat: 'La obesidad en adultos casi se ha triplicado desde 1975 a nivel mundial (OMS, 2024).'
   },
   5: {
-    icon: '🩻', name: 'Consulta Médica', cat: 'Casilla Especial · Pago Fijo',
-    action: 'pay', amount: '$30',
-    edu: 'La consulta médica preventiva es clave en la detección temprana de ECNT. El examen físico sistemático incluye: signos vitales, IMC, glucemia en ayunas, perfil lipídico y PA. En enfermería, el rol en la consulta abarca la toma de signos vitales, educación al paciente y seguimiento del cumplimiento terapéutico.',
-    game: 'Casilla de pago fijo: siempre pagas $30 al banco sin importar a quién pertenezca. Representa el costo basal de atención médica preventiva.',
-    stat: 'Un control preventivo anual puede detectar el 70% de las ECNT en etapa temprana.'
+    icon: '❓', name: 'Pregunta ECNT #1', cat: 'Casilla de Pregunta · Prevención General', type: 'trivia',
+    edu: 'Las casillas de pregunta ponen a prueba lo aprendido sobre enfermedades crónicas no transmisibles. Responder correctamente refuerza el conocimiento clínico real que usarás como profesional de enfermería.',
+    game: 'Responde la pregunta de opción múltiple. Si aciertas, ganas dinero del banco. Si fallas, pagas una penalidad. Si tienes 3+ Estudiantes, puedes pedir ayuda para eliminar 2 opciones incorrectas.',
+    stat: '¡Pon a prueba tus conocimientos sobre ECNT!'
   },
   6: {
-    icon: '🩸', name: 'Diabetes Tipo 2', cat: 'Diabetes · D-1',
-    action: 'pay', amount: '$60',
-    edu: 'La DM2 se caracteriza por resistencia a insulina e hiperglucemia crónica. Criterios diagnósticos ADA: glucemia en ayunas ≥126 mg/dL, HbA1c ≥6.5%, glucemia 2h post-PTOG ≥200 mg/dL. Las complicaciones crónicas son micro (retinopatía, nefropatía, neuropatía) y macrovasculares (IAM, ACV). El pilar del tratamiento es el cambio de estilo de vida más metformina.',
-    game: 'Casilla Diabetes de primer precio. Propiedad rentable a largo plazo si construyes. Con Hospital la renta sube a $300.',
-    stat: '537 millones de personas viven con diabetes en el mundo (IDF, 2021).'
+    icon: '🩸', name: 'Diabetes Tipo 2', cat: 'Diabetes · D-1', type: 'property',
+    price: 300, rent: 60,
+    edu: 'La DM2 se caracteriza por resistencia a insulina e hiperglucemia crónica. Criterios diagnósticos: glucemia en ayunas ≥126 mg/dL, HbA1c ≥6.5%, o glucemia 2h post-PTOG ≥200 mg/dL. Las complicaciones son micro (retinopatía, nefropatía, neuropatía) y macrovasculares (IAM, ACV). El pilar del tratamiento es el cambio de estilo de vida más metformina.',
+    game: 'Primera propiedad de Diabetes. Precio $300. Rentable a largo plazo si construyes en el grupo D.',
+    stat: '589 millones de adultos (20-79 años) viven con diabetes en el mundo — 1 de cada 9 (IDF Diabetes Atlas, 11.ª ed., 2024).'
   },
   7: {
-    icon: '💔', name: 'Infarto Agudo de Miocardio', cat: 'Cardiología · C-2',
-    action: 'pay', amount: '$150',
-    edu: 'El IAM ocurre por oclusión de una arteria coronaria, generalmente por rotura de placa ateromatosa. La triada diagnóstica: dolor precordial típico, cambios en ECG (elevación ST en STEMI) y elevación de troponinas. El protocolo de enfermería incluye: O₂ si SatO₂ <90%, AAS 300mg, monitorización continua, acceso IV y preparación para cateterismo. La ventana de reperfusión es <120 min (puerta-balón).',
-    game: 'Casilla de alto valor en Cardiología. Pagar $150 simula el alto costo del tratamiento del IAM. Muy rentable para el dueño con edificaciones.',
-    stat: 'El IAM es la principal causa de muerte en el mundo; ocurre uno cada 40 segundos en EE.UU.'
+    icon: '💔', name: 'Infarto Agudo de Miocardio', cat: 'Cardiología · C-2', type: 'property',
+    price: 750, rent: 150,
+    edu: 'El IAM ocurre por oclusión de una arteria coronaria, generalmente por rotura de placa ateromatosa. La tríada diagnóstica: dolor precordial típico, cambios en ECG (elevación ST en STEMI) y elevación de troponinas. El protocolo de enfermería incluye: O₂ si SatO₂ <90%, AAS 300mg, monitorización continua, acceso IV y preparación para cateterismo.',
+    game: 'Propiedad de alto valor en Cardiología. Precio $750. Muy rentable para el dueño si tiene construcciones.',
+    stat: 'Las cardiopatías representan la mayor causa de muerte por ECNT: más de 19 millones de muertes al año (OMS, 2024).'
   },
   8: {
-    icon: '⚠️', name: 'Tarjeta Riesgo', cat: 'Casilla Especial',
+    icon: '⚠️', name: 'Tarjeta Riesgo', cat: 'Casilla Especial', type: 'special',
     action: 'pay', amount: '$50–$100',
-    edu: 'Los factores de riesgo cardiovascular modificables incluyen: tabaquismo, HTA, dislipidemia, DM, obesidad, sedentarismo y dieta inadecuada. La escala Framingham estima el riesgo de evento cardiovascular a 10 años. En enfermería, la educación en modificación de factores de riesgo es una intervención NIC prioritaria.',
-    game: 'Toma la primera tarjeta del mazo Riesgo y aplica la penalidad. Pagas entre $50 y $100 al banco. Con 3 T.Riesgo acumuladas en el mismo turno, pierdes un turno adicional. Con 5 T.Riesgo vas directo a UCI.',
-    stat: 'Eliminar solo el tabaquismo reduce el riesgo cardiovascular en un 50% al año de abstinencia.'
+    edu: 'Los factores de riesgo cardiovascular modificables incluyen: tabaquismo, HTA, dislipidemia, DM, obesidad, sedentarismo y dieta inadecuada. En enfermería, la educación en modificación de factores de riesgo es una intervención prioritaria.',
+    game: 'Toma la primera tarjeta del mazo Riesgo y paga entre $50 y $100. Con 3 T.Riesgo en el mismo turno pierdes un turno adicional; con 5, vas directo a UCI (a menos que tengas 5+ Estudiantes para reducirlo).',
+    stat: 'El tabaquismo, la inactividad física, el alcohol y la dieta inadecuada son los principales factores de riesgo conductuales de las ECNT (OMS, 2023).'
   },
   9: {
-    icon: '🫁', name: 'EPOC', cat: 'Pulmonar · R-1',
-    action: 'pay', amount: '$90',
-    edu: 'La Enfermedad Pulmonar Obstructiva Crónica se caracteriza por obstrucción irreversible del flujo aéreo (VEF1/CVF <0.70 post-broncodilatador). Estadios GOLD I-IV según VEF1%. El tabaquismo causa el 85-90% de los casos. El manejo incluye: abandono del tabaco (único que modifica la historia natural), BDCA, BDLA, corticoides inhalados en estadios avanzados, rehabilitación pulmonar y O₂ domiciliario si PaO₂ <55 mmHg.',
-    game: 'Primera casilla Pulmonar. Pagar $90 representa el alto costo sanitario del EPOC. Propiedad de nivel medio-alto.',
-    stat: 'El EPOC afecta a 480 millones de personas; es la 3ª causa de muerte mundial.'
+    icon: '🫁', name: 'EPOC', cat: 'Pulmonar · R-1', type: 'property',
+    price: 450, rent: 90,
+    edu: 'La Enfermedad Pulmonar Obstructiva Crónica se caracteriza por obstrucción irreversible del flujo aéreo (VEF1/CVF <0.70 post-broncodilatador). El tabaquismo causa más del 70% de los casos en países de altos ingresos. El manejo incluye abandono del tabaco, broncodilatadores, corticoides inhalados en estadios avanzados, rehabilitación pulmonar y oxígeno domiciliario.',
+    game: 'Primera propiedad Pulmonar. Precio $450.',
+    stat: 'La EPOC es la 3.ª causa de muerte a nivel mundial: 3.4 millones de muertes en 2023 (OMS).'
   },
   10: {
-    icon: '🏥', name: 'Visita al Hospital', cat: 'Casilla Especial',
-    action: 'free', amount: 'GRATIS',
-    edu: 'El hospital es el escenario de prácticas clínicas para el estudiante de enfermería. La visita sin ingreso refleja la importancia de la atención ambulatoria y la continuidad asistencial. Un sistema de salud eficiente prioriza la atención primaria para evitar hospitalizaciones innecesarias.',
-    game: 'Si caes aquí, simplemente estás de visita. No pagas nada. Solo vas a UCI si la carta o una penalidad te envían. La casilla de visita y la de UCI están en el mismo espacio físico, pero tienen diferente efecto.',
-    stat: 'El 75% de los ingresos hospitalarios por ECNT son prevenibles con manejo ambulatorio adecuado.'
+    icon: '🏗', name: 'Centro de Construcción', cat: 'Casilla Especial · Construcción', type: 'build',
+    edu: 'La infraestructura sanitaria —consultorios, clínicas y hospitales— es clave para atender a la población con ECNT. Cada nivel de construcción representa mayor capacidad resolutiva y más estudiantes de enfermería en formación práctica.',
+    game: 'Al caer aquí se abre el panel de Construcciones con un 15% de descuento por esta vez. Necesitas poseer TODAS las propiedades de una categoría para construir en ella. También puedes construir en cualquier momento de tu turno desde el botón "🏗 Construir" del panel lateral.',
+    stat: 'Cada Consultorio, Clínica y Hospital que construyes forma Estudiantes de Enfermería que te dan beneficios durante la partida.'
   },
   11: {
-    icon: '😮‍💨', name: 'Asma Bronquial', cat: 'Pulmonar · R-2',
-    action: 'pay', amount: '$70',
-    edu: 'El asma es una enfermedad inflamatoria crónica de la vía aérea con hiperreactividad bronquial reversible. El diagnóstico es clínico + espirométrico (reversibilidad ≥12% con broncodilatador). Clasificación GINA: controlada, parcialmente controlada, no controlada. El tratamiento escalonado incluye: SABA como rescate, corticoides inhalados de mantenimiento, LABA, antileucotrienos y terapia biológica (anti-IgE, anti-IL5) en asma grave.',
-    game: 'Casilla Pulmonar de precio moderado. Pagas $70 al dueño o al banco si no tiene propietario.',
-    stat: '339 millones de personas padecen asma; es la ECNT más frecuente en niños.'
+    icon: '😮‍💨', name: 'Control y Manejo del Asma', cat: 'Pulmonar · R-2', type: 'wellness',
+    earn: 55,
+    edu: 'El asma es una enfermedad inflamatoria crónica de la vía aérea con hiperreactividad bronquial reversible. El tratamiento escalonado (GINA 2024) incluye corticoides inhalados como base del control, con SABA solo de rescate. Cuando el asma está bien controlada, el paciente no presenta síntomas diurnos ni nocturnos y mantiene su función pulmonar.',
+    game: 'Casilla de Bienestar: cobras $55 por representar el control adecuado del asma mediante tratamiento inhalado correcto.',
+    stat: 'El asma afecta a más de 260 millones de personas en el mundo (GINA, 2024).'
   },
   12: {
-    icon: '📊', name: 'Glucemia y Control Metabólico', cat: 'Diabetes · D-2',
-    action: 'pay', amount: '$40',
-    edu: 'La glucemia es la concentración de glucosa en sangre. Valores de referencia: ayunas 70-99 mg/dL (normal), 100-125 mg/dL (prediabetes), ≥126 mg/dL (DM). La HbA1c refleja el control glucémico de los últimos 3 meses; objetivo terapéutico <7% en la mayoría de pacientes. La hiperglucemia sostenida produce glucosilación de proteínas tisulares causando las complicaciones crónicas de la DM.',
-    game: 'Casilla Diabetes de menor precio. Buena inversión inicial para la categoría. Con Hotel la rentabilidad es alta en relación a su costo de compra.',
-    stat: 'La HbA1c por encima de 9% triplica el riesgo de complicaciones microvasculares.'
+    icon: '📊', name: 'Automonitoreo y Control Glucémico', cat: 'Diabetes · D-2', type: 'wellness',
+    earn: 45,
+    edu: 'El automonitoreo de glucemia capilar y la HbA1c (objetivo <7% en la mayoría de pacientes) permiten ajustar el tratamiento y prevenir complicaciones. La educación en autocontrol es una intervención de enfermería de alto impacto en el manejo de la diabetes.',
+    game: 'Casilla de Bienestar: cobras $45 por mantener un buen control metabólico y automonitoreo constante.',
+    stat: 'Mantener la HbA1c cerca del objetivo terapéutico reduce significativamente el riesgo de complicaciones microvasculares (ADA, Standards of Care 2024).'
   },
   13: {
-    icon: '💚', name: 'Tarjeta Salud', cat: 'Casilla Especial',
+    icon: '💚', name: 'Tarjeta Salud', cat: 'Casilla Especial', type: 'special',
     action: 'earn', amount: '$50–$100',
-    edu: 'La adherencia terapéutica es un determinante clave del control de las ECNT. Solo el 50% de los pacientes con enfermedades crónicas cumple el tratamiento a largo plazo. Las intervenciones de enfermería para mejorar la adherencia incluyen: educación personalizada, simplificación del régimen, recordatorios y seguimiento telefónico.',
-    game: 'Segunda casilla Tarjeta Salud del tablero. Igual que sq2: cobra $50-$100. Acumula estas tarjetas para desbloquear construcciones.',
-    stat: 'Mejorar la adherencia terapéutica tendría mayor impacto que cualquier avance farmacológico.'
+    edu: 'La adherencia terapéutica es un determinante clave del control de las ECNT. Las intervenciones de enfermería para mejorar la adherencia incluyen: educación personalizada, simplificación del régimen y seguimiento.',
+    game: 'Segunda Tarjeta Salud del tablero. Cobra $50-$100 y con suerte suma un Estudiante a tu equipo.',
+    stat: 'Mejorar la adherencia terapéutica es una de las intervenciones más costo-efectivas en ECNT (OMS).'
   },
   14: {
-    icon: '🔬', name: 'Detección Temprana del Cáncer', cat: 'Oncología · O-1',
-    action: 'pay', amount: '$120',
-    edu: 'La detección temprana del cáncer (cribado/screening) reduce la mortalidad al identificar la enfermedad en estadios tratables. Programas clave: mamografía (ca. mama, mujeres 50-74a), Papanicolaou/VPH (ca. cérvix), colonoscopia (ca. colorrectal >50a), PSA (ca. próstata), esputo/TAC de baja dosis (ca. pulmón en fumadores). La sensibilidad y especificidad definen la calidad del test de cribado.',
-    game: 'Primera casilla Oncología. Precio medio-alto. El cáncer representado como propiedad cara simboliza su alto costo social y económico.',
-    stat: 'El diagnóstico en estadio I mejora la supervivencia a 5 años del cáncer de colon del 10% al 90%.'
+    icon: '🔬', name: 'Detección Temprana del Cáncer', cat: 'Oncología · O-1', type: 'wellness',
+    earn: 110,
+    edu: 'La detección temprana del cáncer (cribado/screening) reduce la mortalidad al identificar la enfermedad en estadios tratables. Programas clave: mamografía (mujeres 50-74a), Papanicolaou/VPH, colonoscopia (>50a), PSA y TAC de baja dosis en fumadores. Aproximadamente entre un 30% y un 50% de los cánceres se podrían prevenir o detectar a tiempo evitando factores de riesgo conocidos.',
+    game: 'Casilla de Bienestar de alto valor: cobras $110 por practicar la detección temprana.',
+    stat: 'El diagnóstico en estadio temprano mejora drásticamente la supervivencia en la mayoría de los cánceres (OMS/IARC, 2024).'
   },
   15: {
-    icon: '🛡️', name: 'Seguro Médico', cat: 'Casilla Especial · Beneficio',
+    icon: '🛡️', name: 'Seguro Médico', cat: 'Casilla Especial · Beneficio', type: 'special',
     action: 'earn', amount: '$100',
-    edu: 'Los sistemas de seguro médico son fundamentales para garantizar el acceso universal a la salud. La cobertura de medicamentos para ECNT reduce la mortalidad en poblaciones vulnerables. En Ecuador, el IESS y el MSP ofrecen cobertura para tratamiento de diabetes, HTA y cáncer. La enfermería comunitaria facilita el acceso a estos servicios.',
-    game: 'Casilla especial de beneficio: cobras $100 del banco siempre que caigas aquí. No tiene propietario y no se puede comprar. Representa el beneficio del sistema de salud.',
-    stat: 'El acceso a seguro médico reduce la mortalidad por ECNT hasta en un 40% en países de bajos ingresos.'
+    edu: 'Los sistemas de seguro médico son fundamentales para garantizar el acceso universal a la salud. La cobertura de medicamentos para ECNT reduce la mortalidad en poblaciones vulnerables. En Ecuador, el IESS y el MSP ofrecen cobertura para tratamiento de diabetes, HTA y cáncer.',
+    game: 'Casilla especial de beneficio: cobras $100 del banco siempre que caigas aquí. No se puede comprar.',
+    stat: 'El acceso a servicios de salud esenciales reduce la mortalidad prematura por ECNT (OMS, Cobertura Universal de Salud).'
   },
   16: {
-    icon: '🏃', name: 'Actividad Física y Ejercicio', cat: 'Cardiología · C-3',
-    action: 'pay', amount: '$80',
-    edu: 'La OMS recomienda ≥150 min/semana de actividad física moderada o ≥75 min de intensa para adultos. El ejercicio aeróbico reduce la PA sistólica 5-8 mmHg, los triglicéridos 20-30% y la glucemia en ayunas 10-15 mg/dL. Los MET (equivalentes metabólicos) cuantifican la intensidad: caminar rápido = 3.5 MET, correr = 8 MET. En pacientes post-IAM, la rehabilitación cardíaca con ejercicio reduce la mortalidad 26%.',
-    game: 'Casilla Cardiología de precio moderado. Curiosamente, el ejercicio "cuesta" en el juego pero protege la salud. Con todas las propiedades Cardio construidas, la renta aquí es muy alta.',
-    stat: 'La inactividad física causa 3.2 millones de muertes anuales y cuesta al sistema sanitario billones.'
+    icon: '🏃', name: 'Actividad Física y Ejercicio', cat: 'Cardiología · C-3', type: 'wellness',
+    earn: 70,
+    edu: 'La OMS recomienda ≥150 min/semana de actividad física moderada o ≥75 min de intensa para adultos. El ejercicio aeróbico reduce la presión arterial, mejora el perfil lipídico y la sensibilidad a la insulina. En pacientes post-IAM, la rehabilitación cardíaca con ejercicio reduce significativamente la mortalidad.',
+    game: 'Casilla de Bienestar: cobras $70 por cumplir con la actividad física recomendada.',
+    stat: 'La inactividad física es uno de los principales factores de riesgo conductuales de mortalidad global (OMS, 2022).'
   },
   17: {
-    icon: '🥑', name: 'Dieta Saludable', cat: 'Nutrición · N-3',
-    action: 'pay', amount: '$60',
-    edu: 'La dieta DASH (Dietary Approaches to Stop Hypertension) reduce la PA sistólica hasta 11 mmHg. Rica en frutas, verduras, lácteos bajos en grasa, granos integrales; baja en sodio (<2300 mg/día), grasas saturadas y azúcares añadidos. Los AGO-3 (pescado azul, linaza, nueces) reducen triglicéridos 20-30% y tienen efecto antiinflamatorio. La reducción de sodio disminuye el riesgo de ACV en 23%.',
-    game: 'Casilla Nutrición de precio medio. Pagas $60 al dueño. Combinarla con las otras propiedades Nutrición potencia mucho las rentas.',
-    stat: 'La dieta mediterránea reduce el riesgo de diabetes tipo 2 en un 23% y de enfermedades cardiovasculares en un 30%.'
+    icon: '🥑', name: 'Dieta Saludable (DASH)', cat: 'Nutrición · N-3', type: 'wellness',
+    earn: 65,
+    edu: 'La dieta DASH (Dietary Approaches to Stop Hypertension) reduce la presión arterial sistólica de forma clínicamente relevante. Es rica en frutas, verduras, lácteos bajos en grasa y granos integrales; baja en sodio, grasas saturadas y azúcares añadidos.',
+    game: 'Casilla de Bienestar: cobras $65 por seguir un patrón alimentario cardiosaludable.',
+    stat: 'La dieta DASH reduce la presión arterial sistólica de forma comparable a algunos fármacos antihipertensivos (NIH/NHLBI).'
   },
   18: {
-    icon: '⚠️', name: 'Tarjeta Riesgo', cat: 'Casilla Especial',
+    icon: '⚠️', name: 'Tarjeta Riesgo', cat: 'Casilla Especial', type: 'special',
     action: 'pay', amount: '$50–$100',
-    edu: 'El estrés crónico activa el eje hipotalámico-hipofisario-adrenal elevando cortisol, lo que aumenta la PA, la glucemia y la inflamación sistémica. El síndrome de burnout se asocia a mayor incidencia de HTA, DM2 y depresión. Técnicas de manejo: mindfulness, ejercicio, técnicas de respiración y apoyo psicosocial son intervenciones de enfermería basadas en evidencia.',
-    game: 'Segunda Tarjeta Riesgo del tablero. Penalidad $50-$100. Recuerda acumular tus tarjetas: 3 en un turno = turno perdido adicional; 5 = vas a UCI.',
-    stat: 'El estrés crónico aumenta en un 27% el riesgo de infarto de miocardio.'
+    edu: 'El estrés crónico activa el eje hipotalámico-hipofisario-adrenal elevando cortisol, lo que aumenta la PA, la glucemia y la inflamación sistémica. Técnicas de manejo: mindfulness, ejercicio y apoyo psicosocial son intervenciones de enfermería basadas en evidencia.',
+    game: 'Segunda Tarjeta Riesgo del tablero. Paga $50-$100. Recuerda: 3 en un turno = pierdes turno; 5 = vas a UCI.',
+    stat: 'El estrés crónico se asocia a mayor riesgo cardiovascular (American Heart Association, 2021).'
   },
   19: {
-    icon: '💊', name: 'Tratamiento Oncológico', cat: 'Oncología · O-2',
-    action: 'pay', amount: '$300',
-    edu: 'El tratamiento del cáncer incluye cirugía, radioterapia, quimioterapia, terapia dirigida e inmunoterapia. La quimioterapia afecta células de rápida división causando efectos adversos: mucositis, neutropenia febril, náuseas, alopecia y neuropatía periférica. El rol de enfermería oncológica incluye: administración segura de citostáticos, manejo de vías centrales, control de efectos adversos y cuidado paliativo. La escala ECOG valora la capacidad funcional del paciente oncológico.',
-    game: 'Casilla Oncología de máximo precio ($300). La más cara de las propiedades de la columna izquierda. Su alto costo refleja el precio real del tratamiento oncológico.',
-    stat: 'El costo promedio del tratamiento de cáncer avanzado supera los $150,000 USD por paciente al año en EE.UU.'
+    icon: '💊', name: 'Tratamiento Oncológico', cat: 'Oncología · O-2', type: 'property',
+    price: 1500, rent: 300,
+    edu: 'El tratamiento del cáncer incluye cirugía, radioterapia, quimioterapia, terapia dirigida e inmunoterapia. El rol de enfermería oncológica incluye: administración segura de citostáticos, manejo de vías centrales, control de efectos adversos y cuidado paliativo.',
+    game: 'La propiedad más cara del tablero ($1,500). Su alto costo refleja el precio real del tratamiento oncológico prolongado.',
+    stat: 'El cáncer causa alrededor de 10 millones de muertes al año en el mundo (OMS, 2024).'
   },
   20: {
-    icon: '🚨', name: 'UCI — Unidad de Cuidados Intensivos', cat: 'Casilla Especial',
+    icon: '🚨', name: 'UCI — Unidad de Cuidados Intensivos', cat: 'Casilla Especial', type: 'special',
     action: 'lose', amount: '2 TURNOS',
-    edu: 'La UCI es la unidad de mayor complejidad hospitalaria. Los criterios de ingreso incluyen: fallo multiorgánico, shock séptico, IAM complicado, ACV hemorrágico, cetoacidosis diabética grave. Las escalas de gravedad más usadas son APACHE II, SOFA y Glasgow. El rol de enfermería en UCI incluye: monitorización continua (FC, PA, SatO₂, capnografía), manejo de ventilación mecánica, cuidados de CVC y prevención de infecciones asociadas a dispositivos (NAVM, bacteriemia por CVC).',
-    game: 'La casilla más temida. Pierdes 2 turnos o pagas $150 para salir en tu próximo turno. Si sacas dobles en tu turno en UCI, puedes salir gratis. Una Tarjeta Salud especial también permite salir.',
-    stat: 'La mortalidad en UCI oscila entre 10% y 50% según el diagnóstico; el manejo de enfermería reduce las complicaciones hasta un 30%.'
+    edu: 'La UCI es la unidad de mayor complejidad hospitalaria. Los criterios de ingreso incluyen: fallo multiorgánico, shock séptico, IAM complicado, ACV hemorrágico, cetoacidosis diabética grave. El rol de enfermería en UCI incluye: monitorización continua, manejo de ventilación mecánica y prevención de infecciones asociadas a dispositivos.',
+    game: 'La casilla más temida. Pierdes 2 turnos o pagas $150 para salir. Si tienes 5+ Estudiantes, puedes usarlos para reducir tu estadía a solo 1 turno.',
+    stat: 'La mortalidad en UCI varía ampliamente según el diagnóstico y la calidad del cuidado brindado (Society of Critical Care Medicine).'
   },
   21: {
-    icon: '🥕', name: 'Vitaminas y Micronutrientes', cat: 'Nutrición · N-4',
-    action: 'pay', amount: '$45',
-    edu: 'Las vitaminas son micronutrientes esenciales que el organismo no puede sintetizar en cantidades suficientes. Vitaminas liposolubles (A, D, E, K) se almacenan en tejido adiposo; hidrosolubles (C, complejo B) no se almacenan y deben ingerirse diariamente. La vitamina D es clave en metabolismo óseo, función inmune y prevención de enfermedades crónicas. La deficiencia de vitamina B12 causa anemia megaloblástica y neuropatía. En el adulto mayor, la suplementación con calcio+vitamina D reduce fracturas un 15%.',
-    game: 'Casilla Nutrición en la fila superior. Precio medio. Al poseer N-3, N-4 y N-5 juntos, la renta se triplica.',
-    stat: 'El 42% de los adultos en EE.UU. tiene deficiencia de vitamina D; en Ecuador se estima un 60% en zonas andinas.'
+    icon: '🥕', name: 'Deficiencia de Micronutrientes', cat: 'Nutrición · N-4', type: 'property',
+    price: 225, rent: 45,
+    edu: 'Las vitaminas son micronutrientes esenciales. La deficiencia de vitamina D afecta a una proporción muy alta de la población mundial, especialmente en zonas de menor exposición solar y en el adulto mayor. La deficiencia de vitamina B12 causa anemia megaloblástica y neuropatía. En el adulto mayor, la suplementación con calcio+vitamina D reduce el riesgo de fracturas.',
+    game: 'Propiedad de Nutrición. Precio $225. Representa el costo de tratar carencias nutricionales no corregidas a tiempo.',
+    stat: 'La deficiencia de vitamina D es un problema de salud pública extendido a nivel global (NIH Office of Dietary Supplements, 2024).'
   },
   22: {
-    icon: '🧬', name: 'Prevención del Cáncer', cat: 'Oncología · O-3',
-    action: 'pay', amount: '$100',
-    edu: 'La prevención primaria del cáncer aborda los factores de riesgo modificables: tabaquismo (30% de todos los cánceres), alcohol (12%), obesidad (5-10%), infecciones (VPH, H. pylori, VHB/VHC), radiación UV y contaminantes ambientales. La prevención secundaria incluye el cribado. Las vacunas contra VPH (Gardasil 9) previenen el 90% de los cánceres de cérvix. El tamoxifeno reduce el riesgo de ca. mama hormonosensible en mujeres de alto riesgo.',
-    game: 'Casilla Oncología de precio moderado. Buena inversión para completar el grupo O y empezar a construir.',
-    stat: 'La vacunación contra VPH podría eliminar el cáncer de cérvix como problema de salud pública antes de 2100.'
+    icon: '🧬', name: 'Prevención del Cáncer', cat: 'Oncología · O-3', type: 'wellness',
+    earn: 95,
+    edu: 'La prevención primaria del cáncer aborda los factores de riesgo modificables: tabaquismo, alcohol, obesidad, infecciones (VPH, H. pylori), radiación UV. Las vacunas contra el VPH previenen la gran mayoría de los cánceres de cérvix relacionados con el virus.',
+    game: 'Casilla de Bienestar: cobras $95 por adoptar conductas de prevención oncológica.',
+    stat: 'Entre un 30% y un 50% de los casos de cáncer se podrían prevenir evitando factores de riesgo modificables (OMS/IARC).'
   },
   23: {
-    icon: '🧾', name: 'Examen de Salud Preventivo', cat: 'Casilla Especial · Pago Fijo',
-    action: 'pay', amount: '$25',
-    edu: 'El examen de salud preventivo o chequeo médico anual permite detectar ECNT en fase subclínica. Incluye: anamnesis, examen físico completo, glucemia en ayunas, perfil lipídico, función renal y hepática, hemograma, orina completa, ECG en >40 años y valoración del riesgo cardiovascular. En enfermería, el triaje y la captación activa de pacientes asintomáticos con factores de riesgo son intervenciones de alto impacto poblacional.',
-    game: 'Pago fijo de $25 al banco. No tiene propietario. El costo más bajo del tablero, simbolizando que la prevención es barata comparada con el tratamiento.',
-    stat: 'Cada $1 invertido en prevención ahorra $14 en costos de tratamiento de ECNT.'
+    icon: '❓', name: 'Pregunta ECNT #2', cat: 'Casilla de Pregunta · Diabetes', type: 'trivia',
+    edu: 'Refuerza tus conocimientos sobre la epidemiología de la diabetes, una de las ECNT de mayor crecimiento a nivel mundial.',
+    game: 'Responde la pregunta de opción múltiple. Acertar = ganas dinero. Fallar = pagas. Puedes usar Estudiantes para pedir ayuda.',
+    stat: '¡Pon a prueba tus conocimientos sobre ECNT!'
   },
   24: {
-    icon: '💉', name: 'Insulinoterapia', cat: 'Diabetes · D-3',
-    action: 'pay', amount: '$80',
-    edu: 'La insulina es la hormona anabólica principal, producida por las células β del páncreas. Tipos de insulina: ultrarrápida (lispro, aspart, glulisina, acción en 15 min), rápida (regular, 30-60 min), intermedia (NPH, 2-4h) y larga duración (glargina, detemir, degludec, acción 20-42h). El esquema basal-bolo imita la secreción fisiológica. La hipoglucemia (<70 mg/dL) es la complicación aguda más frecuente; el protocolo de enfermería es: regla 15-15 (15g hidratos de carbono, control a 15 min).',
-    game: 'Casilla Diabetes de precio medio. Requería tratamiento en la vida real; en el juego, el dueño "trata" a quien cae y cobra la "consulta".',
-    stat: 'El 25% de los diabéticos tipo 2 requerirán insulina en algún momento de su evolución.'
+    icon: '💉', name: 'Insulinoterapia', cat: 'Diabetes · D-3', type: 'property',
+    price: 400, rent: 80,
+    edu: 'La insulina es la hormona anabólica principal, producida por las células β del páncreas. Tipos: ultrarrápida, rápida, intermedia (NPH) y de acción prolongada. El esquema basal-bolo imita la secreción fisiológica. La hipoglucemia (<70 mg/dL) es la complicación aguda más frecuente; el protocolo de enfermería es la "regla 15-15".',
+    game: 'Propiedad de Diabetes de precio medio. $400.',
+    stat: 'Una proporción importante de las personas con diabetes tipo 2 requerirá insulina en algún momento de su evolución (ADA, 2024).'
   },
   25: {
-    icon: '🫀', name: 'Dislipidemia y Colesterol', cat: 'Cardiología · C-4',
-    action: 'pay', amount: '$90',
-    edu: 'La dislipidemia se define como la alteración patológica de los lípidos plasmáticos. Valores ideales: LDL <100 mg/dL (muy alto riesgo <70 mg/dL), HDL >40 mg/dL (H) y >50 mg/dL (M), TG <150 mg/dL, CT <200 mg/dL. Las estatinas son el fármaco de elección; reducen LDL 30-50% y la mortalidad cardiovascular 20-35%. El índice aterogénico (CT/HDL) >5 indica alto riesgo. La hipertrigliceridemia severa (>1000 mg/dL) puede causar pancreatitis aguda.',
-    game: 'Cuarta propiedad Cardio de precio alto. Tener las 5 Cardio juntas es muy rentable. Si el dueño tiene Hospital aquí, la renta supera los $450.',
-    stat: 'El tratamiento con estatinas reduce el riesgo de primer infarto en un 36% en pacientes de alto riesgo.'
+    icon: '🫀', name: 'Control de Colesterol y Dieta Cardiosaludable', cat: 'Cardiología · C-4', type: 'wellness',
+    earn: 90,
+    edu: 'El control lipídico (LDL <100 mg/dL, o <70 mg/dL en muy alto riesgo) mediante dieta baja en grasas saturadas, ejercicio y, si es necesario, estatinas, reduce de forma importante el riesgo de eventos cardiovasculares. Las estatinas reducen la mortalidad cardiovascular y el riesgo de un primer infarto en pacientes de alto riesgo.',
+    game: 'Casilla de Bienestar: cobras $90 por mantener tu perfil lipídico bajo control.',
+    stat: 'El tratamiento con estatinas reduce sustancialmente el riesgo de un primer infarto en pacientes de alto riesgo (Cholesterol Treatment Trialists\' Collaboration, Lancet).'
   },
   26: {
-    icon: '💚', name: 'Tarjeta Salud', cat: 'Casilla Especial',
+    icon: '💚', name: 'Tarjeta Salud', cat: 'Casilla Especial', type: 'special',
     action: 'earn', amount: '$50–$100',
-    edu: 'La educación terapéutica al paciente con ECNT es una intervención NIC de alta evidencia. Incluye: automanejo de la enfermedad, reconocimiento de signos de alarma, uso correcto de inhaladores, automonitorización glucémica, cuidado de los pies en el diabético y adherencia al tratamiento. El empoderamiento del paciente reduce hospitalizaciones un 20-30%.',
-    game: 'Tercera Tarjeta Salud del tablero (fila superior). Cobra $50-$100. Muy útil si llevas pocas tarjetas Salud acumuladas.',
-    stat: 'Los programas de educación a pacientes crónicos reducen las visitas a urgencias en un 25%.'
+    edu: 'La educación terapéutica al paciente con ECNT es una intervención de alta evidencia. Incluye: automanejo, reconocimiento de signos de alarma, uso correcto de inhaladores, automonitorización glucémica y cuidado de los pies en el diabético.',
+    game: 'Tercera Tarjeta Salud del tablero. Cobra $50-$100 y posiblemente ganes un Estudiante.',
+    stat: 'La educación al paciente reduce las visitas a urgencias y las hospitalizaciones evitables (OMS).'
   },
   27: {
-    icon: '🚬', name: 'Tabaquismo y EPOC', cat: 'Pulmonar · R-3',
-    action: 'pay', amount: '$85',
-    edu: 'El tabaco contiene más de 7000 sustancias tóxicas; la nicotina genera dependencia activando receptores nicotínicos en el SNC. El humo causa inflamación crónica en la vía aérea → destrucción de alvéolos (enfisema) y fibrosis bronquial (bronquitis crónica). El índice paquetes/año (IPA = cigarrillos/día ÷ 20 × años fumando) cuantifica la exposición: IPA >10 = riesgo significativo de EPOC. La vareniclina (Champix) es el tratamiento más eficaz para dejar de fumar (tasa de éxito 44% a 1 año).',
-    game: 'Casilla Pulmonar de precio moderado-alto. El tabaquismo "destruye" los pulmones y en el juego destroza tu economía si el dueño tiene edificaciones.',
-    stat: 'El tabaco mata a 8 millones de personas al año; el 20% de los fumadores desarrollará EPOC.'
+    icon: '🚭', name: 'Cesación del Tabaquismo', cat: 'Pulmonar · R-3', type: 'wellness',
+    earn: 85,
+    edu: 'Dejar de fumar es la intervención más costo-efectiva para reducir el riesgo de EPOC, cáncer de pulmón y enfermedad cardiovascular. El riesgo cardiovascular disminuye de forma importante al año de abstinencia. La vareniclina y el reemplazo de nicotina son tratamientos de primera línea con buena evidencia de eficacia.',
+    game: 'Casilla de Bienestar: cobras $85 por dejar de fumar, una de las decisiones más protectoras que existen.',
+    stat: 'El tabaco mata a más de 8 millones de personas al año en el mundo (OMS, 2023).'
   },
   28: {
-    icon: '🔭', name: 'Diagnóstico Oncológico', cat: 'Oncología · O-4',
-    action: 'pay', amount: '$180',
-    edu: 'El diagnóstico definitivo de cáncer requiere confirmación histopatológica mediante biopsia. El estadiaje TNM (Tumor, Nódulos, Metástasis) determina la extensión y el pronóstico. Las técnicas diagnósticas incluyen: TAC, PET-TAC (detecta metástasis ≥8mm), RMN, gammagrafía ósea y biopsia líquida (ctDNA en sangre). Los marcadores tumorales (PSA, CA-125, CEA, AFP) apoyan el diagnóstico y el seguimiento, no son diagnósticos solos. El rol de enfermería en oncología diagnóstica incluye la preparación del paciente y la gestión de muestras.',
-    game: 'Segunda propiedad más cara de Oncología. Precio $180. Si el dueño tiene Hospital en O, la renta puede llegar a $900.',
-    stat: 'El PET-TAC detecta metástasis en el 25% de los casos considerados localizados por TAC convencional.'
+    icon: '🔭', name: 'Diagnóstico Oncológico', cat: 'Oncología · O-4', type: 'property',
+    price: 900, rent: 180,
+    edu: 'El diagnóstico definitivo de cáncer requiere confirmación histopatológica mediante biopsia. El estadiaje TNM (Tumor, Nódulos, Metástasis) determina la extensión y el pronóstico. Las técnicas diagnósticas incluyen TAC, PET-TAC, RMN y biopsia líquida.',
+    game: 'Propiedad de Oncología. Precio $900.',
+    stat: 'El diagnóstico temprano y preciso mejora significativamente el pronóstico oncológico (OMS/IARC, 2024).'
   },
   29: {
-    icon: '⚠️', name: 'Tarjeta Riesgo', cat: 'Casilla Especial',
+    icon: '⚠️', name: 'Tarjeta Riesgo', cat: 'Casilla Especial', type: 'special',
     action: 'pay', amount: '$50–$100',
-    edu: 'El consumo de alcohol aumenta el riesgo de: cirrosis hepática, cardiomiopatía alcohólica, pancreatitis crónica, neuropatía y 7 tipos de cáncer (boca, faringe, laringe, esófago, hígado, colorrectal y mama). No existe cantidad segura de alcohol respecto al riesgo de cáncer. En el contexto clínico, el cuestionario AUDIT detecta consumo perjudicial y dependencia alcohólica.',
-    game: 'Tercera Tarjeta Riesgo del tablero (fila superior). Aplica la misma regla: acumula 3 y pierdes un turno extra; 5 y vas a UCI.',
-    stat: 'El alcohol es responsable del 5.1% de la carga mundial de enfermedades y lesiones.'
+    edu: 'El consumo de alcohol aumenta el riesgo de cirrosis hepática, cardiomiopatía, pancreatitis crónica y varios tipos de cáncer. No existe un nivel de consumo "seguro" respecto al riesgo de cáncer. El cuestionario AUDIT ayuda a detectar consumo perjudicial.',
+    game: 'Tercera Tarjeta Riesgo del tablero. Aplica la misma regla de acumulación.',
+    stat: 'El uso nocivo del alcohol contribuye de forma relevante a la carga mundial de enfermedad (OMS, Global Status Report on Alcohol).'
   },
   30: {
-    icon: '🛡', name: 'Zona Libre', cat: 'Casilla Especial',
+    icon: '🛡', name: 'Zona Libre', cat: 'Casilla Especial', type: 'special',
     action: 'free', amount: 'DESCANSAS',
-    edu: 'La Zona Libre representa la resiliencia en salud: la capacidad de recuperarse de situaciones adversas. En medicina preventiva, la "zona libre" equivale a los períodos de remisión o control estable de una ECNT, donde el paciente no genera gastos sanitarios agudos. La adherencia al tratamiento es lo que mantiene a los pacientes en su propia zona libre.',
-    game: 'Descansas sin pagar nada. Si caes exactamente aquí (no enviado por tarjeta), solo descansas. Esta casilla actúa como refugio temporal en el tablero.',
-    stat: 'El 60% de los pacientes con DM2 bien controlados permanecen libres de complicaciones por más de 10 años.'
+    edu: 'La Zona Libre representa la resiliencia en salud: la capacidad de recuperarse de situaciones adversas. En medicina preventiva equivale a los períodos de remisión o control estable de una ECNT.',
+    game: 'Descansas sin pagar nada si caes exactamente aquí.',
+    stat: 'La adherencia sostenida al tratamiento es lo que mantiene a un paciente crónico en su propia "zona libre" de complicaciones.'
   },
   31: {
-    icon: '🧬', name: 'Resistencia a la Insulina', cat: 'Diabetes · D-4',
-    action: 'pay', amount: '$90',
-    edu: 'La resistencia a la insulina (RI) es el paso fisiopatológico previo a la DM2. El tejido adiposo visceral produce adipocinas proinflamatorias (TNF-α, IL-6, resistina) que interfieren con la señalización de insulina en músculo e hígado. El HOMA-IR (glucosa en ayunas × insulina / 405) evalúa la RI; valor normal <2.5. El síndrome metabólico (obesidad central + HTA + dislipidemia + hiperglucemia) multiplica ×5 el riesgo de DM2. Intervención: reducción del 7% del peso corporal previene el 58% de los casos de DM2.',
-    game: 'Cuarta casilla Diabetes. Precio $90. Al poseer D-1 a D-4, el grupo completo permite construir y las rentas se disparan.',
-    stat: 'El 88 millones de adultos en EE.UU. tienen prediabetes; el 70% desarrollará DM2 sin intervención.'
+    icon: '🧬', name: 'Prevención de la Resistencia a la Insulina', cat: 'Diabetes · D-4', type: 'wellness',
+    earn: 70,
+    edu: 'La resistencia a la insulina (RI) es el paso fisiopatológico previo a la DM2. Perder alrededor del 7% del peso corporal mediante dieta y ejercicio reduce marcadamente el riesgo de progresar a diabetes tipo 2 en personas con prediabetes, según el histórico Diabetes Prevention Program.',
+    game: 'Casilla de Bienestar: cobras $70 por prevenir activamente la resistencia a la insulina con estilo de vida saludable.',
+    stat: 'Una reducción de peso del 7% junto con actividad física redujo en un 58% la incidencia de diabetes tipo 2 en el estudio Diabetes Prevention Program (NEJM, 2002).'
   },
   32: {
-    icon: '🍔', name: 'Alimentos Ultraprocesados', cat: 'Nutrición · N-5',
-    action: 'pay', amount: '$55',
-    edu: 'La clasificación NOVA categoriza los alimentos por grado de procesamiento industrial. Los ultraprocesados (Grupo 4) contienen aditivos para maximizar palatabilidad y vida útil: emulsionantes, colorantes, saborizantes artificiales, edulcorantes y conservantes. Su consumo elevado se asocia a: obesidad, DM2, HTA, dislipidemia, síndrome metabólico y mayor riesgo de cáncer colorrectal. Contienen alta densidad energética, sodio (>600mg/100g), azúcares añadidos y grasas trans.',
-    game: 'Quinta propiedad Nutrición. Precio $55. Completar todas las N desbloquea el grupo para construir y maximizar rentas.',
-    stat: 'Los países con mayor consumo de ultraprocesados tienen tasas de obesidad 3 veces mayores que los de menor consumo.'
+    icon: '🍔', name: 'Alimentos Ultraprocesados', cat: 'Nutrición · N-5', type: 'property',
+    price: 275, rent: 55,
+    edu: 'La clasificación NOVA categoriza los alimentos por grado de procesamiento industrial. Los ultraprocesados contienen aditivos para maximizar palatabilidad y vida útil. Su consumo elevado se asocia a obesidad, DM2, HTA, dislipidemia y síndrome metabólico.',
+    game: 'Propiedad de Nutrición. Precio $275.',
+    stat: 'Una mayor proporción de ultraprocesados en la dieta se asocia consistentemente con mayor riesgo de obesidad y ECNT (OPS/OMS, 2023).'
   },
   33: {
-    icon: '🧪', name: 'Análisis Clínicos de Laboratorio', cat: 'Casilla Especial · Pago Fijo',
-    action: 'pay', amount: '$90',
-    edu: 'El laboratorio clínico es la herramienta diagnóstica más utilizada en medicina. Parámetros clave en ECNT: HbA1c (control DM), perfil lipídico (riesgo CV), creatinina + TFG estimada (función renal), microalbuminuria (daño renal precoz en DM/HTA), PCR-us (inflamación sistémica), BNP/NT-proBNP (insuficiencia cardíaca). El pre-analítico (ayunas, hemólisis, transporte) afecta hasta el 70% de los errores de laboratorio.',
-    game: 'Pago fijo de $90 al banco. Más caro que la Consulta (sq5) y el Examen (sq23), reflejando que los análisis especializados tienen mayor costo. No tiene propietario.',
-    stat: 'El laboratorio clínico interviene en el 70% de las decisiones diagnósticas y terapéuticas en medicina.'
+    icon: '❓', name: 'Pregunta ECNT #3', cat: 'Casilla de Pregunta · Pulmonar', type: 'trivia',
+    edu: 'Refuerza tus conocimientos sobre enfermedades respiratorias crónicas y su relación con el tabaquismo.',
+    game: 'Responde correctamente para ganar dinero del banco. Si fallas, pagas una penalidad.',
+    stat: '¡Pon a prueba tus conocimientos sobre ECNT!'
   },
   34: {
-    icon: '🧠', name: 'Accidente Cerebrovascular (ACV)', cat: 'Cardiología · C-5',
-    action: 'pay', amount: '$180',
-    edu: 'El ACV es la segunda causa de muerte y primera de discapacidad en el mundo. Tipos: isquémico (85%, tromboembólico) y hemorrágico (15%). La escala NIHSS cuantifica el déficit neurológico. La escala FAST (Face, Arms, Speech, Time) permite reconocimiento precoz. En isquémico, la trombólisis IV con rt-PA está indicada <4.5h del inicio; la trombectomía mecánica hasta 24h. Complicaciones de enfermería: prevención de aspiración, úlceras por presión, TVP y contracturas. La rehabilitación multidisciplinar debe iniciarse <24-48h del ingreso.',
-    game: 'Casilla más cara de Cardiología ($180). Junto con C-2 (Infarto) son las dos propiedades más costosas del grupo rojo.',
-    stat: 'Cada 40 segundos ocurre un ACV en EE.UU.; el 25% de los supervivientes tendrá un segundo evento en 5 años.'
+    icon: '🧠', name: 'Accidente Cerebrovascular (ACV)', cat: 'Cardiología · C-5', type: 'property',
+    price: 900, rent: 180,
+    edu: 'El ACV es la segunda causa de muerte y una de las principales causas de discapacidad en el mundo. Tipos: isquémico (~85%) y hemorrágico (~15%). La escala FAST (Face, Arms, Speech, Time) permite el reconocimiento precoz. En isquémico, la trombólisis IV está indicada dentro de las primeras horas del inicio de síntomas.',
+    game: 'Propiedad más cara de Cardiología junto con el Infarto. Precio $900.',
+    stat: 'El ACV es una de las principales causas de muerte y discapacidad a nivel mundial (OMS, World Stroke Organization, 2022).'
   },
   35: {
-    icon: '💚', name: 'Tarjeta Salud', cat: 'Casilla Especial',
+    icon: '💚', name: 'Tarjeta Salud', cat: 'Casilla Especial', type: 'special',
     action: 'earn', amount: '$50–$100',
-    edu: 'La actividad física regular modifica favorablemente todos los factores de riesgo cardiovascular: reduce la PA 5-7 mmHg, aumenta el HDL 5-10%, reduce los TG 20-30%, mejora la sensibilidad a insulina y contribuye al control del peso. El ejercicio de resistencia (pesas) mejora la masa muscular y el metabolismo basal, fundamental en el manejo de la obesidad y la diabetes tipo 2.',
-    game: 'Cuarta Tarjeta Salud del tablero (columna derecha). Sigue acumulando para llegar a 3 y construir Consultorio.',
-    stat: '150 minutos semanales de ejercicio moderado reducen la mortalidad por cualquier causa en un 33%.'
+    edu: 'La actividad física regular modifica favorablemente todos los factores de riesgo cardiovascular. El ejercicio de resistencia mejora la masa muscular y el metabolismo basal, fundamental en el manejo de la obesidad y la diabetes tipo 2.',
+    game: 'Cuarta Tarjeta Salud del tablero. Cobra $50-$100 y posiblemente sumes un Estudiante.',
+    stat: 'La actividad física regular reduce la mortalidad por cualquier causa (OMS, Guidelines on Physical Activity 2020).'
   },
   36: {
-    icon: '🌡️', name: 'Fibrosis Pulmonar Idiopática', cat: 'Pulmonar · R-4',
-    action: 'pay', amount: '$180',
-    edu: 'La fibrosis pulmonar idiopática (FPI) es una enfermedad progresiva e irreversible del parénquima pulmonar. Se caracteriza por la acumulación anormal de tejido fibroso que destruye la arquitectura alveolar. La TC de alta resolución muestra patrón UIP (usual interstitial pneumonia). La espirometría revela patrón restrictivo (CVF <80% y VEF1/CVF >0.70). El pronóstico es malo: mediana de supervivencia 3-5 años. Los antifibróticos (pirfenidona, nintedanib) reducen la progresión. El trasplante pulmonar es la única opción curativa.',
-    game: 'Casilla Pulmonar más cara ($180). Equivale al Hospital en tratamiento. Es la R-4, la más cara del grupo respiratorio.',
-    stat: 'La FPI tiene una supervivencia media de 3-5 años; peor que muchos tipos de cáncer.'
+    icon: '🌡️', name: 'Fibrosis Pulmonar Idiopática', cat: 'Pulmonar · R-4', type: 'property',
+    price: 900, rent: 180,
+    edu: 'La fibrosis pulmonar idiopática (FPI) es una enfermedad progresiva e irreversible del parénquima pulmonar. La TC de alta resolución muestra patrón UIP. Los antifibróticos (pirfenidona, nintedanib) reducen la progresión. El trasplante pulmonar es la única opción curativa.',
+    game: 'Propiedad Pulmonar más cara. Precio $900.',
+    stat: 'La FPI tiene un pronóstico reservado, con una supervivencia media inferior a la de muchos tipos de cáncer (American Thoracic Society).'
   },
   37: {
-    icon: '🧫', name: 'Biología Molecular del Cáncer', cat: 'Oncología · O-5',
-    action: 'pay', amount: '$180',
-    edu: 'El cáncer es una enfermedad genética adquirida. Los oncogenes (RAS, HER2, BRAF) aceleran la proliferación celular cuando se activan. Los genes supresores de tumores (p53, BRCA1/2, RB) frenan el ciclo celular cuando funcionan; su pérdida descontrola la proliferación. Las terapias dirigidas (imatinib en LMC con BCR-ABL, trastuzumab en HER2+, vemurafenib en BRAF V600E) atacan específicamente estas alteraciones moleculares con menor toxicidad que la quimioterapia convencional.',
-    game: 'Quinta y última casilla Oncología ($180). Junto con O-2 y O-4 son las más caras del grupo. Poseerlas todas es devastador para los rivales.',
-    stat: 'Las terapias dirigidas han aumentado la supervivencia media del melanoma metastásico de 9 meses a más de 5 años.'
+    icon: '🧫', name: 'Biología Molecular del Cáncer y Terapias Dirigidas', cat: 'Oncología · O-5', type: 'property',
+    price: 900, rent: 180,
+    edu: 'El cáncer es una enfermedad genética adquirida. Los oncogenes (RAS, HER2, BRAF) aceleran la proliferación cuando se activan; los genes supresores de tumores (p53, BRCA1/2) la frenan cuando funcionan. Las terapias dirigidas (trastuzumab en HER2+, vemurafenib en BRAF V600E) atacan específicamente estas alteraciones con menor toxicidad que la quimioterapia convencional.',
+    game: 'Última propiedad de Oncología. Precio $900. Junto con O-2 y O-4 forman el grupo más caro del tablero.',
+    stat: 'Las terapias dirigidas han mejorado sustancialmente la supervivencia en varios cánceres con alteraciones moleculares específicas (National Cancer Institute).'
   },
   38: {
-    icon: '⚠️', name: 'Tarjeta Riesgo', cat: 'Casilla Especial',
+    icon: '⚠️', name: 'Tarjeta Riesgo', cat: 'Casilla Especial', type: 'special',
     action: 'pay', amount: '$50–$100',
-    edu: 'La obesidad abdominal o visceral (CC >88cm en mujeres, >102cm en hombres) es más peligrosa que la subcutánea. El tejido adiposo visceral es metabólicamente activo: produce angiotensinógeno (→HTA), VLDL (→dislipidemia), PCR y fibrinógeno (→inflamación y trombosis) e inhibidor del activador de plasminógeno (→riesgo trombótico). El síndrome metabólico con obesidad central multiplica por 5 el riesgo cardiovascular.',
-    game: 'Cuarta Tarjeta Riesgo del tablero (columna derecha). Mismas reglas de acumulación: cuidado con llegar a 5.',
-    stat: 'La obesidad abdominal aumenta el riesgo de síndrome metabólico en un 500% respecto a la obesidad periférica.'
+    edu: 'La obesidad abdominal o visceral (perímetro >88cm en mujeres, >102cm en hombres) es metabólicamente más peligrosa que la subcutánea. El síndrome metabólico con obesidad central multiplica de forma importante el riesgo cardiovascular.',
+    game: 'Cuarta Tarjeta Riesgo del tablero. Mismas reglas de acumulación: cuidado con llegar a 5.',
+    stat: 'La obesidad central es un componente clave del síndrome metabólico y del riesgo cardiovascular (IDF Consensus, Federación Internacional de Diabetes).'
   },
   39: {
-    icon: '💧', name: 'Hidratación y Función Renal', cat: 'Nutrición · N-6',
-    action: 'pay', amount: '$65',
-    edu: 'La ingesta adecuada de agua es esencial para la función renal, termorregulación, transporte de nutrientes y eliminación de toxinas. La recomendación es 35 ml/kg/día. La deshidratación crónica es un factor de riesgo para litiasis renal, infección urinaria y deterioro renal. En pacientes con ICC o ERC se debe restringir líquidos. La valoración del balance hídrico (ingresos vs. egresos) es una intervención básica de enfermería. Los electrolitos (Na, K, Cl) regulan el volumen extracelular y son marcadores de hidratación.',
-    game: 'Última casilla antes de volver a SALIDA. Precio $65. Propiedad Nutrición. Con Hotel N, esta casilla cierra el círculo de rentas del grupo.',
-    stat: 'Una ingesta diaria de agua de 2L reduce el riesgo de litiasis renal recurrente en un 50%.'
+    icon: '💧', name: 'Hidratación y Función Renal', cat: 'Nutrición · N-6', type: 'wellness',
+    earn: 50,
+    edu: 'La ingesta adecuada de agua es esencial para la función renal, termorregulación y eliminación de toxinas. La deshidratación crónica es un factor de riesgo para litiasis renal e infección urinaria. La valoración del balance hídrico es una intervención básica de enfermería.',
+    game: 'Última casilla antes de volver a SALIDA. Casilla de Bienestar: cobras $50 por mantener una buena hidratación.',
+    stat: 'Una ingesta adecuada de líquidos se asocia a menor riesgo de litiasis renal recurrente (National Kidney Foundation).'
   }
 };
+
+/* ══════════════════════════════════════════════
+   PREGUNTAS ECNT (casillas de trivia)
+   Cada pregunta ya fue verificada contra fuentes
+   reales (OMS, IDF, GINA). Ver referencias APA 7.
+══════════════════════════════════════════════ */
+const TRIVIA_QUESTIONS = {
+  5: {
+    q: '¿Qué porcentaje aproximado de todas las muertes en el mundo es causado por enfermedades crónicas no transmisibles (ECNT), según la OMS?',
+    options: ['25%', '50%', '74%', '90%'],
+    correct: 2,
+    source: 'Organización Mundial de la Salud. (2023). Noncommunicable diseases [Fact sheet].',
+    reward: 120, penalty: 60
+  },
+  23: {
+    q: 'Según la Federación Internacional de Diabetes (IDF Diabetes Atlas, 11.ª edición, 2024), ¿cuántos adultos viven con diabetes en el mundo?',
+    options: ['150 millones', '350 millones', '589 millones', '1,000 millones'],
+    correct: 2,
+    source: 'International Diabetes Federation. (2024). IDF Diabetes Atlas (11th ed.).',
+    reward: 120, penalty: 60
+  },
+  33: {
+    q: 'Según la OMS, ¿qué porcentaje de los casos de EPOC en países de altos ingresos es atribuible al tabaquismo?',
+    options: ['10%', '30%', 'Más del 70%', '100%'],
+    correct: 2,
+    source: 'World Health Organization. (2025). Chronic obstructive pulmonary disease (COPD) [Fact sheet].',
+    reward: 120, penalty: 60
+  }
+};
+
+/* ══════════════════════════════════════════════
+   CLASIFICACIÓN DE CASILLAS (derivada de SQUARE_DATA)
+══════════════════════════════════════════════ */
+const PROPERTY_SQ = Object.keys(SQUARE_DATA).map(Number).filter(k => SQUARE_DATA[k].type === 'property');
+const WELLNESS_SQ = Object.keys(SQUARE_DATA).map(Number).filter(k => SQUARE_DATA[k].type === 'wellness');
+const TRIVIA_SQ   = Object.keys(SQUARE_DATA).map(Number).filter(k => SQUARE_DATA[k].type === 'trivia');
+const BUILD_SQ    = Object.keys(SQUARE_DATA).map(Number).filter(k => SQUARE_DATA[k].type === 'build');
+
+const SALUD_SQ  = [2, 13, 26, 35];
+const RIESGO_SQ = [8, 18, 29, 38];
+const EARN_FIXED = { 15: 100 };
+
+/* Grupos de categoría (solo casillas comprables) */
+const GROUPS = {
+  cardio:   { label: 'Cardiología',  color: '#FF9090', squares: [1, 7, 34] },
+  nutri:    { label: 'Nutrición',    color: '#90E898', squares: [4, 21, 32] },
+  diabetes: { label: 'Diabetes',     color: '#F8E898', squares: [6, 24] },
+  pulmonar: { label: 'Pulmonar',     color: '#A8D8F8', squares: [9, 36] },
+  onco:     { label: 'Oncología',    color: '#D8B8F0', squares: [19, 28, 37] },
+};
+// mapa inverso: casilla → clave de grupo
+const GROUP_OF = {};
+Object.entries(GROUPS).forEach(([key, g]) => g.squares.forEach(sq => { GROUP_OF[sq] = key; }));
+
+// Costos de construcción por grupo y estudiantes que otorgan
+const BUILD_COST = { consultorio: 150, clinica: 400, hospital: 900 };
+const BUILD_STUDENTS = { consultorio: 2, clinica: 5, hospital: 12 };
+const LEVEL_NAMES = ['—', 'Consultorio 🏢', 'Clínica 🏥', 'Hospital 🏨'];
+const LEVEL_MULT  = [1, 2, 3, 5];
 
 /* ══════════════════════════════════════════════
    MAPA DE CASILLAS (centros en SVG 900×900)
@@ -306,7 +369,7 @@ const SQUARES = [
   { cx: 750, cy: 843 }, { cx: 675, cy: 843 }, { cx: 600, cy: 843 },
   { cx: 525, cy: 843 }, { cx: 450, cy: 843 }, { cx: 375, cy: 843 },
   { cx: 300, cy: 843 }, { cx: 225, cy: 843 }, { cx: 150, cy: 843 },
-  { cx: 57,  cy: 843 }, // 10 VISITA
+  { cx: 57,  cy: 843 }, // 10 CONSTRUCCIÓN
   { cx: 57,  cy: 750 }, { cx: 57,  cy: 675 }, { cx: 57,  cy: 600 },
   { cx: 57,  cy: 525 }, { cx: 57,  cy: 450 }, { cx: 57,  cy: 375 },
   { cx: 57,  cy: 300 }, { cx: 57,  cy: 225 }, { cx: 57,  cy: 150 },
@@ -327,20 +390,27 @@ const state = {
   turn:      0,
   positions: [0, 0, 0],
   money:     [1500, 1500, 1500],
-  props:     [0, 0, 0],          // número de propiedades compradas
-  // Tarjetas acumuladas POR TURNO (reset al cambiar turno)
-  tSaludTurn:  [0, 0, 0],        // tarjetas salud acumuladas en el turno
+  owners:    {},                 // { casilla: playerIdx }
+  props:     [0, 0, 0],          // nº de propiedades que posee cada jugador
+  students:  [0, 0, 0],          // Estudiantes de Enfermería por jugador
+  groupLevel: {                  // nivel de construcción (0-3) por grupo y jugador
+    cardio:   [0, 0, 0],
+    nutri:    [0, 0, 0],
+    diabetes: [0, 0, 0],
+    pulmonar: [0, 0, 0],
+    onco:     [0, 0, 0],
+  },
+  tSaludTurn:  [0, 0, 0],
   tRiesgoTurn: [0, 0, 0],
-  // Construcciones totales
-  consultorios: [0, 0, 0],
-  clinicas:     [0, 0, 0],
-  hospitales:   [0, 0, 0],
   rolling:      false,
-  uciTurns:    [0, 0, 0],        // turnos restantes en UCI
+  uciTurns:    [0, 0, 0],
+  awaitingInput: false,          // bloquea nextTurn mientras hay un modal abierto
+  pendingSq:   null,
+  buildDiscount: false,
 };
 
-const NAMES   = ['Jugador 1', 'Jugador 2', 'Jugador 3'];
-const TOKENS  = ['🧑', '👩', '👦'];
+let NAMES   = ['Jugador 1', 'Jugador 2', 'Jugador 3'];
+let TOKENS  = ['🧑', '👩', '👦'];
 const COLORS  = ['#C0392B', '#1A5276', '#1E8449'];
 const OFFSETS = [
   { dx: -12, dy:  12 },
@@ -348,34 +418,28 @@ const OFFSETS = [
   { dx:  14, dy:  14 },
 ];
 
-/* ── CASILLAS ESPECIALES ── */
-const SALUD_SQ  = [2, 13, 26, 35];
-const RIESGO_SQ = [8, 18, 29, 38];
-const PROPERTY_SQ = [1,3,4,6,7,9,11,12,14,16,17,19,21,22,24,25,27,28,31,32,34,36,37,39];
-// Mitad GANAN (propiedades pares del array), mitad PAGAN
-// Regla: propiedades con índice par en PROPERTY_SQ = cobrar; índice impar = pagar al banco
-// Simplificado: casillas impares del tablero = pagar; pares = cobrar (excepto especiales)
-
-const RENT = {
-  1:60, 3:35, 4:50, 6:60, 7:150, 9:90,
-  11:70, 12:40, 14:120, 16:80, 17:60, 19:300,
-  21:45, 22:100, 24:80, 25:90, 27:85, 28:180,
-  31:90, 32:55, 34:180, 36:180, 37:180, 39:65,
-};
-const PAY_FIXED = { 5:30, 23:25, 33:90 };
-const EARN_FIXED = { 15:100 };
-
-/* ─── BONUS DE CONSTRUCCIONES ─── */
-function getRentMultiplier(playerIdx) {
-  const c  = state.consultorios[playerIdx];
-  const cl = state.clinicas[playerIdx];
-  const h  = state.hospitales[playerIdx];
-  if (h > 0) return 5;
-  if (cl >= 4) return 4;
-  if (cl >= 2) return 3;
-  if (cl >= 1) return 2;
-  if (c > 0)   return 1.5;
-  return 1;
+/* ══════════════════════════════════════════════
+   CONEXIÓN CON EL LOGIN
+   Si el jugador inició sesión o se registró en
+   login.html, tomamos su nombre y ficha elegida
+   como Jugador 1.
+══════════════════════════════════════════════ */
+function loadLoginPlayer() {
+  try {
+    const raw = localStorage.getItem('medicopolisPlayer');
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    if (data && data.name) {
+      NAMES[0] = data.name;
+      document.querySelector('#p0card .player-name').textContent = data.name;
+    }
+    if (data && data.token) {
+      TOKENS[0] = data.token;
+      $('p0token').textContent = data.token;
+    }
+  } catch (e) {
+    // Si no hay datos válidos, seguimos con los valores por defecto
+  }
 }
 
 /* ── UTILIDADES DOM ── */
@@ -393,17 +457,22 @@ function addLog(text, cls = '') {
 function updateMoneyUI() {
   state.money.forEach((m, i) => {
     $('p' + i + 'money').textContent = '$' + Math.max(0, m).toLocaleString();
-    $('p' + i + 'props').textContent = `Props: ${state.props[i]}`;
+    $('p' + i + 'props').textContent = `Props: ${state.props[i]} · 🎓 ${state.students[i]}`;
   });
 }
 
 function updateBuildUI() {
   const p = state.turn;
-  $('bConsult0').textContent = `J${p+1}: ${state.consultorios[p]}`;
-  $('bClinic0').textContent  = `J${p+1}: ${state.clinicas[p]}`;
-  $('bHosp0').textContent    = `J${p+1}: ${state.hospitales[p]}`;
+  $('bConsult0').textContent = groupSummary(p);
   $('tSalud0').textContent   = state.tSaludTurn[p];
   $('tRiesgo0').textContent  = state.tRiesgoTurn[p];
+}
+
+function groupSummary(p) {
+  return Object.keys(GROUPS).map(k => {
+    const lvl = state.groupLevel[k][p];
+    return `${GROUPS[k].label.slice(0,3)}:${lvl}`;
+  }).join('  ');
 }
 
 function updateTurnUI() {
@@ -449,7 +518,10 @@ function movePawnSvg(playerIdx) {
 }
 
 function initPawns() {
-  for (let i = 0; i < 3; i++) movePawnSvg(i);
+  for (let i = 0; i < 3; i++) {
+    $('pawn' + i + 't').textContent = TOKENS[i];
+    movePawnSvg(i);
+  }
 }
 
 /* ── DADO ── */
@@ -471,89 +543,74 @@ function animateDie(elId, finalFace) {
 }
 
 /* ══════════════════════════════════════════════
-   LÓGICA DE CONSTRUCCIONES
-   - 3 Tarjetas Salud acumuladas en turno = +1 Consultorio
-   - 3 Consultorios = +1 Clínica (consume los 3 consultorios)
-   - 4 Clínicas     = +1 Hospital (consume las 4 clínicas)
-   - Penalidades:
-     - 3 T.Riesgo en turno = pierde turno adicional
-     - 5 T.Riesgo en turno = va a UCI directo
-     - 5 T.Salud  en turno = avanza 3 casillas extra
+   PROPIEDADES, RENTA Y ESTUDIANTES
 ══════════════════════════════════════════════ */
-function checkBuildProgress(playerIdx) {
-  const salud  = state.tSaludTurn[playerIdx];
-  const riesgo = state.tRiesgoTurn[playerIdx];
-  let extraMsg = '';
+function playerOwnsGroup(playerIdx, groupKey) {
+  return GROUPS[groupKey].squares.every(sq => state.owners[sq] === playerIdx);
+}
 
-  // 3 T.Salud → construir Consultorio
-  if (salud > 0 && salud % 3 === 0) {
-    state.consultorios[playerIdx]++;
-    addLog(`🏢 ${NAMES[playerIdx]} construye un CONSULTORIO (#${state.consultorios[playerIdx]})`, 'build');
-    // 3 Consultorios → Clínica
-    if (state.consultorios[playerIdx] >= 3) {
-      state.consultorios[playerIdx] -= 3;
-      state.clinicas[playerIdx]++;
-      addLog(`🏥 ${NAMES[playerIdx]} construye una CLÍNICA (#${state.clinicas[playerIdx]})`, 'build');
-      // 4 Clínicas → Hospital
-      if (state.clinicas[playerIdx] >= 4) {
-        state.clinicas[playerIdx] -= 4;
-        state.hospitales[playerIdx]++;
-        addLog(`🏨 ¡${NAMES[playerIdx]} construye un HOSPITAL! (#${state.hospitales[playerIdx]})`, 'build');
-        addLog(`🏨 La renta de todas sus propiedades es ahora ×5`, 'build');
-      }
-    }
-  }
+function getGroupMultiplier(ownerIdx, groupKey) {
+  const lvl = state.groupLevel[groupKey][ownerIdx];
+  return LEVEL_MULT[lvl];
+}
 
-  // Bonus 5 T.Salud → avanza 3 casillas
-  if (salud === 5) {
-    extraMsg = 'bonus5salud';
-    addLog(`⭐ ¡${NAMES[playerIdx]} tiene 5 Tarjetas Salud! Avanza 3 casillas extra`, 'good');
-  }
+// Descuento por Estudiantes de Enfermería: 5% por cada 5 estudiantes, máx 40%
+function studentDiscount(playerIdx) {
+  return Math.min(40, Math.floor(state.students[playerIdx] / 5) * 5);
+}
 
-  // 3 T.Riesgo → pierde turno adicional
-  if (riesgo === 3) {
-    addLog(`💀 ${NAMES[playerIdx]} acumula 3 Tarjetas Riesgo — pierde un turno adicional`, 'alert');
-  }
-
-  // 5 T.Riesgo → UCI directo
-  if (riesgo >= 5) {
-    state.positions[playerIdx] = 20;
-    state.uciTurns[playerIdx]  = 2;
-    movePawnSvg(playerIdx);
-    addLog(`🚨 ¡${NAMES[playerIdx]} acumula 5 Tarjetas Riesgo — va DIRECTO a UCI!`, 'alert');
-  }
-
-  updateBuildUI();
-  return extraMsg;
+function addStudents(playerIdx, n) {
+  state.students[playerIdx] += n;
+  addLog(`🎓 ${NAMES[playerIdx]} suma ${n} Estudiante(s) de Enfermería (total: ${state.students[playerIdx]})`, 'good');
 }
 
 /* ── LÓGICA DE CASILLA ── */
 function resolveSquare(playerIdx, sq) {
   const p = playerIdx;
   const n = NAMES[p];
+  const d = SQUARE_DATA[sq];
+  state.awaitingInput = false;
 
   // Pasar por SALIDA ya se maneja en rollDice
 
   if (sq === 20) {
-    state.uciTurns[p] = 2;
-    addLog(`🚨 ${n} cae en UCI — pierde 2 turnos o paga $150`, 'alert');
+    const usedStudents = state.students[p] >= 5;
+    if (usedStudents) {
+      state.students[p] -= 5;
+      state.uciTurns[p] = 1;
+      addLog(`🚨 ${n} cae en UCI, pero usa 5 🎓 Estudiantes para reducir su estadía a 1 turno`, 'alert');
+    } else {
+      state.uciTurns[p] = 2;
+      addLog(`🚨 ${n} cae en UCI — pierde 2 turnos o paga $150`, 'alert');
+    }
     return;
   }
-  if (sq === 10) { addLog(`🏥 ${n} visita el hospital — solo de paseo`, ''); return; }
   if (sq === 30) { addLog(`🛡 ${n} descansa en Zona Libre`, 'good'); return; }
+
+  // Centro de Construcción
+  if (BUILD_SQ.includes(sq)) {
+    addLog(`🏗 ${n} cae en el Centro de Construcción — ¡construcciones con 15% de descuento!`, 'build');
+    state.awaitingInput = true;
+    openBuildModal(true);
+    return;
+  }
+
+  // Pregunta ECNT
+  if (TRIVIA_SQ.includes(sq)) {
+    addLog(`❓ ${n} cae en una Pregunta ECNT`, 'highlight');
+    state.awaitingInput = true;
+    openTriviaModal(sq);
+    return;
+  }
 
   // Tarjeta Salud
   if (SALUD_SQ.includes(sq)) {
     const bonus = [50, 75, 100][Math.floor(Math.random() * 3)];
     state.money[p] += bonus;
     state.tSaludTurn[p]++;
-    addLog(`💚 ${n} saca Tarjeta Salud — cobra $${bonus} (total turno: ${state.tSaludTurn[p]})`, 'good');
-    const extra = checkBuildProgress(p);
-    if (extra === 'bonus5salud') {
-      state.positions[p] = (state.positions[p] + 3) % TOTAL;
-      movePawnSvg(p);
-      resolveSquare(p, state.positions[p]);
-    }
+    addLog(`💚 ${n} saca Tarjeta Salud — cobra $${bonus}`, 'good');
+    if (Math.random() < 0.3) addStudents(p, 1);
+    checkRiesgoProgress(p);
     updateMoneyUI();
     return;
   }
@@ -564,16 +621,7 @@ function resolveSquare(playerIdx, sq) {
     state.money[p] -= fine;
     state.tRiesgoTurn[p]++;
     addLog(`⚠️ ${n} saca Tarjeta Riesgo — paga $${fine} (total turno: ${state.tRiesgoTurn[p]})`, 'alert');
-    checkBuildProgress(p);
-    updateMoneyUI();
-    return;
-  }
-
-  // Pago fijo (Consulta, Examen, Análisis)
-  if (PAY_FIXED[sq] !== undefined) {
-    state.money[p] -= PAY_FIXED[sq];
-    const d = SQUARE_DATA[sq];
-    addLog(`🏦 ${n} cae en ${d ? d.name : 'Pago fijo'} — paga $${PAY_FIXED[sq]}`, '');
+    checkRiesgoProgress(p);
     updateMoneyUI();
     return;
   }
@@ -586,23 +634,44 @@ function resolveSquare(playerIdx, sq) {
     return;
   }
 
-  // Propiedades: paga renta al banco o al dueño
-  if (RENT[sq] !== undefined) {
-    const base = RENT[sq];
-    // Multiplicador según construcciones del jugador activo (simplificado: mejor jugador = mayor renta)
-    // Para hacerlo más justo: el propietario (si hubiera sistema de compra) cobraría su propio multiplicador
-    // En este sistema simplificado todas las propiedades pertenecen al "banco médico"
-    const mult = getRentMultiplier(p);
-    const finalRent = Math.round(base * mult);
-    state.money[p] -= finalRent;
-    state.props[p]++;
-    const d = SQUARE_DATA[sq];
-    const label = d ? d.name : `Casilla ${sq}`;
-    if (mult > 1) {
-      addLog(`🏠 ${n} cae en ${label} — paga $${finalRent} (base $${base} ×${mult} por construcciones)`, 'highlight');
-    } else {
-      addLog(`🏠 ${n} cae en ${label} — paga $${finalRent}`, 'highlight');
+  // Casilla de Bienestar (gana dinero, no se compra)
+  if (WELLNESS_SQ.includes(sq)) {
+    const amt = d.earn;
+    state.money[p] += amt;
+    addLog(`🌿 ${n} cae en ${d.name} — hábito protector: cobra $${amt}`, 'good');
+    updateMoneyUI();
+    return;
+  }
+
+  // Propiedad (enfermedad / factor de riesgo)
+  if (PROPERTY_SQ.includes(sq)) {
+    const owner = state.owners[sq];
+
+    if (owner === undefined) {
+      // Libre: ofrecer compra
+      addLog(`🏷 ${n} cae en ${d.name} (libre) — puede comprarla por $${d.price}`, 'highlight');
+      state.awaitingInput = true;
+      openBuyModal(sq);
+      return;
     }
+
+    if (owner === p) {
+      addLog(`🏠 ${n} cae en su propia propiedad: ${d.name}. No paga renta.`, '');
+      return;
+    }
+
+    // Pagar renta al dueño
+    const groupKey = GROUP_OF[sq];
+    const mult = getGroupMultiplier(owner, groupKey);
+    let rent = Math.round(d.rent * mult);
+    const disc = studentDiscount(p);
+    if (disc > 0) rent = Math.round(rent * (1 - disc / 100));
+
+    state.money[p] -= rent;
+    state.money[owner] += rent;
+    const multTxt = mult > 1 ? ` (base $${d.rent} ×${mult} por ${LEVEL_NAMES[state.groupLevel[groupKey][owner]]})` : '';
+    const discTxt = disc > 0 ? ` [−${disc}% por Estudiantes]` : '';
+    addLog(`🏠 ${n} cae en ${d.name} de ${NAMES[owner]} — paga $${rent}${multTxt}${discTxt}`, 'highlight');
     updateMoneyUI();
     return;
   }
@@ -610,9 +679,236 @@ function resolveSquare(playerIdx, sq) {
   addLog(`📍 ${n} avanza a casilla ${sq}`);
 }
 
+/* ══════════════════════════════════════════════
+   MODAL: COMPRAR PROPIEDAD
+══════════════════════════════════════════════ */
+function openBuyModal(sq) {
+  state.pendingSq = sq;
+  const d = SQUARE_DATA[sq];
+  const p = state.turn;
+  $('buyTitle').textContent = `${d.icon} ${d.name}`;
+  $('buyCat').textContent   = d.cat;
+  $('buyDesc').textContent  = d.edu.length > 220 ? d.edu.slice(0, 220) + '…' : d.edu;
+  $('buyPrice').textContent = `$${d.price}`;
+  $('buyMoney').textContent = `Tu dinero: $${Math.max(0, state.money[p]).toLocaleString()}`;
+  const btn = $('buyConfirmBtn');
+  btn.disabled = state.money[p] < d.price;
+  $('buyModal').classList.remove('hidden');
+}
+
+function confirmBuy() {
+  const sq = state.pendingSq;
+  const d  = SQUARE_DATA[sq];
+  const p  = state.turn;
+  if (state.money[p] < d.price) return;
+  state.money[p] -= d.price;
+  state.owners[sq] = p;
+  state.props[p]++;
+  addLog(`✅ ${NAMES[p]} compra ${d.name} por $${d.price}`, 'good');
+  updateMoneyUI();
+  closeBuyModal();
+}
+
+function declineBuy() {
+  const sq = state.pendingSq;
+  addLog(`🚫 ${NAMES[state.turn]} decide no comprar ${SQUARE_DATA[sq].name}. Sigue disponible para el banco.`, '');
+  closeBuyModal();
+}
+
+function closeBuyModal() {
+  $('buyModal').classList.add('hidden');
+  state.pendingSq = null;
+  state.awaitingInput = false;
+  nextTurn();
+}
+
+/* ══════════════════════════════════════════════
+   MODAL: PREGUNTA ECNT
+══════════════════════════════════════════════ */
+let triviaAnswered = false;
+
+function openTriviaModal(sq) {
+  state.pendingSq = sq;
+  triviaAnswered = false;
+  const t = TRIVIA_QUESTIONS[sq];
+  $('triviaQ').textContent = t.q;
+  const optsWrap = $('triviaOpts');
+  optsWrap.innerHTML = '';
+  t.options.forEach((opt, i) => {
+    const b = document.createElement('button');
+    b.className = 'trivia-opt';
+    b.textContent = opt;
+    b.onclick = () => answerTrivia(i);
+    optsWrap.appendChild(b);
+  });
+  $('triviaResult').textContent = '';
+  $('triviaResult').className = 'trivia-result';
+  $('triviaHelpBtn').style.display = state.students[state.turn] >= 3 ? 'inline-block' : 'none';
+  $('triviaCloseBtn').classList.add('hidden');
+  $('triviaModal').classList.remove('hidden');
+}
+
+function useStudentHelp() {
+  const sq = state.pendingSq;
+  const t = TRIVIA_QUESTIONS[sq];
+  if (state.students[state.turn] < 3 || triviaAnswered) return;
+  state.students[state.turn] -= 3;
+  updateMoneyUI();
+  const opts = $('triviaOpts').children;
+  let hidden = 0;
+  for (let i = 0; i < opts.length; i++) {
+    if (i !== t.correct && hidden < 2) {
+      opts[i].disabled = true;
+      opts[i].classList.add('trivia-eliminated');
+      hidden++;
+    }
+  }
+  $('triviaHelpBtn').style.display = 'none';
+  addLog(`🎓 ${NAMES[state.turn]} usa 3 Estudiantes para pedir ayuda en la pregunta`, '');
+}
+
+function answerTrivia(idx) {
+  if (triviaAnswered) return;
+  triviaAnswered = true;
+  const sq = state.pendingSq;
+  const t = TRIVIA_QUESTIONS[sq];
+  const p = state.turn;
+  const opts = $('triviaOpts').children;
+  for (let i = 0; i < opts.length; i++) opts[i].disabled = true;
+  opts[t.correct].classList.add('trivia-correct');
+
+  const result = $('triviaResult');
+  if (idx === t.correct) {
+    state.money[p] += t.reward;
+    result.textContent = `✅ ¡Correcto! Ganas $${t.reward}. Fuente: ${t.source}`;
+    result.className = 'trivia-result good';
+    addLog(`❓ ${NAMES[p]} responde correctamente — gana $${t.reward}`, 'good');
+  } else {
+    opts[idx].classList.add('trivia-wrong');
+    state.money[p] -= t.penalty;
+    result.textContent = `❌ Incorrecto. Pagas $${t.penalty}. Respuesta correcta: "${t.options[t.correct]}". Fuente: ${t.source}`;
+    result.className = 'trivia-result bad';
+    addLog(`❓ ${NAMES[p]} responde mal — paga $${t.penalty}`, 'alert');
+  }
+  updateMoneyUI();
+  $('triviaHelpBtn').style.display = 'none';
+  $('triviaCloseBtn').classList.remove('hidden');
+}
+
+function closeTriviaModal() {
+  $('triviaModal').classList.add('hidden');
+  state.pendingSq = null;
+  state.awaitingInput = false;
+  nextTurn();
+}
+
+/* ══════════════════════════════════════════════
+   MODAL: CONSTRUCCIONES
+══════════════════════════════════════════════ */
+function openBuildModal(fromSquare = false) {
+  state.buildDiscount = fromSquare;
+  renderBuildModal();
+  $('buildModal').classList.remove('hidden');
+}
+
+function renderBuildModal() {
+  const p = state.turn;
+  const wrap = $('buildGroups');
+  wrap.innerHTML = '';
+  const discountNote = state.buildDiscount ? ' <span class="build-discount-tag">−15% hoy</span>' : '';
+
+  Object.entries(GROUPS).forEach(([key, g]) => {
+    const owns = playerOwnsGroup(p, key);
+    const lvl  = state.groupLevel[key][p];
+    const nextLvl = lvl + 1;
+    const row = document.createElement('div');
+    row.className = 'build-group-row';
+
+    let costHtml = '';
+    if (lvl >= 3) {
+      costHtml = `<span class="build-maxed">🏨 Nivel máximo alcanzado</span>`;
+    } else {
+      const levelKey = ['consultorio','clinica','hospital'][lvl];
+      let cost = BUILD_COST[levelKey];
+      if (state.buildDiscount) cost = Math.round(cost * 0.85);
+      const canAfford = owns && state.money[p] >= cost;
+      costHtml = `
+        <button class="build-btn" ${canAfford ? '' : 'disabled'} onclick="buildLevel('${key}')">
+          Construir ${LEVEL_NAMES[nextLvl]} — $${cost}
+        </button>
+        ${!owns ? '<span class="build-locked">🔒 Necesitas poseer las ' + g.squares.length + ' propiedades del grupo</span>' : ''}
+      `;
+    }
+
+    row.innerHTML = `
+      <div class="build-group-head">
+        <span class="build-group-name" style="color:${g.color}">${g.label}${discountNote}</span>
+        <span class="build-group-level">${LEVEL_NAMES[lvl]}</span>
+      </div>
+      <div class="build-group-actions">${costHtml}</div>
+    `;
+    wrap.appendChild(row);
+  });
+
+  $('buildStudentsInfo').textContent = `🎓 Estudiantes de ${NAMES[p]}: ${state.students[p]}`;
+}
+
+function buildLevel(groupKey) {
+  const p = state.turn;
+  if (!playerOwnsGroup(p, groupKey)) return;
+  const lvl = state.groupLevel[groupKey][p];
+  if (lvl >= 3) return;
+  const levelKey = ['consultorio','clinica','hospital'][lvl];
+  let cost = BUILD_COST[levelKey];
+  if (state.buildDiscount) cost = Math.round(cost * 0.85);
+  if (state.money[p] < cost) return;
+
+  state.money[p] -= cost;
+  state.groupLevel[groupKey][p]++;
+  addStudents(p, BUILD_STUDENTS[levelKey]);
+  addLog(`🏗 ${NAMES[p]} construye ${LEVEL_NAMES[lvl + 1]} en ${GROUPS[groupKey].label} por $${cost}`, 'build');
+  updateMoneyUI();
+  updateBuildUI();
+  renderBuildModal();
+}
+
+function closeBuildModal() {
+  $('buildModal').classList.add('hidden');
+  state.buildDiscount = false;
+  if (state.awaitingInput) {
+    state.awaitingInput = false;
+    nextTurn();
+  }
+}
+
+/* ══════════════════════════════════════════════
+   TARJETA RIESGO: penalidades acumuladas
+══════════════════════════════════════════════ */
+function checkRiesgoProgress(playerIdx) {
+  const riesgo = state.tRiesgoTurn[playerIdx];
+
+  if (riesgo === 3) {
+    addLog(`💀 ${NAMES[playerIdx]} acumula 3 Tarjetas Riesgo — pierde un turno adicional`, 'alert');
+  }
+  if (riesgo >= 5) {
+    state.positions[playerIdx] = 20;
+    const usedStudents = state.students[playerIdx] >= 5;
+    if (usedStudents) {
+      state.students[playerIdx] -= 5;
+      state.uciTurns[playerIdx] = 1;
+      addLog(`🚨 ¡${NAMES[playerIdx]} acumula 5 Tarjetas Riesgo — va a UCI, pero usa Estudiantes y solo pierde 1 turno!`, 'alert');
+    } else {
+      state.uciTurns[playerIdx] = 2;
+      addLog(`🚨 ¡${NAMES[playerIdx]} acumula 5 Tarjetas Riesgo — va DIRECTO a UCI!`, 'alert');
+    }
+    movePawnSvg(playerIdx);
+  }
+  updateBuildUI();
+}
+
 /* ── TIRAR DADOS ── */
 function rollDice() {
-  if (state.rolling) return;
+  if (state.rolling || state.awaitingInput) return;
 
   // Verificar si está en UCI
   if (state.uciTurns[state.turn] > 0) {
@@ -654,14 +950,12 @@ function rollDice() {
     resolveSquare(state.turn, state.positions[state.turn]);
     updateMoneyUI();
 
-    // Penalización extra: 3 T.Riesgo en turno = salta el siguiente turno
-    if (state.tRiesgoTurn[state.turn] === 3) {
-      // Avanzar dos turnos
-      state.turn = (state.turn + 1) % 3;
-      addLog(`⏭ Turno adicional saltado por 3 Tarjetas Riesgo`, 'alert');
+    if (!state.awaitingInput) {
+      nextTurn();
+    } else {
+      // El turno continuará cuando se cierre el modal correspondiente
+      state.rolling = false;
     }
-
-    nextTurn();
   }, 680);
 }
 
@@ -685,17 +979,35 @@ function nextTurn() {
 ══════════════════════════════════════════════ */
 const tooltip = document.getElementById('squareTip');
 
-// Construir HTML del tooltip
 function buildTooltip(sq) {
   const d = SQUARE_DATA[sq];
   if (!d) return '';
 
-  const actionLabel = {
-    pay:  `PAGAS ${d.amount}`,
-    earn: `COBRAS ${d.amount}`,
-    free: d.amount,
-    lose: `PIERDES ${d.amount}`,
-  }[d.action];
+  let actionLabel = '';
+  let actionCls = 'free';
+
+  if (d.type === 'property') {
+    const owner = state.owners[sq];
+    actionLabel = owner === undefined ? `COMPRAR $${d.price}` : `RENTA $${d.rent}+ → ${NAMES[owner]}`;
+    actionCls = owner === undefined ? 'earn' : 'pay';
+  } else if (d.type === 'wellness') {
+    actionLabel = `GANAS $${d.earn}`;
+    actionCls = 'earn';
+  } else if (d.type === 'trivia') {
+    actionLabel = 'RESPONDE Y GANA';
+    actionCls = 'free';
+  } else if (d.type === 'build') {
+    actionLabel = 'CONSTRUIR (−15%)';
+    actionCls = 'free';
+  } else {
+    actionLabel = {
+      pay:  `PAGAS ${d.amount}`,
+      earn: `COBRAS ${d.amount}`,
+      free: d.amount,
+      lose: `PIERDES ${d.amount}`,
+    }[d.action];
+    actionCls = d.action;
+  }
 
   return `
     <div class="tip-header">
@@ -705,14 +1017,13 @@ function buildTooltip(sq) {
         <div class="tip-cat">${d.cat}</div>
       </div>
     </div>
-    <span class="tip-action ${d.action}">${actionLabel}</span>
+    <span class="tip-action ${actionCls}">${actionLabel}</span>
     <div class="tip-edu">${d.edu}</div>
     <div class="tip-game">⚙️ <strong>En el juego:</strong> ${d.game}</div>
     ${d.stat ? `<div class="tip-stat">📊 <span><strong>Dato clave:</strong> ${d.stat}</span></div>` : ''}
   `;
 }
 
-// Posicionar tooltip cerca del cursor sin salirse de la pantalla
 function positionTooltip(e) {
   const tip = tooltip;
   const vw  = window.innerWidth;
@@ -730,7 +1041,6 @@ function positionTooltip(e) {
   tip.style.top  = y + 'px';
 }
 
-// Asignar eventos a todas las casillas con data-sq
 document.querySelectorAll('.sq-hover').forEach(el => {
   const sq = parseInt(el.dataset.sq, 10);
 
@@ -750,8 +1060,10 @@ document.querySelectorAll('.sq-hover').forEach(el => {
 });
 
 /* ── INIT ── */
+loadLoginPlayer();
 initPawns();
 updateTurnUI();
 updateMoneyUI();
 addLog(`🎮 ¡Juego iniciado! Turno: ${NAMES[state.turn]}`);
 addLog(`💡 Pasa el cursor sobre cada casilla para ver información educativa`, 'good');
+addLog(`🏗 Usa el botón "Construir" o cae en el Centro de Construcción para edificar`, 'good');
